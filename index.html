@@ -1,1 +1,42 @@
-Just wait...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Public Upload</title>
+</head>
+<body>
+  <h2>Upload an Image or Video</h2>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="media" accept="image/*,video/*" required />
+    <button type="submit">Upload</button>
+  </form>
+
+  <h3>Uploaded Media</h3>
+  <div id="gallery"></div>
+
+  <script>
+    async function loadMedia() {
+      const res = await fetch('/uploads');
+      const files = await res.json();
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      files.forEach(file => {
+        const ext = file.split('.').pop().toLowerCase();
+        const isVideo = ['mp4', 'webm', 'ogg'].includes(ext);
+        const el = document.createElement(isVideo ? 'video' : 'img');
+        el.src = `/uploads/${file}`;
+        if (isVideo) {
+          el.controls = true;
+          el.width = 320;
+        } else {
+          el.width = 200;
+        }
+        gallery.appendChild(el);
+      });
+    }
+
+    loadMedia();
+  </script>
+</body>
+</html>
