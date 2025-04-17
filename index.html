@@ -1,74 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Age Verification</title>
-  <style>
-    #age-modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      color: white;
-      flex-direction: column;
-      text-align: center;
-    }
-    .btn {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .yes { background-color: green; color: white; }
-    .no { background-color: red; color: white; }
-  </style>
-</head>
-<body>
-
-<div id="age-modal">
-  <h2>Are you 18 or older?</h2>
-  <div>
-    <button class="btn yes" onclick="allowAccess()">Yes</button>
-    <button class="btn no" onclick="denyAccess()">No</button>
-  </div>
-</div>
-
-<!-- Your site content -->
-<div id="site-content" style="display:none;">
-  <h1>Welcome to the website!</h1>
-  <p>Your content goes here.</p>
-</div>
-
-<script>
-  function allowAccess() {
-    document.getElementById('age-modal').style.display = 'none';
-    document.getElementById('site-content').style.display = 'block';
-  }
-
-  function denyAccess() {
-    window.location.href = 'https://www.google.com';
-  }
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Photos and Videos</title>
+    <title>Age Verification and Upload</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Upload Photos and Videos</h1>
-    <form action="upload.php" method="POST" enctype="multipart/form-data">
-        <label for="file">Choose a file to upload:</label><br><br>
-        <input type="file" name="fileToUpload" id="fileToUpload" accept="image/*,video/*"><br><br>
-        <input type="submit" value="Upload File" name="submit">
-    </form>
+    <h1>Age Verification</h1>
+    <!-- Age verification form -->
+    <div id="age-verification">
+        <label for="age">Please enter your age:</label><br><br>
+        <input type="number" id="age" name="age" min="1" required><br><br>
+        <button onclick="verifyAge()">Verify Age</button>
+    </div>
+
+    <!-- Upload form, initially hidden -->
+    <div id="upload-form" class="hidden">
+        <h2>Upload Content (18+ Only)</h2>
+        <form action="upload.php" method="POST" enctype="multipart/form-data">
+            <label for="file">Choose a file to upload (images or videos only):</label><br><br>
+            <input type="file" name="fileToUpload" id="fileToUpload" accept="image/*,video/*"><br><br>
+            <input type="submit" value="Upload File" name="submit">
+        </form>
+    </div>
+
+    <script>
+        function verifyAge() {
+            const age = document.getElementById("age").value;
+            if (age >= 18) {
+                document.getElementById("age-verification").classList.add("hidden");
+                document.getElementById("upload-form").classList.remove("hidden");
+            } else {
+                alert("You must be 18 or older to upload content.");
+            }
+        }
+    </script>
 </body>
 </html>
