@@ -3,61 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Age Verification and Media Upload</title>
+    <title>Adult Content Upload</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { max-width: 600px; margin: auto; padding: 20px; }
-        .hidden { display: none; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .upload-form {
+            margin-bottom: 20px;
+        }
+        .upload-form input[type="file"] {
+            margin: 10px 0;
+        }
+        .comment-section {
+            margin-top: 20px;
+        }
+        .comment {
+            border-top: 1px solid #ccc;
+            padding: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Age Verification</h1>
-        <form id="ageForm">
-            <label for="age">Enter your age:</label>
-            <input type="number" id="age" required>
-            <button type="submit">Submit</button>
-        </form>
-        <div id="uploadSection" class="hidden">
-            <h2>Upload Photos and Videos</h2>
-            <input type="file" id="mediaUpload" accept="image/*,video/*" multiple>
-            <button id="uploadButton">Upload</button>
-            <div id="commentsSection">
+
+<div class="container">
+    <h1>Adult Content Upload</h1>
+    <form class="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+        <label for="age-verification">Are you 18 or older? (Yes/No)</label>
+        <input type="text" id="age-verification" name="age-verification" required>
+        
+        <label for="file-upload">Upload your content:</label>
+        <input type="file" id="file-upload" name="file-upload" accept="image/*,video/*" required>
+        
+        <button type="submit">Upload</button>
+    </form>
+
+    <div class="content-display">
+        <h2>Uploaded Content</h2>
+        <div class="content-item">
+            <video controls>
+                <source src="video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="comment-section">
                 <h3>Comments</h3>
-                <textarea id="commentInput" placeholder="Leave a comment..."></textarea>
-                <button id="commentButton">Comment</button>
-                <ul id="commentsList"></ul>
+                <div class="comment">
+                    <p>User1: Great video!</p>
+                </div>
+                <form action="/comment" method="post">
+                    <input type="text" name="comment" placeholder="Add a comment" required>
+                    <button type="submit">Submit</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        document.getElementById('ageForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const age = document.getElementById('age').value;
-            if (age >= 18) {
-                document.getElementById('uploadSection').classList.remove('hidden');
-            } else {
-                alert('You must be 18 or older to upload media.');
-            }
-        });
-
-        document.getElementById('uploadButton').addEventListener('click', function() {
-            const files = document.getElementById('mediaUpload').files;
-            if (files.length > 0) {
-                alert('Files uploaded successfully!');
-            }
-        });
-
-        document.getElementById('commentButton').addEventListener('click', function() {
-            const comment = document.getElementById('commentInput').value;
-            if (comment) {
-                const li = document.createElement('li');
-                li.textContent = comment;
-                document.getElementById('commentsList').appendChild(li);
-                document.getElementById('commentInput').value = '';
-            }
-        });
-    </script>
 </body>
 </html>
