@@ -1,9 +1,59 @@
-                Please read.
-
-<div style="text-align: center; margin-top: 20%;">
-    <h1 style="font-size: 2.5em; color: red;">Warning: You must be 18+</h1>
-    <div style="margin-top: 20px;">
-        <button style="font-size: 1.5em; background-color: green; color: white; padding: 10px 20px; border: none; cursor: pointer;">Yes</button>
-        <button style="font-size: 1.5em; background-color: red; color: white; padding: 10px 20px; border: none; cursor: pointer;">No</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Verification</title>
+    <style>
+        body {
+            background-color: red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .warning {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .button {
+            font-size: 24px;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .yes {
+            background-color: green;
+            color: white;
+        }
+        .no {
+            background-color: gray;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="warning">
+        <h1>You must be 18+</h1>
+        <button class="button yes" onclick="allowAccess()">Yes</button>
+        <button class="button no" onclick="denyAccess()">No</button>
     </div>
-</div>
+
+    <script>
+        function allowAccess() {
+            document.body.innerHTML = '<h1>Welcome to the site!</h1>';
+        }
+
+        function denyAccess() {
+            alert("You cannot access this site.");
+            window.location.href = "about:blank";
+        }
+    </script>
+</body>
+</html>
