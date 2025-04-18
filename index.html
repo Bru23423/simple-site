@@ -285,11 +285,6 @@
         <div class="confirm-delete" id="confirm-${post.id}">
           <p>Are you sure you want to delete this post?</p>
           <button class="green"
- <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script>
 const firebaseConfig = {
   apiKey: "AIzaSyBUazYAZZkL7Z6_zUhXHJC6FHc_lZVlua0",
   authDomain: "justfunit-c25dd.firebaseapp.com",
@@ -299,11 +294,8 @@ const firebaseConfig = {
   messagingSenderId: "340893927279",
   appId: "1:340893927279:web:9de690e1bfc33e09a30a9a"
 };
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-
-  // Initialize services
-  const database = firebase.database();
-  const auth = firebase.auth();
-</script>
