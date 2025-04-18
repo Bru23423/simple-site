@@ -3,29 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Age Verification</title>
+    <title>Age Confirmation</title>
     <style>
         body {
-            background-color: red;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            font-family: Arial, sans-serif;
         }
-        .warning {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
+        .container {
             text-align: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
         .button {
-            font-size: 24px;
-            padding: 10px 20px;
+            padding: 15px 30px;
+            font-size: 20px;
             margin: 10px;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
         }
         .yes {
@@ -33,26 +28,38 @@
             color: white;
         }
         .no {
-            background-color: gray;
+            background-color: red;
             color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        .websites {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="warning">
-        <h1>You must be 18+</h1>
-        <button class="button yes" onclick="allowAccess()">Yes</button>
-        <button class="button no" onclick="denyAccess()">No</button>
+    <div class="container" id="age-confirmation">
+        <h1>18+ Warning</h1>
+        <button class="button yes" onclick="confirmAge()">Yes</button>
+        <button class="button no" onclick="redirectToGoogle()">No</button>
+    </div>
+    <div class="websites hidden" id="website-list">
+        <h2>Choose a website:</h2>
+        <button class="button" onclick="window.location.href='https://www.pornhub.com/'">Pornhub</button>
+        <button class="button" onclick="window.location.href='https://rule34.xxx/'">Rule34</button>
     </div>
 
     <script>
-        function allowAccess() {
-            document.body.innerHTML = '<h1>Welcome to the site!</h1>';
+        function confirmAge() {
+            document.body.style.backgroundColor = "green";
+            document.getElementById('age-confirmation').classList.add('hidden');
+            document.getElementById('website-list').classList.remove('hidden');
         }
 
-        function denyAccess() {
-            alert("You cannot access this site.");
-            window.location.href = "about:blank";
+        function redirectToGoogle() {
+            window.location.href = "https://www.google.com/";
         }
     </script>
 </body>
