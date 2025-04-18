@@ -254,6 +254,39 @@
      window.onload = function() {
        loadGallery();
      };
+    function submitComment(postId) {
+  const commentInput = document.getElementById(`commentInput-${postId}`);
+  const commentText = commentInput.value.trim();
+
+  if (!commentText || !currentUser) return;
+
+  const commentData = {
+    user: currentUser,
+    text: commentText,
+    timestamp: Date.now()
+  };
+
+  const commentRef = firebase.database().ref(`comments/${postId}`).push();
+  commentRef.set(commentData);
+
+  commentInput.value = "";
+}
+
+function loadComments(postId) {
+  const commentsRef = firebase.database().ref(`comments/${postId}`);
+  commentsRef.on('value', snapshot => {
+    const commentList = document.getElementById(`commentList-${postId}`);
+    commentList.innerHTML = '';
+
+    snapshot.forEach(childSnapshot => {
+      const comment = childSnapshot.val();
+      const div = document.createElement("div");
+      div.innerText = `${comment.user}: ${comment.text}`;
+      commentList.appendChild(div);
+    });
+  });
+}
+loadComments(postId);
    </script>
  </body>
  </html>
