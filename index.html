@@ -2,144 +2,157 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fan Art Posts</title>
+  <title>Art Gallery</title>
   <style>
-    body { background: #121212; color: white; font-family: Arial; margin: 0; padding: 0; }
-    .gallery { display: flex; flex-wrap: wrap; padding: 1em; gap: 1em; }
-    .post { cursor: pointer; border: 1px solid #333; padding: 10px; background: #1e1e1e; border-radius: 10px; width: 200px; }
-    .post img { width: 100%; border-radius: 8px; }
-
-    /* Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-             background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; }
-    .modal-content { background: #222; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
-    .comment { border-top: 1px solid #444; padding: 5px 0; }
-    .like-btn { margin-top: 10px; cursor: pointer; color: #1e90ff; }
+    body { font-family: Arial; background: #111; color: #eee; margin: 0; }
+    header, footer { background: #222; padding: 1em; text-align: center; }
+    .auth { float: right; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1em; padding: 1em; }
+    .card { background: #222; padding: 1em; border-radius: 10px; }
+    video, img { max-width: 100%; border-radius: 10px; }
+    .comment-section { margin-top: 10px; }
   </style>
 </head>
 <body>
-
-  <h2 style="text-align:center; padding: 1em;">Fan Art Gallery</h2>
-
-  <div class="gallery" id="gallery"></div>
-
-  <div class="modal" id="postModal">
-    <div class="modal-content">
-      <span id="closeModal" style="float:right; cursor:pointer;">&times;</span>
-      <h3 id="postOwner"></h3>
-      <img id="modalImage" src="" style="width:100%; border-radius:8px;" />
-      <div class="like-btn" id="likeBtn">❤️ Like (<span id="likeCount">0</span>)</div>
-
-      <div style="margin-top: 1em;">
-        <input type="text" id="commentInput" placeholder="Write a comment..." style="width: 100%;" />
-        <button onclick="submitComment()">Comment</button>
-      </div>
-      <div id="comments" style="margin-top:1em;"></div>
+  <header>
+    <h1>Fan Art Gallery</h1>
+    <div class="auth">
+      <span id="user-info"></span>
+      <button onclick="openLogin()">Login</button>
+      <button onclick="logout()" id="logoutBtn" style="display:none">Logout</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <section style="padding: 1em;">
+    <input type="file" id="fileInput" accept="image/*,video/*" />
+    <input type="text" id="tagsInput" placeholder="Enter tags (e.g. #fun #art)" />
+    <button onclick="uploadPost()">Upload</button>
+  </section>
+
+  <section style="padding: 1em;">
+    <input type="text" id="searchInput" placeholder="Search by tags..." />
+    <button onclick="searchPosts()">Search</button>
+  </section>
+
+  <main class="gallery" id="gallery"></main>
+
+  <footer>&copy; 2025 Fan Gallery</footer>
+
+  <!-- Firebase SDK must be included separately -->
 
   <script>
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-      projectId: "YOUR_PROJECT",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
     let currentUser = null;
-    let currentPostId = null;
 
-    // Dummy login for this example
+    // Check for session
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        currentUser = user.displayName || user.email;
-      } else {
-        firebase.auth().signInAnonymously(); // For testing
+        currentUser = user;
+        document.getElementById("user-info").innerText = "Hello, " + user.email;
+        document.getElementById("logoutBtn").style.display = "inline";
       }
     });
 
-    // Load posts
-    const gallery = document.getElementById('gallery');
-    firebase.database().ref('posts').on('value', snapshot => {
-      gallery.innerHTML = '';
-      snapshot.forEach(child => {
-        const data = child.val();
-        const post = document.createElement('div');
-        post.className = 'post';
-        post.innerHTML = `<img src="${data.image}" alt="Fan Art" /><div>${data.user}</div>`;
-        post.onclick = () => openModal(child.key, data);
-        gallery.appendChild(post);
-      });
-    });
-
-    function openModal(postId, data) {
-      currentPostId = postId;
-      document.getElementById('modalImage').src = data.image;
-      document.getElementById('postOwner').innerText = `Posted by: ${data.user}`;
-      document.getElementById('postModal').style.display = 'flex';
-      loadComments(postId);
-      loadLikes(postId);
+    function openLogin() {
+      const email = prompt("Email:");
+      const password = prompt("Password:");
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch(err => {
+          if (err.code === "auth/user-not-found") {
+            firebase.auth().createUserWithEmailAndPassword(email, password);
+          } else {
+            alert(err.message);
+          }
+        });
     }
 
-    function loadComments(postId) {
-      const commentsDiv = document.getElementById('comments');
-      commentsDiv.innerHTML = '';
-      firebase.database().ref('comments/' + postId).on('value', snapshot => {
-        commentsDiv.innerHTML = '';
+    function logout() {
+      firebase.auth().signOut();
+      location.reload();
+    }
+
+    function uploadPost() {
+      if (!currentUser) return alert("Login to upload.");
+      const file = document.getElementById("fileInput").files[0];
+      const tags = document.getElementById("tagsInput").value;
+      if (!file || !tags) return alert("Fill everything");
+
+      const ref = firebase.storage().ref('uploads/' + Date.now() + "_" + file.name);
+      ref.put(file).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+      }).then(url => {
+        const isVideo = file.type.startsWith("video");
+        firebase.database().ref("posts").push({
+          url, tags, uid: currentUser.uid, email: currentUser.email, views: 0, likes: 0, type: isVideo ? "video" : "image"
+        });
+        document.getElementById("fileInput").value = "";
+        document.getElementById("tagsInput").value = "";
+      });
+    }
+
+    function loadPosts(filter = "") {
+      firebase.database().ref("posts").once("value", snapshot => {
+        const gallery = document.getElementById("gallery");
+        gallery.innerHTML = "";
         snapshot.forEach(child => {
-          const c = child.val();
-          const div = document.createElement('div');
-          div.className = 'comment';
-          div.innerText = `${c.user}: ${c.text}`;
-          commentsDiv.appendChild(div);
+          const data = child.val();
+          if (!filter || data.tags.includes(filter)) {
+            const el = document.createElement("div");
+            el.className = "card";
+            el.innerHTML = `
+              <strong>Posted by: ${data.email}</strong><br/>
+              ${data.type === "video"
+                ? `<video controls src="${data.url}"></video>`
+                : `<img src="${data.url}" />`}
+              <p>Tags: ${data.tags}</p>
+              <p>Views: ${data.views || 0}</p>
+              <p>Likes: <span id="like-${child.key}">${data.likes || 0}</span></p>
+              <button onclick="likePost('${child.key}')">❤️ Like</button>
+              <div class="comment-section">
+                <input type="text" id="comment-${child.key}" placeholder="Comment..." />
+                <button onclick="addComment('${child.key}')">Comment</button>
+                <div id="comments-${child.key}"></div>
+              </div>
+            `;
+            gallery.appendChild(el);
+
+            firebase.database().ref(`comments/${child.key}`).on("value", snap => {
+              const commentsDiv = document.getElementById(`comments-${child.key}`);
+              commentsDiv.innerHTML = "";
+              snap.forEach(c => {
+                const comment = c.val();
+                const p = document.createElement("p");
+                p.innerText = `${comment.email}: ${comment.text}`;
+                commentsDiv.appendChild(p);
+              });
+            });
+
+            // Count views
+            firebase.database().ref("posts/" + child.key + "/views").transaction(v => (v || 0) + 1);
+          }
         });
       });
     }
 
-    function submitComment() {
-      const input = document.getElementById('commentInput');
+    function likePost(postId) {
+      firebase.database().ref("posts/" + postId + "/likes").transaction(l => (l || 0) + 1);
+    }
+
+    function addComment(postId) {
+      const input = document.getElementById("comment-" + postId);
       const text = input.value.trim();
-      if (!text || !currentUser || !currentPostId) return;
-
-      const commentData = {
-        user: currentUser,
-        text: text,
-        timestamp: Date.now()
-      };
-
-      firebase.database().ref(`comments/${currentPostId}`).push(commentData);
-      input.value = '';
-    }
-
-    function loadLikes(postId) {
-      const likeCountSpan = document.getElementById('likeCount');
-      firebase.database().ref(`likes/${postId}`).on('value', snapshot => {
-        const likes = snapshot.val() || {};
-        likeCountSpan.innerText = Object.keys(likes).length;
+      if (!text || !currentUser) return;
+      firebase.database().ref("comments/" + postId).push({
+        text, email: currentUser.email
       });
+      input.value = "";
     }
 
-    document.getElementById('likeBtn').onclick = () => {
-      if (!currentUser || !currentPostId) return;
-      const likeRef = firebase.database().ref(`likes/${currentPostId}/${firebase.auth().currentUser.uid}`);
-      likeRef.set(true);
-    };
+    function searchPosts() {
+      const term = document.getElementById("searchInput").value;
+      loadPosts(term);
+    }
 
-    document.getElementById('closeModal').onclick = () => {
-      document.getElementById('postModal').style.display = 'none';
-    };
+    loadPosts();
   </script>
 </body>
 </html>
-
