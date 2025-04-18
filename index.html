@@ -1,272 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fan Art Posts</title>
+  <style>
+    body { background: #121212; color: white; font-family: Arial; margin: 0; padding: 0; }
+    .gallery { display: flex; flex-wrap: wrap; padding: 1em; gap: 1em; }
+    .post { cursor: pointer; border: 1px solid #333; padding: 10px; background: #1e1e1e; border-radius: 10px; width: 200px; }
+    .post img { width: 100%; border-radius: 8px; }
 
- <html lang="en">
- <head>
-   <meta charset="UTF-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <title>Fan Art Gallery</title>
-   <style>
-     body {
-       font-family: Arial, sans-serif;
-       background-color: #1a1a1a;
-       color: #eee;
-       margin: 0;
-     }
- 
-     header {
-       background-color: #333;
-       padding: 1em;
-       text-align: center;
-     }
- 
-     .auth-buttons {
-       text-align: right;
-       padding: 0.5em 1em;
-     }
- 
-     .auth-buttons button {
-       margin-left: 0.5em;
-       padding: 0.5em 1em;
-     }
- 
-     nav {
-       text-align: center;
-       margin: 1em;
-     }
- 
-     nav input {
-       padding: 0.5em;
-       width: 250px;
-     }
- 
-     .upload-section {
-       display: none;
-       text-align: center;
-       margin: 2em;
-     }
- 
-     .upload-section input,
-     .upload-section button {
-       margin: 0.5em;
-       padding: 0.5em;
-     }
- 
-     .gallery {
-       display: grid;
-       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-       gap: 1em;
-       padding: 1em;
-     }
- 
-     .gallery img {
-       width: 100%;
-       border-radius: 8px;
-     }
- 
-     .tags {
-       margin-top: 0.5em;
-       font-size: 0.9em;
-       color: #aaa;
-     }
- 
-     .modal {
-       display: none;
-       position: fixed;
-       top: 0; left: 0; width: 100%; height: 100%;
-       background: rgba(0, 0, 0, 0.7);
-       justify-content: center;
-       align-items: center;
-     }
- 
-     .modal-content {
-       background: #222;
-       padding: 2em;
-       border-radius: 10px;
-       max-width: 300px;
-       width: 90%;
-     }
- 
-     .modal-content input {
-       display: block;
-       width: 100%;
-       margin-bottom: 1em;
-       padding: 0.5em;
-     }
- 
-     footer {
-       text-align: center;
-       padding: 2em;
-       background-color: #111;
-       color: #666;
-     }
-   </style>
- </head>
- <body>
-   <header>
-     <h1>Fan Art Gallery</h1>
-     <div class="auth-buttons">
-       <span id="welcomeMsg"></span>
-       <button onclick="openModal('login')">Login</button>
-       <button onclick="openModal('register')">Register</button>
-       <button onclick="logout()" id="logoutBtn" style="display: none;">Logout</button>
-     </div>
-   </header>
- 
-   <nav>
-     <input type="text" placeholder="Search tags..." />
-     <button>Search</button>
-   </nav>
- 
-   <section class="upload-section" id="uploadSection">
-     <h2>Upload Image</h2>
-     <input type="file" id="imageInput" accept="image/*" />
-     <input type="text" id="imageTags" placeholder="Enter tags (e.g. #cat #art)" />
-     <button onclick="uploadImage()">Upload</button>
-   </section>
- 
-   <main class="gallery" id="gallery"></main>
- 
-   <footer>
-     &copy; 2025 Fan Gallery. All rights reserved.
-   </footer>
- 
-   <!-- Modal -->
-   <div class="modal" id="authModal">
-     <div class="modal-content">
-       <h2 id="modalTitle">Login</h2>
-       <input type="text" id="username" placeholder="Username" />
-       <input type="password" id="password" placeholder="Password" />
-       <button onclick="submitAuth()">Submit</button>
-       <button onclick="closeModal()">Cancel</button>
-     </div>
-   </div>
- 
-   <script>
-     let currentMode = "login";
-     let currentUser = null;
- 
-     function openModal(mode) {
-       currentMode = mode;
-       document.getElementById("modalTitle").innerText = mode === "login" ? "Login" : "Register";
-       document.getElementById("authModal").style.display = "flex";
-     }
- 
-     function closeModal() {
-       document.getElementById("authModal").style.display = "none";
-       document.getElementById("username").value = "";
-       document.getElementById("password").value = "";
-     }
- 
-     function submitAuth() {
-       const username = document.getElementById("username").value;
-       const password = document.getElementById("password").value;
- 
-       if (!username || !password) {
-         alert("Please fill in all fields.");
-         return;
-       }
- 
-       if (currentMode === "register") {
-         if (localStorage.getItem("user_" + username)) {
-           alert("Username already exists!");
-         } else {
-           localStorage.setItem("user_" + username, password);
-           alert("Registered! Now log in.");
-         }
-       } else {
-         const storedPass = localStorage.getItem("user_" + username);
-         if (storedPass === password) {
-           loginUser(username);
-         } else {
-           alert("Invalid credentials.");
-         }
-       }
- 
-       closeModal();
-     }
- 
-     function loginUser(user) {
-       currentUser = user;
-       document.getElementById("welcomeMsg").innerText = `Welcome, ${user}`;
-       document.getElementById("logoutBtn").style.display = "inline-block";
-       document.getElementById("uploadSection").style.display = "block";
-     }
- 
-     function logout() {
-       currentUser = null;
-       document.getElementById("welcomeMsg").innerText = "";
-       document.getElementById("logoutBtn").style.display = "none";
-       document.getElementById("uploadSection").style.display = "none";
-     }
- 
-     function uploadImage() {
-       if (!currentUser) {
-         alert("You must be logged in to upload.");
-         return;
-       }
- 
-       const fileInput = document.getElementById("imageInput");
-       const tags = document.getElementById("imageTags").value;
-       const file = fileInput.files[0];
- 
-       if (!file) {
-         alert("Please select an image.");
-         return;
-       }
- 
-       const reader = new FileReader();
-       reader.onload = function(e) {
-         const imageData = {
-           src: e.target.result,
-           tags: tags,
-           user: currentUser
-         };
- 
-         // Save to localStorage
-         const uploads = JSON.parse(localStorage.getItem("uploads") || "[]");
-         uploads.push(imageData);
-         localStorage.setItem("uploads", JSON.stringify(uploads));
- 
-         addImageToGallery(imageData);
- 
-         fileInput.value = "";
-         document.getElementById("imageTags").value = "";
-       };
- 
-       reader.readAsDataURL(file);
-     }
- 
-     function addImageToGallery(data) {
-       const gallery = document.getElementById("gallery");
-       const div = document.createElement("div");
-       div.innerHTML = `
-         <img src="${data.src}" alt="Uploaded Image" />
-         <div class="tags">${data.tags}</div>
-       `;
-       gallery.prepend(div);
-     }
- 
-     function loadGallery() {
-       const uploads = JSON.parse(localStorage.getItem("uploads") || "[]");
-       uploads.forEach(addImageToGallery);
-     }
- 
-     // Load gallery when page loads
-     window.onload = function() {
-       loadGallery();
-     }; 
-    <div id="commentSection">
-  <h3>Comments</h3>
-  <div id="commentsList"></div>
-  <div id="commentForm" style="margin-top:1em;">
-    <input type="text" id="commentInput" placeholder="Write a comment..." style="width: 80%;" />
-    <button onclick="submitComment()">Post</button>
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+             background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; }
+    .modal-content { background: #222; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
+    .comment { border-top: 1px solid #444; padding: 5px 0; }
+    .like-btn { margin-top: 10px; cursor: pointer; color: #1e90ff; }
+  </style>
+</head>
+<body>
+
+  <h2 style="text-align:center; padding: 1em;">Fan Art Gallery</h2>
+
+  <div class="gallery" id="gallery"></div>
+
+  <div class="modal" id="postModal">
+    <div class="modal-content">
+      <span id="closeModal" style="float:right; cursor:pointer;">&times;</span>
+      <h3 id="postOwner"></h3>
+      <img id="modalImage" src="" style="width:100%; border-radius:8px;" />
+      <div class="like-btn" id="likeBtn">❤️ Like (<span id="likeCount">0</span>)</div>
+
+      <div style="margin-top: 1em;">
+        <input type="text" id="commentInput" placeholder="Write a comment..." style="width: 100%;" />
+        <button onclick="submitComment()">Comment</button>
+      </div>
+      <div id="comments" style="margin-top:1em;"></div>
+    </div>
   </div>
-</div>
 
-   </script>
- </body>
- </html>
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let currentUser = null;
+    let currentPostId = null;
+
+    // Dummy login for this example
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user.displayName || user.email;
+      } else {
+        firebase.auth().signInAnonymously(); // For testing
+      }
+    });
+
+    // Load posts
+    const gallery = document.getElementById('gallery');
+    firebase.database().ref('posts').on('value', snapshot => {
+      gallery.innerHTML = '';
+      snapshot.forEach(child => {
+        const data = child.val();
+        const post = document.createElement('div');
+        post.className = 'post';
+        post.innerHTML = `<img src="${data.image}" alt="Fan Art" /><div>${data.user}</div>`;
+        post.onclick = () => openModal(child.key, data);
+        gallery.appendChild(post);
+      });
+    });
+
+    function openModal(postId, data) {
+      currentPostId = postId;
+      document.getElementById('modalImage').src = data.image;
+      document.getElementById('postOwner').innerText = `Posted by: ${data.user}`;
+      document.getElementById('postModal').style.display = 'flex';
+      loadComments(postId);
+      loadLikes(postId);
+    }
+
+    function loadComments(postId) {
+      const commentsDiv = document.getElementById('comments');
+      commentsDiv.innerHTML = '';
+      firebase.database().ref('comments/' + postId).on('value', snapshot => {
+        commentsDiv.innerHTML = '';
+        snapshot.forEach(child => {
+          const c = child.val();
+          const div = document.createElement('div');
+          div.className = 'comment';
+          div.innerText = `${c.user}: ${c.text}`;
+          commentsDiv.appendChild(div);
+        });
+      });
+    }
+
+    function submitComment() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if (!text || !currentUser || !currentPostId) return;
+
+      const commentData = {
+        user: currentUser,
+        text: text,
+        timestamp: Date.now()
+      };
+
+      firebase.database().ref(`comments/${currentPostId}`).push(commentData);
+      input.value = '';
+    }
+
+    function loadLikes(postId) {
+      const likeCountSpan = document.getElementById('likeCount');
+      firebase.database().ref(`likes/${postId}`).on('value', snapshot => {
+        const likes = snapshot.val() || {};
+        likeCountSpan.innerText = Object.keys(likes).length;
+      });
+    }
+
+    document.getElementById('likeBtn').onclick = () => {
+      if (!currentUser || !currentPostId) return;
+      const likeRef = firebase.database().ref(`likes/${currentPostId}/${firebase.auth().currentUser.uid}`);
+      likeRef.set(true);
+    };
+
+    document.getElementById('closeModal').onclick = () => {
+      document.getElementById('postModal').style.display = 'none';
+    };
+  </script>
+</body>
+</html>
+
