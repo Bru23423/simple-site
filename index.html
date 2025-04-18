@@ -140,9 +140,43 @@
     </div>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
   <script>
-    let currentMode = "login";
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const storage = firebase.storage();
     let currentUser = null;
+
+    // Check if user is already logged in when page refreshes
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById("welcomeMsg").innerText = `Welcome, ${user.email}`;
+        document.getElementById("logoutBtn").style.display = "inline-block";
+        document.getElementById("uploadSection").style.display = "block";
+        loadGallery();
+      } else {
+        document.getElementById("welcomeMsg").innerText = "";
+        document.getElementById("logoutBtn").style.display = "none";
+        document.getElementById("uploadSection").style.display = "none";
+      }
+    });
 
     function openModal(mode) {
       currentMode = mode;
@@ -166,36 +200,26 @@
       }
 
       if (currentMode === "register") {
-        if (localStorage.getItem("user_" + username)) {
-          alert("Username already exists!");
-        } else {
-          localStorage.setItem("user_" + username, password);
-          alert("Registered! Now log in.");
-        }
+        auth.createUserWithEmailAndPassword(username, password)
+          .then(() => {
+            alert("Registered successfully. Please log in.");
+          })
+          .catch(error => {
+            alert("Error: " + error.message);
+          });
       } else {
-        const storedPass = localStorage.getItem("user_" + username);
-        if (storedPass === password) {
-          loginUser(username);
-        } else {
-          alert("Invalid credentials.");
-        }
+        auth.signInWithEmailAndPassword(username, password)
+          .then(() => {
+            closeModal();
+          })
+          .catch(error => {
+            alert("Error: " + error.message);
+          });
       }
-
-      closeModal();
-    }
-
-    function loginUser(user) {
-      currentUser = user;
-      document.getElementById("welcomeMsg").innerText = `Welcome, ${user}`;
-      document.getElementById("logoutBtn").style.display = "inline-block";
-      document.getElementById("uploadSection").style.display = "block";
     }
 
     function logout() {
-      currentUser = null;
-      document.getElementById("welcomeMsg").innerText = "";
-      document.getElementById("logoutBtn").style.display = "none";
-      document.getElementById("uploadSection").style.display = "none";
+      auth.signOut();
     }
 
     function uploadImage() {
@@ -218,13 +242,11 @@
         const imageData = {
           src: e.target.result,
           tags: tags,
-          user: currentUser
+          user: currentUser.email
         };
 
-        // Save to localStorage
-        const uploads = JSON.parse(localStorage.getItem("uploads") || "[]");
-        uploads.push(imageData);
-        localStorage.setItem("uploads", JSON.stringify(uploads));
+        const newImageRef = db.ref("uploads").push();
+        newImageRef.set(imageData);
 
         addImageToGallery(imageData);
 
@@ -241,23 +263,23 @@
       div.innerHTML = `
         <img src="${data.src}" alt="Uploaded Image" />
         <div class="tags">${data.tags}</div>
+        <div>Uploaded by: ${data.user}</div>
+        <button onclick="deleteImage('${data.user}', '${data.src}')">Delete</button>
       `;
       gallery.prepend(div);
     }
 
-    function loadGallery() {
-      const uploads = JSON.parse(localStorage.getItem("uploads") || "[]");
-      uploads.forEach(addImageToGallery);
-    }
+    function deleteImage(user, imageSrc) {
+      if (currentUser.email !== user) {
+        alert("You can only delete your own images.");
+        return;
+      }
 
-    // Load gallery when page loads
-    window.onload = function() {
-      loadGallery();
-    };
-  </script>
-</body>
-</html>
- <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+      db.ref("uploads").orderByChild("src").equalTo(imageSrc).once("value", snapshot => {
+        snapshot.forEach(childSnapshot => {
+          childSnapshot.ref.remove();
+        });
+      });
+
+      const gallery = document.getElementById("gallery");
+      const images = gallery.getElementsByTag
