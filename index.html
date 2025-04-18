@@ -1,118 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ArtShare</title>
+  <meta charset="UTF-8">
+  <title>Art Upload Platform</title>
   <style>
-    body { font-family: Arial; background: #f9f9f9; margin: 0; padding: 0; }
-    header { background: #333; color: white; padding: 10px; text-align: center; }
-    .auth-form, .upload-form, .gallery { padding: 20px; max-width: 600px; margin: auto; }
-    .art-item { border: 1px solid #ccc; margin: 10px 0; padding: 10px; background: #fff; }
-    .comment { font-size: 0.9em; color: #555; }
-    .likes { color: red; cursor: pointer; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; }
+    .buttons { display: flex; gap: 10px; margin-top: 10px; }
+    .like-btn, .comment-btn, .delete-btn { cursor: pointer; }
+    .confirm-delete { display: none; margin-top: 10px; }
+    .green { background-color: green; color: white; padding: 5px; border: none; cursor: pointer; }
+    .red { background-color: red; color: white; padding: 5px; border: none; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🎨 ArtShare</h1>
-    <div id="userStatus"></div>
-  </header>
+<h1>Upload Your Art</h1>
+<form id="uploadForm">
+  <input type="text" id="title" placeholder="Name your artwork" required><br><br>
+  <input type="text" id="tags" placeholder="Tags (comma-separated)" required><br><br>
+  <input type="file" id="file" accept="image/*,video/*" required><br><br>
+  <button type="submit">Upload</button>
+</form>
 
-  <!-- Signup/Login -->
-  <div class="auth-form" id="authForm">
-    <h2>Sign Up / Log In</h2>
-    <input type="text" id="username" placeholder="Enter username" /><br/><br/>
-    <button onclick="login()">Login</button>
-  </div>
+<h2>Search</h2>
+<input type="text" id="searchInput" placeholder="Search by name or tag...">
 
-  <!-- Upload Form -->
-  <div class="upload-form" id="uploadForm" style="display:none;">
-    <h2>Upload Your Art</h2>
-    <input type="text" id="artTitle" placeholder="Art title" /><br/><br/>
-    <input type="url" id="artURL" placeholder="Image URL" /><br/><br/>
-    <button onclick="uploadArt()">Upload</button>
-  </div>
+<h2>Posts</h2>
+<div id="postsContainer"></div>
 
-  <!-- Gallery -->
-  <div class="gallery" id="gallery">
-    <h2>Gallery</h2>
-    <!-- Art items will be injected here -->
-  </div>
+<script>
+  let posts = [];
+  let userId = 'exampleUser123'; // Simulate a logged-in user
 
-  <script>
-    let currentUser = localStorage.getItem('artshareUser');
-    let artList = JSON.parse(localStorage.getItem('artList')) || [];
+  document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const tags = document.getElementById('tags').value.split(',');
+    const file = document.getElementById('file').files[0];
 
-    if (currentUser) {
-      document.getElementById('authForm').style.display = 'none';
-      document.getElementById('uploadForm').style.display = 'block';
-      document.getElementById('userStatus').innerText = `Logged in as ${currentUser}`;
-    }
+    if (!file) return alert("Please upload a file.");
 
-    function login() {
-      const username = document.getElementById('username').value;
-      if (username) {
-        localStorage.setItem('artshareUser', username);
-        location.reload();
-      }
-    }
+    const postId = Date.now().toString();
+    const url = URL.createObjectURL(file);
 
-    function uploadArt() {
-      const title = document.getElementById('artTitle').value;
-      const url = document.getElementById('artURL').value;
-      if (title && url && currentUser) {
-        artList.push({
-          title,
-          url,
-          author: currentUser,
-          views: 0,
-          likes: 0,
-          comments: []
-        });
-        localStorage.setItem('artList', JSON.stringify(artList));
-        displayGallery();
-      }
-    }
+    posts.push({
+      id: postId,
+      title,
+      tags,
+      fileUrl: url,
+      likes: 0,
+      comments: [],
+      owner: userId
+    });
 
-    function likeArt(index) {
-      artList[index].likes += 1;
-      localStorage.setItem('artList', JSON.stringify(artList));
-      displayGallery();
-    }
+    renderPosts();
+  });
 
-    function commentArt(index) {
-      const comment = prompt("Leave a comment:");
-      if (comment) {
-        artList[index].comments.push(`${currentUser}: ${comment}`);
-        localStorage.setItem('artList', JSON.stringify(artList));
-        displayGallery();
-      }
-    }
+  function renderPosts(filter = "") {
+    const container = document.getElementById('postsContainer');
+    container.innerHTML = "";
 
-    function displayGallery() {
-      const container = document.getElementById('gallery');
-      container.innerHTML = "<h2>Gallery</h2>";
-      artList.forEach((art, index) => {
-        art.views += 1;
-        const div = document.createElement('div');
-        div.className = 'art-item';
-        div.innerHTML = `
-          <h3>${art.title}</h3>
-          <img src="${art.url}" alt="${art.title}" style="max-width:100%"/><br/>
-          <p>By <strong>${art.author}</strong> | 👁️ ${art.views} views | ❤️ ${art.likes}</p>
-          <button onclick="likeArt(${index})">Like</button>
-          <button onclick="commentArt(${index})">Comment</button>
-          <div class="comment">${art.comments.join('<br/>')}</div>
-        `;
-        container.appendChild(div);
-      });
-      localStorage.setItem('artList', JSON.stringify(artList));
-    }
+    posts.filter(p => {
+      return p.title.includes(filter) || p.tags.some(tag => tag.includes(filter));
+    }).forEach(post => {
+      const div = document.createElement('div');
+      div.className = 'post';
+      div.innerHTML = `
+        <strong>${post.title}</strong><br>
+        Tags: ${post.tags.join(', ')}<br>
+        ${post.fileUrl.endsWith('.mp4') ? 
+          `<video width="300" controls src="${post.fileUrl}"></video>` : 
+          `<img src="${post.fileUrl}" width="300">`
+        }
+        <div class="buttons">
+          <button class="like-btn" onclick="likePost('${post.id}')">Like (${post.likes})</button>
+          <button class="comment-btn" onclick="commentPost('${post.id}')">Comment</button>
+          ${post.owner === userId ? `<button class="delete-btn" onclick="showDeleteConfirm('${post.id}')">Delete</button>` : ''}
+        </div>
+        <div class="confirm-delete" id="confirm-${post.id}">
+          <p>Are you sure you want to delete?</p>
+          <button class="green" onclick="deletePost('${post.id}')">Yes</button>
+          <button class="red" onclick="hideDeleteConfirm('${post.id}')">No</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
 
-    displayGallery();
-  </script>
+  function likePost(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+    if (!post.likedBy) post.likedBy = new Set();
+    if (post.likedBy.has(userId)) return alert("You've already liked this post.");
+
+    post.likes++;
+    post.likedBy.add(userId);
+    renderPosts(document.getElementById('searchInput').value);
+  }
+
+  function commentPost(id) {
+    const comment = prompt("Enter your comment:");
+    if (!comment) return;
+    const post = posts.find(p => p.id === id);
+    post.comments.push({ user: userId, text: comment });
+    alert("Comment added!");
+  }
+
+  function showDeleteConfirm(id) {
+    document.getElementById(`confirm-${id}`).style.display = 'block';
+  }
+
+  function hideDeleteConfirm(id) {
+    document.getElementById(`confirm-${id}`).style.display = 'none';
+  }
+
+  function deletePost(id) {
+    posts = posts.filter(p => p.id !== id);
+    renderPosts(document.getElementById('searchInput').value);
+  }
+
+  document.getElementById('searchInput').addEventListener('input', function() {
+    renderPosts(this.value);
+  });
+
+  renderPosts();
+</script>
 
 </body>
 </html>
+
