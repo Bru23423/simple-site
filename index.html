@@ -77,26 +77,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Centered</title>
+    <title>Image in Top Left Corner</title>
     <style>
         body {
             margin: 0;
-            height: 25vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            background-color: #f0f0f0;
+            padding: 0;
         }
-
-        img {
-            margin-top: 20px; /* Optional, for spacing from the top */
+        .top-left-image {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
 <body>
-    <img src="justfunito.png" alt="Just Funito" />
+    <img src="your-image-url.jpg" alt="Justfunito.png" class="top-left-image">
 </body>
 </html>
-
 
 
