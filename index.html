@@ -3,183 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NSFW Art Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Sign In</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@9.6.1/firebase.js"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <!-- Age Verification Modal -->
-    <div id="ageVerification" class="flex items-center justify-center min-h-screen fixed top-0 left-0 w-full bg-black bg-opacity-50">
-        <div class="max-w-md w-full space-y-6 p-6 bg-gray-800 rounded shadow">
-            <h1 class="text-3xl font-bold text-center">You must be 18 or older</h1>
-            <p class="text-sm text-center">By entering this site, you confirm that you are 18 years or older.</p>
-            <button id="verifyBtn" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">I am 18 or older</button>
-        </div>
+<body>
+    <h1>Sign In</h1>
+    <button id="google-sign-in">Sign in with Google</button>
+    <button id="apple-sign-in">Sign in with Apple</button>
+
+    <div id="name-password-form" style="display:none;">
+        <h2>Create your Profile</h2>
+        <input type="text" id="username" placeholder="Enter your name" required>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button id="submit-profile">Submit</button>
     </div>
 
-    <!-- Authentication Section (Login/Signup) -->
-    <div id="authContainer" class="flex items-center justify-center min-h-screen">
-        <div class="max-w-md w-full space-y-6 p-6 bg-gray-800 rounded shadow">
-            <h1 class="text-3xl font-bold text-center">Sign In to Upload Art</h1>
-            <form id="loginForm" class="space-y-4">
-                <h2 class="text-xl font-semibold">Sign In</h2>
-                <input type="text" placeholder="Username" id="loginUsername" class="w-full p-2 rounded text-black" required>
-                <input type="password" placeholder="Password" id="loginPassword" class="w-full p-2 rounded text-black" required>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">Login</button>
-            </form>
-
-            <hr class="border-gray-600">
-
-            <form id="signupForm" class="space-y-4">
-                <h2 class="text-xl font-semibold">Create Account</h2>
-                <input type="text" placeholder="Username" id="signupUsername" class="w-full p-2 rounded text-black" required>
-                <input type="password" placeholder="Password" id="signupPassword" class="w-full p-2 rounded text-black" required>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-2 rounded">Sign Up</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Dashboard Section (After login) -->
-    <div id="dashboard" class="hidden p-6">
-        <header class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Welcome to the NSFW Art Dashboard</h1>
-            <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Logout</button>
-        </header>
-
-        <div class="mb-6">
-            <h2 class="text-2xl font-semibold">Upload Art</h2>
-            <form id="uploadForm" class="space-y-4">
-                <input type="file" id="fileInput" accept="image/*,video/*" class="w-full p-2 text-black rounded" required>
-                <input type="text" id="titleInput" placeholder="Title" class="w-full p-2 text-black rounded" required>
-                <textarea id="tagsInput" placeholder="Tags (comma separated)" class="w-full p-2 text-black rounded" required></textarea>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-2 rounded">Upload</button>
-            </form>
-        </div>
-
-        <div class="mb-4">
-            <h2 class="text-xl font-semibold">Your Art Gallery</h2>
-            <section id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Art posts will be dynamically inserted here -->
-            </section>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js";
-
+    <script>
+        // Firebase configuration
         const firebaseConfig = {
-      apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
-      authDomain: "justfunitcom.firebaseapp.com",
-      projectId: "justfunitcom",
-      storageBucket: "justfunitcom.firebasestorage.app",
-      messagingSenderId: "12321079878",
-      appId: "1:12321079878:web:301d5a953691b733278047"
-    };
+  apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
+  authDomain: "justfunitcom.firebaseapp.com",
+  projectId: "justfunitcom",
+  storageBucket: "justfunitcom.firebasestorage.app",
+  messagingSenderId: "12321079878",
+  appId: "1:12321079878:web:301d5a953691b733278047"
+};
+        
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const firestore = firebase.firestore();
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        // UI Elements
-        const authContainer = document.getElementById("authContainer");
-        const dashboard = document.getElementById("dashboard");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const gallery = document.getElementById("gallery");
-
-        // Age Verification Logic
-        document.getElementById("verifyBtn").addEventListener("click", () => {
-            document.getElementById("ageVerification").style.display = 'none';
-            authContainer.style.display = 'flex';
-        });
-
-        // Show dashboard if logged in
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                authContainer.classList.add("hidden");
-                dashboard.classList.remove("hidden");
-                loadArtPosts();
-            } else {
-                authContainer.classList.remove("hidden");
-                dashboard.classList.add("hidden");
-            }
-        });
-
-        // Login
-        document.getElementById("loginForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const username = document.getElementById("loginUsername").value;
-            const password = document.getElementById("loginPassword").value;
-            const email = `${username}@artsite.com`;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                alert(error.message);
-            }
-        });
-
-        // Sign Up
-        document.getElementById("signupForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const username = document.getElementById("signupUsername").value;
-            const password = document.getElementById("signupPassword").value;
-            const email = `${username}@artsite.com`;
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                alert("Account created! You can now log in.");
-            } catch (error) {
-                alert(error.message);
-            }
-        });
-
-        // Logout
-        logoutBtn.addEventListener("click", async () => {
-            await signOut(auth);
-        });
-
-        // Upload Art
-        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const file = document.getElementById("fileInput").files[0];
-            const title = document.getElementById("titleInput").value;
-            const tags = document.getElementById("tagsInput").value.split(',');
-
-            if (file) {
-                const storageRef = ref(storage, `art/${file.name}`);
-                const uploadTask = await uploadBytes(storageRef, file);
-                const downloadURL = await getDownloadURL(uploadTask.ref);
-
-                try {
-                    const docRef = await addDoc(collection(db, "posts"), {
-                        title,
-                        tags,
-                        imageUrl: downloadURL,
-                        createdAt: new Date(),
-                    });
-                    alert("Art uploaded successfully!");
-                    loadArtPosts(); // Reload gallery
-                } catch (error) {
-                    alert("Error uploading art: " + error.message);
+        // Google sign-in
+        document.getElementById('google-sign-in').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).then((result) => {
+                // If the user is new, prompt to create a profile
+                if (result.additionalUserInfo.isNewUser) {
+                    showProfileForm(result.user);
                 }
-            }
+            }).catch((error) => {
+                console.error(error.message);
+            });
         });
 
-        // Load Art Posts
-        async function loadArtPosts() {
-            const querySnapshot = await getDocs(collection(db, "posts"));
-            gallery.innerHTML = ""; // Clear gallery
-            querySnapshot.forEach((doc) => {
-                const postData = doc.data();
-                const postDiv = document.createElement("div");
-                postDiv.className = "bg-gray-800 p-4 rounded shadow";
-                postDiv.innerHTML = `
-                    <h3 class="text-xl">${postData.title}</h3>
-                    <img src="${postData.imageUrl}" class="w-full h-auto rounded mt-2" />
-                    <p class="text-sm text-gray-400 mt-2">Tags: ${postData.tags.join(', ')}</p>
-                `;
-                gallery.appendChild(postDiv);
+        // Apple sign-in (this requires Firebase and Apple login setup in your Firebase console)
+        document.getElementById('apple-sign-in').addEventListener('click', () => {
+            const provider = new firebase.auth.OAuthProvider('apple.com');
+            auth.signInWithPopup(provider).then((result) => {
+                if (result.additionalUserInfo.isNewUser) {
+                    showProfileForm(result.user);
+                }
+            }).catch((error) => {
+                console.error(error.message);
+            });
+        });
+
+        // Show profile creation form
+        function showProfileForm(user) {
+            document.getElementById('name-password-form').style.display = 'block';
+            document.getElementById('submit-profile').addEventListener('click', () => {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                if (username && password) {
+                    // Update Firebase Authentication to set the password
+                    user.updatePassword(password).then(() => {
+                        // Store the user's name in Firestore
+                        firestore.collection('users').doc(user.uid).set({
+                            username: username
+                        }).then(() => {
+                            alert("Profile created successfully!");
+                            // Redirect to another page or home page
+                            window.location.href = 'home.html';
+                        }).catch((error) => {
+                            console.error("Error saving user data: ", error);
+                        });
+                    }).catch((error) => {
+                        console.error("Error setting password: ", error);
+                    });
+                } else {
+                    alert("Please fill out all fields.");
+                }
             });
         }
     </script>
