@@ -1,112 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Gallery</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #111;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-            margin: 0;
-        }
-        .warning-box {
-            background-color: #d9534f;
-            padding: 30px;
-            border-radius: 10px;
-            display: inline-block;
-        }
-        .warning-box h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-        .warning-box p {
-            font-size: 18px;
-            margin-bottom: 30px;
-        }
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .button {
-            background-color: #5bc0de;
-            padding: 15px 30px;
-            font-size: 18px;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .button:hover {
-            background-color: #31b0d5;
-        }
-        .video-link {
-            margin: 10px 0;
-            font-size: 18px;
-            color: #007BFF;
-            cursor: pointer;
-        }
-        .video-link:hover {
-            text-decoration: underline;
-        }
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
-        #content {
-            display: none;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NSFW Search Engine</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .age-check, .container {
+      display: none;
+      padding: 40px 20px;
+    }
+
+    .age-check {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+      background: #000;
+    }
+
+    .age-check button {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1em;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 500px;
+      margin-top: 20px;
+    }
+
+    .results {
+      margin-top: 30px;
+    }
+
+    .result-item {
+      background: #222;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 600px;
+    }
+
+    .result-item a {
+      color: #00bfff;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Warning box -->
-<div class="warning-box" id="warning-box">
-    <h1>⚠️ WARNING: Adult Content Ahead ⚠️</h1>
-    <p>This site contains explicit material intended for individuals aged 18 years or older. By entering, you confirm that you are of legal age in your country or region to view adult content.</p>
-    <p>If you're under 18 or if such material is illegal in your jurisdiction, please exit now.</p>
+  <div class="age-check" id="ageCheck">
+    <h1>🔞 Adults Only</h1>
+    <p>This site contains adult content. You must be 18+ to continue.</p>
+    <button onclick="verifyAge()">I am 18+</button>
+    <button onclick="window.location.href='https://google.com'">Leave</button>
+  </div>
 
-    <div class="buttons">
-        <a href="javascript:void(0);" onclick="agree();" class="button">I am 18+ and want to proceed</a>
-        <a href="exit-page.html" class="button">Exit</a>
-    </div>
-</div>
+  <div class="container" id="mainPage">
+    <h1>NSFW Search</h1>
+    <input type="text" id="searchInput" placeholder="Type a tag like 'milf', 'hentai', 'threesome'..." />
+    <div class="results" id="results"></div>
+  </div>
 
-<!-- Content to hide initially -->
-<div id="content">
-    <h1>Porn Gallery</h1>
-
-    <!-- Links to Videos -->
-    <div>
-        <a class="video-link" href="#" onclick="loadVideo('https://www.pornhub.com/view_video.php?viewkey=679d568832ab3')">Fischl x Slime [Genshin Impact] </a>
-    </div>
-
-    <!-- Iframe to Display Video -->
-    <div id="video-container">
-        <iframe id="video-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-</div>
-
-<script>
-    function agree() {
-        // Hide the warning box
-        document.getElementById('warning-box').style.display = 'none';
-
-        // Show the content
-        document.getElementById('content').style.display = 'block';
+  <script>
+    function verifyAge() {
+      document.getElementById("ageCheck").style.display = "none";
+      document.getElementById("mainPage").style.display = "block";
     }
 
-    function loadVideo(url) {
-        var iframe = document.getElementById('video-frame');
-        iframe.src = url;
-    }
-</script>
+    const sites = [
+      { name: "Pornhub", url: "https://www.pornhub.com/video/search?search=" },
+      { name: "xHamster", url: "https://xhamster.com/search/" },
+      { name: "xVideos", url: "https://www.xvideos.com/?k=" },
+      { name: "Rule34", url: "https://rule34.xxx/index.php?page=post&s=list&tags=" },
+      { name: "RedGIFs", url: "https://www.redgifs.com/gifs/search/" }
+    ];
 
+    const tags = [
+      // Only 50 shown here. Full 1000+ will be in external JSON or separate JS file.
+      "hentai", "milf", "blowjob", "lesbian", "anal", "creampie", "threesome", "feet", "futa", "anime",
+      "teen", "big tits", "boobs", "furry", "cosplay", "bdsm", "public", "pov", "cumshot", "interracial",
+      "mature", "ebony", "asian", "dp", "spanking", "cuckold", "massage", "orgy", "schoolgirl", "latex",
+      "domination", "strapon", "throat", "bukkake", "facial", "solo", "blonde", "brunette", "panties",
+      "squirt", "sissy", "deepthroat", "nurse", "maid", "incest", "stepmom", "stepsister", "goth", "chubby"
+    ];
+
+    const input = document.getElementById("searchInput");
+    const results = document.getElementById("results");
+
+    input.addEventListener("input", () => {
+      const query = input.value.toLowerCase();
+      results.innerHTML = "";
+
+      const matchedTags = tags.filter(tag => tag.includes(query)).slice(0, 20);
+
+      if (matchedTags.length === 0) {
+        results.innerHTML = "<p>No matching tags found.</p>";
+        return;
+      }
+
+      matchedTags.forEach(tag => {
+        sites.forEach(site => {
+          results.innerHTML += `
+            <div class="result-item">
+              <strong>${tag}</strong><br>
+              <a href="${site.url + encodeURIComponent(tag)}" target="_blank">
+                View on ${site.name}
+              </a>
+            </div>
+          `;
+        });
+      });
+    });
+  </script>
 </body>
 </html>
