@@ -82,6 +82,27 @@
             padding: 5px;
             cursor: pointer;
         }
+        .age-verification {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .age-verification button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            padding: 15px 30px;
+            border: none;
+            cursor: pointer;
+        }
+        .age-verification button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -89,10 +110,9 @@
     <h1>Adult Art Gallery (18+ Content)</h1>
 
     <!-- Age Verification Form -->
-    <div id="age-verification">
-        <h2>Please verify your age to continue</h2>
-        <input type="number" id="age-input" placeholder="Enter your age">
-        <button onclick="verifyAge()">Verify Age</button>
+    <div id="age-verification" class="age-verification">
+        <h2>You must be 18 or older to access this site.</h2>
+        <button onclick="verifyAge()">I Agree</button>
     </div>
 
     <!-- Content Section (Hidden until age verification) -->
@@ -117,18 +137,11 @@
     </div>
 
     <script>
-        // Function to verify user's age
+        // Function to verify user's agreement
         function verifyAge() {
-            const age = document.getElementById('age-input').value;
-            if (age >= 18) {
-                // Allow access to the content
-                document.getElementById('age-verification').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            } else {
-                // Redirect or show a warning for underage users
-                alert("You must be 18 or older to access this content.");
-                window.location.href = "https://www.google.com"; // Redirecting to Google for underage users
-            }
+            // Hide the age verification and show the content
+            document.getElementById('age-verification').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
         }
 
         // Function to save artwork data to LocalStorage
