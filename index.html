@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adult Art Gallery - Upload and Manage Your Posts</title>
+    <title>Art Gallery - Upload Artwork</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,7 +59,6 @@
             background-color: white;
             width: 200px;
             text-align: center;
-            position: relative;
         }
         .art-item img, .art-item video, .art-item gif {
             max-width: 100%;
@@ -72,78 +71,31 @@
             margin-top: 10px;
             color: #666;
         }
-        .delete-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-        }
-        .age-verification {
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .age-verification button {
-            background-color: #4CAF50;
-            color: white;
-            font-size: 18px;
-            padding: 15px 30px;
-            border: none;
-            cursor: pointer;
-        }
-        .age-verification button:hover {
-            background-color: #45a049;
-        }
     </style>
 </head>
 <body>
 
     <h1>Adult Art Gallery (18+ Content)</h1>
 
-    <!-- Age Verification Form -->
-    <div id="age-verification" class="age-verification">
-        <h2>You must be 18 or older to access this site.</h2>
-        <button onclick="verifyAge()">I Agree</button>
+    <!-- Form for uploading art -->
+    <div class="art-form">
+        <input type="text" id="artTitle" placeholder="Enter Artwork Title" required>
+        <textarea id="artDescription" placeholder="Enter Artwork Description" rows="4" required></textarea>
+        <input type="text" id="artTags" placeholder="Enter Tags (comma separated)" required>
+        <input type="file" id="artFile" accept="image/*,video/*,gif/*" required>
+        <button id="saveDataBtn">Upload Artwork</button>
     </div>
 
-    <!-- Content Section (Hidden until age verification) -->
-    <div id="content" style="display:none;">
-        <!-- Form for uploading art -->
-        <div class="art-form">
-            <input type="text" id="artTitle" placeholder="Enter Artwork Title" required>
-            <textarea id="artDescription" placeholder="Enter Artwork Description" rows="4" required></textarea>
-            <input type="text" id="artTags" placeholder="Enter Tags (comma separated)" required>
-            <input type="file" id="artFile" accept="image/*,video/*,gif/*" required>
-            <button id="saveDataBtn">Upload Artwork</button>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="search-bar">
-            <input type="text" id="searchTags" placeholder="Search by Tags" oninput="filterGallery()">
-        </div>
-
-        <!-- Gallery Section -->
-        <h2>Art Gallery</h2>
-        <div id="gallery" class="gallery"></div>
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" id="searchTags" placeholder="Search by Tags" oninput="filterGallery()">
     </div>
+
+    <!-- Gallery Section -->
+    <h2>Art Gallery</h2>
+    <div id="gallery" class="gallery"></div>
 
     <script>
-        // Function to verify user's agreement
-        function verifyAge() {
-            // Hide the age verification and show the content
-            document.getElementById('age-verification').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
-        }
-
         // Function to save artwork data to LocalStorage
         document.getElementById('saveDataBtn').addEventListener('click', () => {
             const title = document.getElementById('artTitle').value;
@@ -156,13 +108,11 @@
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const fileData = {
-                        id: generateUniqueId(),
                         title: title,
                         description: description,
                         tags: tags,
                         type: file.type,
-                        content: event.target.result, // This is the file data (base64 encoded)
-                        ownerId: localStorage.getItem('userId') // Store the uploader's unique ID
+                        content: event.target.result // This is the file data (base64 encoded)
                     };
 
                     // Get saved data from LocalStorage or initialize an empty array
@@ -190,11 +140,6 @@
                 alert('Please fill out all fields and select a file.');
             }
         });
-
-        // Function to generate a unique user ID (For demo purposes, using a random ID)
-        function generateUniqueId() {
-            return 'user-' + Math.random().toString(36).substr(2, 9);
-        }
 
         // Function to display saved artwork data in the gallery
         function displayGallery() {
@@ -236,37 +181,15 @@
                 tags.classList.add('tags');
                 tags.innerText = `Tags: ${artwork.tags.join(', ')}`;
 
-                // Delete button visible only to the owner
-                const deleteButton = document.createElement('button');
-                deleteButton.classList.add('delete-button');
-                deleteButton.innerText = 'Delete';
-                deleteButton.style.display = (artwork.ownerId === localStorage.getItem('userId')) ? 'block' : 'none';
-                deleteButton.onclick = function() {
-                    if (confirm('Are you sure you want to delete this post?')) {
-                        deletePost(artwork.id);
-                    }
-                };
-
                 // Append elements to the art item
                 artItem.appendChild(title);
                 artItem.appendChild(mediaElement);
                 artItem.appendChild(description);
                 artItem.appendChild(tags);
-                artItem.appendChild(deleteButton);
 
                 // Append the art item to the gallery
                 gallery.appendChild(artItem);
             });
-        }
-
-        // Function to delete a post
-        function deletePost(postId) {
-            let artworkData = JSON.parse(localStorage.getItem('artworkData')) || [];
-            artworkData = artworkData.filter(artwork => artwork.id !== postId);
-            localStorage.setItem('artworkData', JSON.stringify(artworkData));
-
-            // Refresh the gallery
-            displayGallery();
         }
 
         // Function to filter gallery based on tag search
@@ -322,11 +245,6 @@
                 // Append the art item to the gallery
                 gallery.appendChild(artItem);
             });
-        }
-
-        // Generate a unique user ID and store it in LocalStorage for demo purposes
-        if (!localStorage.getItem('userId')) {
-            localStorage.setItem('userId', generateUniqueId());
         }
 
         // Display the gallery on page load
