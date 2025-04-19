@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NSFW Art Gallery (18+)</title>
+    <title>NSFW Art Uploader</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            background-color: #f7f7f7;
+            background-color: #f4f4f4;
         }
         h1 {
             text-align: center;
@@ -83,39 +83,18 @@
             margin-top: 10px;
             color: #666;
         }
-        .like-button {
+        .delete-button {
             position: absolute;
             bottom: 10px;
-            left: 10px;
-            background-color: #f39c12;
+            right: 10px;
+            background-color: #e74c3c;
             color: white;
             border: none;
             padding: 5px 10px;
             cursor: pointer;
         }
-        .like-button.liked {
-            background-color: #e74c3c;
-        }
-        .age-verification {
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .age-verification button {
-            background-color: #4CAF50;
-            color: white;
-            font-size: 18px;
-            padding: 15px 30px;
-            border: none;
-            cursor: pointer;
-        }
-        .age-verification button:hover {
-            background-color: #45a049;
+        .delete-button:hover {
+            background-color: #c0392b;
         }
     </style>
 </head>
@@ -123,13 +102,13 @@
 
     <!-- Age Verification -->
     <div id="age-verification" class="age-verification">
-        <h2>You must be 18+ to access this site.</h2>
+        <h2>By entering, you confirm that you are 18+ and agree to the NSFW content.</h2>
         <button onclick="verifyAge()">I Agree</button>
     </div>
 
     <!-- Content Section (Hidden until age verification) -->
     <div id="content" style="display:none;">
-        <h1>NSFW Art Gallery (18+ Content)</h1>
+        <h1>NSFW Art Gallery</h1>
 
         <!-- Upload Form -->
         <div class="art-form">
@@ -170,7 +149,6 @@
                         tags: tags,
                         type: file.type,
                         content: event.target.result, // Base64 encoded file
-                        likes: 0,
                     };
 
                     // Save the file data to localStorage
@@ -235,44 +213,31 @@
                 tags.classList.add('tags');
                 tags.innerText = `Tags: ${artwork.tags.join(', ')}`;
 
-                // Like button
-                const likeButton = document.createElement('button');
-                likeButton.classList.add('like-button');
-                likeButton.innerText = `Like (${artwork.likes})`;
-
-                // Check if the post has been liked in this session
-                const likedPosts = JSON.parse(sessionStorage.getItem('likedPosts')) || [];
-                if (likedPosts.includes(artwork.id)) {
-                    likeButton.classList.add('liked');
-                    likeButton.disabled = true;
-                }
-
-                likeButton.onclick = () => {
-                    artwork.likes++;
-                    likeButton.innerText = `Like (${artwork.likes})`;
-
-                    // Store the liked post in sessionStorage
-                    likedPosts.push(artwork.id);
-                    sessionStorage.setItem('likedPosts', JSON.stringify(likedPosts));
-
-                    // Update the artwork data in localStorage
-                    const updatedArtworkData = artworkData.map(post => post.id === artwork.id ? artwork : post);
-                    localStorage.setItem('artworkData', JSON.stringify(updatedArtworkData));
-
-                    // Disable the button after liking
-                    likeButton.classList.add('liked');
-                    likeButton.disabled = true;
-                };
+                // Delete button (only for the owner of the post)
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('delete-button');
+                deleteButton.innerText = 'Delete Post';
+                deleteButton.onclick = () => deletePost(artwork.id);
 
                 // Append elements to the art item
                 artItem.appendChild(title);
                 artItem.appendChild(mediaElement);
                 artItem.appendChild(description);
                 artItem.appendChild(tags);
-                artItem.appendChild(likeButton);
+                artItem.appendChild(deleteButton);
 
                 gallery.appendChild(artItem);
             });
+        }
+
+        // Delete post
+        function deletePost(postId) {
+            let artworkData = JSON.parse(localStorage.getItem('artworkData')) || [];
+            artworkData = artworkData.filter(post => post.id !== postId); // Remove the deleted post
+            localStorage.setItem('artworkData', JSON.stringify(artworkData));
+
+            // Refresh the gallery after deletion
+            displayGallery();
         }
 
         // Display the gallery on page load
