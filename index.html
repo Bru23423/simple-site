@@ -3,18 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NSFW Art Site</title>
+  <title>NSFW Art Site - 18+ Only</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
-  <div id="authContainer" class="flex items-center justify-center min-h-screen">
+
+  <!-- Age Verification -->
+  <div id="ageVerification" class="flex items-center justify-center min-h-screen">
     <div class="max-w-md w-full space-y-6 p-6 bg-gray-800 rounded shadow">
       <h1 class="text-3xl font-bold text-center">NSFW Art Site - 18+ Only</h1>
-      <p class="text-sm text-center">You must be 18 years or older to access. Please sign in or create an account.</p>
+      <p class="text-sm text-center">Are you 18 years or older? If yes, click "Proceed", otherwise you will be redirected.</p>
+      <button id="proceedBtn" class="w-full bg-green-600 hover:bg-green-700 p-2 rounded">Proceed</button>
+    </div>
+  </div>
+
+  <!-- Authentication Form (Sign In / Sign Up) -->
+  <div id="authContainer" class="flex items-center justify-center min-h-screen hidden">
+    <div class="max-w-md w-full space-y-6 p-6 bg-gray-800 rounded shadow">
+      <h1 class="text-3xl font-bold text-center">Sign In / Sign Up</h1>
 
       <!-- Sign In Form -->
       <form id="loginForm" class="space-y-4">
-        <h2 class="text-xl font-semibold">Sign In</h2>
         <input type="text" placeholder="Username" id="loginUsername" class="w-full p-2 rounded text-black" required>
         <input type="password" placeholder="Password" id="loginPassword" class="w-full p-2 rounded text-black" required>
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">Login</button>
@@ -24,7 +37,6 @@
 
       <!-- Sign Up Form -->
       <form id="signupForm" class="space-y-4">
-        <h2 class="text-xl font-semibold">Create Account</h2>
         <input type="text" placeholder="Username" id="signupUsername" class="w-full p-2 rounded text-black" required>
         <input type="password" placeholder="Password" id="signupPassword" class="w-full p-2 rounded text-black" required>
         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-2 rounded">Sign Up</button>
@@ -32,7 +44,7 @@
     </div>
   </div>
 
-  <!-- Dashboard -->
+  <!-- Dashboard & Upload Section -->
   <div id="dashboard" class="hidden p-4">
     <header class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold">Welcome to the NSFW Art Dashboard</h1>
@@ -40,84 +52,138 @@
     </header>
 
     <nav class="mb-4 space-x-4">
-      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Home</button>
-      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Upload</button>
-      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Rules</button>
+      <button id="uploadPageBtn" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Upload</button>
+      <button id="galleryPageBtn" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Gallery</button>
     </nav>
 
-    <div class="mb-4">
-      <input type="text" placeholder="Search by tags or name..." class="w-full p-2 text-black rounded">
+    <!-- Upload Form -->
+    <div id="uploadForm" class="space-y-4 hidden">
+      <input type="file" id="fileInput" accept="image/*,video/*" class="w-full p-2 text-black rounded">
+      <button id="uploadBtn" class="bg-blue-600 hover:bg-blue-700 w-full p-2 rounded">Upload</button>
     </div>
 
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="bg-gray-800 p-4 rounded shadow">Sample Art Post</div>
-      <div class="bg-gray-800 p-4 rounded shadow">Sample Art Post</div>
-      <div class="bg-gray-800 p-4 rounded shadow">Sample Art Post</div>
+    <!-- Gallery Section -->
+    <section id="gallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+      <!-- Gallery items will be dynamically loaded here -->
     </section>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-
+    // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
-      authDomain: "justfunitcom.firebaseapp.com",
-      projectId: "justfunitcom",
-      storageBucket: "justfunitcom.firebasestorage.app",
-      messagingSenderId: "12321079878",
-      appId: "1:12321079878:web:301d5a953691b733278047"
-    };
+    apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
+    authDomain: "justfunitcom.firebaseapp.com",
+    projectId: "justfunitcom",
+    storageBucket: "justfunitcom.firebasestorage.app",
+    messagingSenderId: "12321079878",
+    appId: "1:12321079878:web:301d5a953691b733278047"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+    const db = firebase.firestore();
 
-    const authContainer = document.getElementById("authContainer");
-    const dashboard = document.getElementById("dashboard");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    // Show dashboard if logged in
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        authContainer.classList.add("hidden");
-        dashboard.classList.remove("hidden");
-      } else {
-        authContainer.classList.remove("hidden");
-        dashboard.classList.add("hidden");
-      }
+    // Handle Age Verification
+    document.getElementById('proceedBtn').addEventListener('click', function() {
+      document.getElementById('ageVerification').classList.add('hidden');
+      document.getElementById('authContainer').classList.remove('hidden');
     });
 
-    // Sign In
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    // Handle Sign Up
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const username = document.getElementById("loginUsername").value;
-      const password = document.getElementById("loginPassword").value;
-      const email = `${username}@artsite.com`;
+      const username = document.getElementById('signupUsername').value;
+      const password = document.getElementById('signupPassword').value;
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    // Sign Up
-    document.getElementById("signupForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const username = document.getElementById("signupUsername").value;
-      const password = document.getElementById("signupPassword").value;
-      const email = `${username}@artsite.com`;
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName: username });
+        const userCredential = await auth.createUserWithEmailAndPassword(`${username}@artsite.com`, password);
+        await userCredential.user.updateProfile({ displayName: username });
         alert("Account created! You can now log in.");
       } catch (error) {
         alert(error.message);
       }
     });
 
+    // Handle Sign In
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      try {
+        await auth.signInWithEmailAndPassword(`${username}@artsite.com`, password);
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    // Handle File Upload
+    document.getElementById('uploadBtn').addEventListener('click', async function() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) {
+        alert('Please select a file to upload.');
+        return;
+      }
+      const user = auth.currentUser;
+      if (user) {
+        const storageRef = storage.ref().child(`uploads/${user.uid}/${file.name}`);
+        await storageRef.put(file);
+        const fileURL = await storageRef.getDownloadURL();
+        await db.collection('posts').add({
+          userId: user.uid,
+          username: user.displayName,
+          fileURL: fileURL,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Upload successful!');
+        loadGallery();
+      } else {
+        alert('Please log in to upload.');
+      }
+    });
+
+    // Load Gallery Posts
+    async function loadGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      const postsSnapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+      postsSnapshot.forEach(doc => {
+        const post = doc.data();
+        const postElement = document.createElement('div');
+        postElement.classList.add('bg-gray-800', 'p-4', 'rounded', 'shadow');
+        const postContent = post.fileURL.endsWith('.mp4') ? `<video controls src="${post.fileURL}" class="w-full h-auto"></video>` : `<img src="${post.fileURL}" class="w-full h-auto">`;
+        postElement.innerHTML = `<p class="text-xl font-bold">${post.username}</p>${postContent}`;
+        gallery.appendChild(postElement);
+      });
+    }
+
     // Logout
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await auth.signOut();
+      document.getElementById('authContainer').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    });
+
+    // Switch between pages (Upload and Gallery)
+    document.getElementById('uploadPageBtn').addEventListener('click', function() {
+      document.getElementById('uploadForm').classList.remove('hidden');
+      document.getElementById('gallery').classList.add('hidden');
+    });
+
+    document.getElementById('galleryPageBtn').addEventListener('click', function() {
+      document.getElementById('uploadForm').classList.add('hidden');
+      document.getElementById('gallery').classList.remove('hidden');
+      loadGallery();
+    });
+
+    // Show dashboard if logged in
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('authContainer').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+      } else {
+        document.getElementById('authContainer').classList.remove('hidden');
+        document.getElementById('dashboard').classList.add('hidden');
+      }
     });
   </script>
 </body>
