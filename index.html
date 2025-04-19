@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Art Gallery - Save Your Artwork</title>
+    <title>Art Gallery - Upload Artwork</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        .art-form input, .art-form textarea {
+        .art-form input[type="file"] {
             margin: 10px;
             padding: 10px;
             width: 80%;
@@ -50,7 +50,7 @@
             width: 200px;
             text-align: center;
         }
-        .art-item img {
+        .art-item img, .art-item video, .art-item gif {
             max-width: 100%;
             height: auto;
         }
@@ -65,10 +65,8 @@
 
     <!-- Form for uploading art -->
     <div class="art-form">
-        <input type="text" id="artTitle" placeholder="Enter Artwork Title" required>
-        <textarea id="artDescription" placeholder="Enter Artwork Description" rows="4" required></textarea>
-        <input type="url" id="artImageUrl" placeholder="Enter Artwork Image URL" required>
-        <button id="saveDataBtn">Save Artwork Data</button>
+        <input type="file" id="artFile" accept="image/*,video/*,gif/*" required>
+        <button id="saveDataBtn">Upload Artwork</button>
     </div>
 
     <!-- Gallery Section -->
@@ -78,37 +76,38 @@
     <script>
         // Function to save artwork data to LocalStorage
         document.getElementById('saveDataBtn').addEventListener('click', () => {
-            const title = document.getElementById('artTitle').value;
-            const description = document.getElementById('artDescription').value;
-            const imageUrl = document.getElementById('artImageUrl').value;
+            const artFileInput = document.getElementById('artFile');
+            const file = artFileInput.files[0];
 
-            // Check if all fields are filled
-            if (title && description && imageUrl) {
-                // Get saved data from LocalStorage or initialize an empty array
-                let artworkData = JSON.parse(localStorage.getItem('artworkData')) || [];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const fileData = {
+                        name: file.name,
+                        type: file.type,
+                        content: event.target.result // This is the file data (base64 encoded)
+                    };
 
-                // Create a new artwork object
-                const artwork = {
-                    title: title,
-                    description: description,
-                    imageUrl: imageUrl
+                    // Get saved data from LocalStorage or initialize an empty array
+                    let artworkData = JSON.parse(localStorage.getItem('artworkData')) || [];
+
+                    // Add new artwork data to the array
+                    artworkData.push(fileData);
+
+                    // Save updated artwork data back to LocalStorage
+                    localStorage.setItem('artworkData', JSON.stringify(artworkData));
+
+                    // Clear the input field
+                    artFileInput.value = '';
+
+                    // Display the updated gallery
+                    displayGallery();
                 };
-
-                // Add new artwork to the array
-                artworkData.push(artwork);
-
-                // Save updated artwork data back to LocalStorage
-                localStorage.setItem('artworkData', JSON.stringify(artworkData));
-
-                // Clear the input fields
-                document.getElementById('artTitle').value = '';
-                document.getElementById('artDescription').value = '';
-                document.getElementById('artImageUrl').value = '';
-
-                // Display the updated gallery
-                displayGallery();
+                
+                // Read the file as a data URL (base64 encoded)
+                reader.readAsDataURL(file);
             } else {
-                alert('Please fill out all fields.');
+                alert('Please select a file to upload.');
             }
         });
 
@@ -125,19 +124,29 @@
                 const artItem = document.createElement('div');
                 artItem.classList.add('art-item');
 
-                // Create image, title, and description elements
-                const img = document.createElement('img');
-                img.src = artwork.imageUrl;
-                img.alt = artwork.title;
                 const title = document.createElement('h3');
-                title.innerText = artwork.title;
-                const description = document.createElement('p');
-                description.innerText = artwork.description;
+                title.innerText = artwork.name;
+
+                // Check the type of the file (image, gif, or video) and display accordingly
+                let mediaElement;
+                if (artwork.type.startsWith('image/')) {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = artwork.content; // Base64 encoded content
+                    mediaElement.alt = artwork.name;
+                } else if (artwork.type.startsWith('video/')) {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = artwork.content; // Base64 encoded content
+                    mediaElement.controls = true;
+                    mediaElement.alt = artwork.name;
+                } else if (artwork.type === 'image/gif') {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = artwork.content; // Base64 encoded content
+                    mediaElement.alt = artwork.name;
+                }
 
                 // Append elements to the art item
-                artItem.appendChild(img);
                 artItem.appendChild(title);
-                artItem.appendChild(description);
+                artItem.appendChild(mediaElement);
 
                 // Append the art item to the gallery
                 gallery.appendChild(artItem);
