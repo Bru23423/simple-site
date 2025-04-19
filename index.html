@@ -3,54 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Adult Art Upload Site</title>
+  <title>Rule 34 Art Upload</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-6">
+<body class="bg-gray-900 text-white min-h-screen">
   <!-- Age Verification -->
-  <div id="ageGate" class="text-center">
-    <h1 class="text-3xl font-bold mb-4">This site contains adult content</h1>
-    <p class="mb-6">You must be 18 years or older to continue.</p>
+  <div id="ageGate" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center text-center p-6">
+    <h1 class="text-3xl font-bold mb-4">🔞 Rule 34 Content Warning</h1>
+    <p class="mb-4">This website contains explicit adult material including pornography, strong themes, and fictional depictions. By clicking "Yes, I Agree", you confirm that you are at least 18 years old and consent to view such content.</p>
     <div class="space-x-4">
-      <button onclick="agree()" class="bg-green-600 px-6 py-2 rounded hover:bg-green-700">Yes, I am 18+</button>
-      <button onclick="window.location.href='https://www.google.com'" class="bg-red-600 px-6 py-2 rounded hover:bg-red-700">No, take me back</button>
+      <button onclick="agree()" class="bg-green-600 px-6 py-2 rounded hover:bg-green-700">✅ Yes, I Agree</button>
+      <button onclick="window.location.href='https://www.google.com'" class="bg-red-600 px-6 py-2 rounded hover:bg-red-700">❌ No, Take Me Back</button>
     </div>
   </div>
 
-  <!-- Auth/Login Section -->
-  <div id="authSection" class="hidden max-w-md w-full space-y-4">
-    <h2 class="text-2xl font-bold">Login or Sign Up</h2>
-    <input id="email" type="email" placeholder="Email" class="w-full p-2 rounded bg-gray-800 text-white">
-    <input id="password" type="password" placeholder="Password" class="w-full p-2 rounded bg-gray-800 text-white">
-    <div class="flex space-x-4">
-      <button onclick="login()" class="flex-1 bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Login</button>
-      <button onclick="signup()" class="flex-1 bg-purple-600 px-4 py-2 rounded hover:bg-purple-700">Sign Up</button>
+  <!-- Navigation Tabs -->
+  <div id="navTabs" class="hidden p-4 bg-gray-800 flex justify-around">
+    <button onclick="showSection('uploadSection')" class="hover:underline">📤 Upload</button>
+    <button onclick="showSection('gallerySection')" class="hover:underline">🖼 Gallery</button>
+    <button onclick="showSection('rulesSection')" class="hover:underline">📜 Rules</button>
+  </div>
+
+  <!-- Auth Section -->
+  <div id="authSection" class="hidden flex flex-col items-center justify-center p-6">
+    <h2 class="text-2xl font-bold mb-4">Sign In or Create Account</h2>
+    <input id="email" type="email" placeholder="Email" class="mb-2 p-2 rounded bg-gray-800 text-white">
+    <input id="password" type="password" placeholder="Password" class="mb-4 p-2 rounded bg-gray-800 text-white">
+    <div class="space-x-4">
+      <button onclick="login()" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Login</button>
+      <button onclick="signup()" class="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700">Sign Up</button>
     </div>
   </div>
 
-  <!-- Main App Section -->
-  <div id="mainApp" class="hidden w-full max-w-4xl mt-10">
-    <div class="mb-6 flex justify-between items-center">
-      <h2 class="text-2xl font-bold">Upload Art</h2>
-      <button onclick="logout()" class="text-red-500 hover:underline">Logout</button>
-    </div>
+  <!-- Upload Section -->
+  <div id="uploadSection" class="hidden p-4">
+    <h2 class="text-xl font-bold mb-4">Upload Your Art</h2>
     <input type="file" id="uploadFile" class="mb-2 text-black">
-    <input type="text" id="caption" placeholder="Caption..." class="w-full p-2 rounded bg-gray-800 text-white mb-2">
-    <input type="text" id="tags" placeholder="Tags (comma-separated)" class="w-full p-2 rounded bg-gray-800 text-white mb-2">
+    <input type="text" id="caption" placeholder="Caption" class="w-full mb-2 p-2 bg-gray-800 rounded">
+    <input type="text" id="tags" placeholder="Tags (comma-separated)" class="w-full mb-2 p-2 bg-gray-800 rounded">
     <button onclick="uploadArt()" class="bg-green-600 px-4 py-2 rounded hover:bg-green-700">Upload</button>
+  </div>
 
-    <input type="text" id="searchTags" oninput="searchByTag()" placeholder="Search by tags..." class="w-full p-2 rounded bg-gray-700 text-white mt-6">
-    <hr class="my-6 border-gray-700">
-
+  <!-- Gallery Section -->
+  <div id="gallerySection" class="hidden p-4">
+    <input type="text" id="searchTags" oninput="searchByTag()" placeholder="Search by tags or name..." class="w-full p-2 rounded bg-gray-700 text-white mb-4">
     <div id="gallery" class="space-y-6"></div>
   </div>
 
+  <!-- Rules Section -->
+  <div id="rulesSection" class="hidden p-4">
+    <h2 class="text-xl font-bold mb-2">Rules & Guidelines</h2>
+    <ul class="list-disc pl-6">
+      <li>You must be 18+ to use this site.</li>
+      <li>Do not upload real-life illegal or abusive content.</li>
+      <li></li>
+      <li>Respect other creators in comments.</li>
+    </ul>
+  </div>
+
   <script>
-  const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyBUazYAZZkL7Z6_zUhXHJC6FHc_lZVlua0",
   authDomain: "justfunit-c25dd.firebaseapp.com",
   databaseURL: "https://justfunit-c25dd-default-rtdb.firebaseio.com",
@@ -59,46 +75,45 @@
   messagingSenderId: "340893927279",
   appId: "1:340893927279:web:9de690e1bfc33e09a30a9a"
 };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    const ageGate = document.getElementById('ageGate');
-    const authSection = document.getElementById('authSection');
-    const mainApp = document.getElementById('mainApp');
     let currentUser;
 
     function agree() {
-      ageGate.style.display = 'none';
-      authSection.style.display = 'block';
+      document.getElementById('ageGate').style.display = 'none';
+      document.getElementById('authSection').style.display = 'flex';
     }
 
     function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      auth.signInWithEmailAndPassword(email, password).then(() => initApp()).catch(err => alert(err.message));
+      auth.signInWithEmailAndPassword(email, password).then(() => initApp()).catch(alert);
     }
 
     function signup() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      auth.createUserWithEmailAndPassword(email, password).then(() => initApp()).catch(err => alert(err.message));
-    }
-
-    function logout() {
-      auth.signOut().then(() => location.reload());
+      auth.createUserWithEmailAndPassword(email, password).then(() => initApp()).catch(alert);
     }
 
     function initApp() {
       auth.onAuthStateChanged(user => {
         if (user) {
           currentUser = user;
-          authSection.style.display = 'none';
-          mainApp.style.display = 'block';
+          document.getElementById('authSection').style.display = 'none';
+          document.getElementById('navTabs').classList.remove('hidden');
+          showSection('gallerySection');
           loadGallery();
         }
+      });
+    }
+
+    function showSection(id) {
+      ['uploadSection', 'gallerySection', 'rulesSection'].forEach(section => {
+        document.getElementById(section).style.display = (section === id) ? 'block' : 'none';
       });
     }
 
@@ -106,7 +121,7 @@
       const file = document.getElementById('uploadFile').files[0];
       const caption = document.getElementById('caption').value;
       const tags = document.getElementById('tags').value.split(',').map(t => t.trim().toLowerCase());
-      if (!file) return alert("Choose a file.");
+      if (!file) return alert("Choose a file to upload.");
 
       const ref = storage.ref('uploads/' + Date.now() + '-' + file.name);
       ref.put(file).then(snapshot => {
@@ -116,6 +131,7 @@
             caption,
             tags,
             user: currentUser.email,
+            uid: currentUser.uid,
             likes: [],
             views: [],
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -131,26 +147,26 @@
         snapshot.forEach(doc => {
           const data = doc.data();
           if (filteredTags.length && !filteredTags.some(tag => data.tags.includes(tag))) return;
-          const postId = doc.id;
-          const isImage = data.url.match(/\.(jpeg|jpg|gif|png)$/i);
           const isLiked = data.likes.includes(currentUser.uid);
+          const postId = doc.id;
 
-          const element = document.createElement('div');
-          element.className = "bg-gray-800 p-4 rounded";
-          element.innerHTML = `
-            <p class="text-sm text-gray-400 mb-2">Uploaded by: ${data.user}</p>
-            ${isImage ? `<img src="${data.url}" class="mb-2 max-h-96 mx-auto rounded">` :
-              `<video src="${data.url}" controls class="mb-2 max-h-96 mx-auto rounded"></video>`}
-            <p class="mb-2">${data.caption}</p>
+          const div = document.createElement('div');
+          div.className = 'bg-gray-800 p-4 rounded';
+          div.innerHTML = `
+            <p class="text-sm text-gray-400">Uploaded by: ${data.user}</p>
+            ${data.url.match(/\.(jpg|jpeg|png|gif)$/i) ? `<img src="${data.url}" class="rounded mb-2 max-h-96">` : `<video src="${data.url}" controls class="rounded mb-2 max-h-96"></video>`}
+            <p>${data.caption}</p>
             <p class="text-sm text-gray-500">Tags: ${data.tags.join(', ')}</p>
             <button onclick="likePost('${postId}')" class="${isLiked ? 'text-yellow-400' : 'text-white'}">❤️ ${data.likes.length}</button>
-            <div id="comments-${postId}" class="mt-4 space-y-1"></div>
-            <input type="text" id="comment-${postId}" placeholder="Add a comment..." class="w-full p-1 bg-gray-700 rounded mt-2">
-            <button onclick="addComment('${postId}')" class="text-sm mt-1 text-blue-400">Post Comment</button>
+            <p class="text-sm mt-1 text-gray-400">Views: ${data.views.length}</p>
           `;
-          gallery.appendChild(element);
-          loadComments(postId);
-          trackView(postId, data.views);
+          gallery.appendChild(div);
+
+          if (!data.views.includes(currentUser.uid)) {
+            db.collection('posts').doc(postId).update({
+              views: [...data.views, currentUser.uid]
+            });
+          }
         });
       });
     }
@@ -159,45 +175,9 @@
       const postRef = db.collection('posts').doc(postId);
       postRef.get().then(doc => {
         const data = doc.data();
-        let likes = data.likes || [];
-        if (!likes.includes(currentUser.uid)) {
-          likes.push(currentUser.uid);
-          postRef.update({ likes });
+        if (!data.likes.includes(currentUser.uid)) {
+          postRef.update({ likes: [...data.likes, currentUser.uid] });
         }
-      });
-    }
-
-    function trackView(postId, views) {
-      if (!views.includes(currentUser.uid)) {
-        db.collection('posts').doc(postId).update({
-          views: [...views, currentUser.uid]
-        });
-      }
-    }
-
-    function addComment(postId) {
-      const commentInput = document.getElementById('comment-' + postId);
-      const comment = commentInput.value;
-      if (!comment) return;
-      db.collection('posts').doc(postId).collection('comments').add({
-        user: currentUser.email,
-        text: comment,
-        time: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      commentInput.value = '';
-    }
-
-    function loadComments(postId) {
-      db.collection('posts').doc(postId).collection('comments').orderBy("time", "asc").onSnapshot(snapshot => {
-        const container = document.getElementById('comments-' + postId);
-        container.innerHTML = '';
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const p = document.createElement('p');
-          p.className = "text-sm text-gray-300";
-          p.textContent = `${data.user}: ${data.text}`;
-          container.appendChild(p);
-        });
       });
     }
 
