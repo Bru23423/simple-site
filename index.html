@@ -3,206 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rule 34 Art Upload</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+  <title>NSFW Art Site</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
-  <!-- Age Verification -->
-  <div id="ageGate" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center text-center p-6">
-    <h1 class="text-3xl font-bold mb-4">🔞 Rule 34 Content Warning</h1>
-    <p class="mb-4">This website contains explicit adult material including pornography, strong themes, and fictional depictions. By clicking "Yes, I Agree", you confirm that you are at least 18 years old and consent to view such content.</p>
-    <div class="space-x-4">
-      <button onclick="agree()" class="bg-green-600 px-6 py-2 rounded hover:bg-green-700">✅ Yes, I Agree</button>
-      <button onclick="window.location.href='https://www.google.com'" class="bg-red-600 px-6 py-2 rounded hover:bg-red-700">❌ No, Take Me Back</button>
+  <div id="authContainer" class="flex items-center justify-center min-h-screen">
+    <div class="max-w-md w-full space-y-6 p-6 bg-gray-800 rounded shadow">
+      <h1 class="text-3xl font-bold text-center">NSFW Art Site - 18+ Only</h1>
+      <p class="text-sm text-center">You must be 18 years or older to access. Please sign in or create an account.</p>
+
+      <!-- Sign In Form -->
+      <form id="loginForm" class="space-y-4">
+        <h2 class="text-xl font-semibold">Sign In</h2>
+        <input type="text" placeholder="Username" id="loginUsername" class="w-full p-2 rounded text-black" required>
+        <input type="password" placeholder="Password" id="loginPassword" class="w-full p-2 rounded text-black" required>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded">Login</button>
+      </form>
+
+      <hr class="border-gray-600">
+
+      <!-- Sign Up Form -->
+      <form id="signupForm" class="space-y-4">
+        <h2 class="text-xl font-semibold">Create Account</h2>
+        <input type="text" placeholder="Username" id="signupUsername" class="w-full p-2 rounded text-black" required>
+        <input type="password" placeholder="Password" id="signupPassword" class="w-full p-2 rounded text-black" required>
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-2 rounded">Sign Up</button>
+      </form>
     </div>
   </div>
 
-  <!-- Navigation Tabs -->
-  <div id="navTabs" class="hidden p-4 bg-gray-800 flex justify-around">
-    <button onclick="showSection('uploadSection')" class="hover:underline">📤 Upload</button>
-    <button onclick="showSection('gallerySection')" class="hover:underline">🖼 Gallery</button>
-    <button onclick="showSection('rulesSection')" class="hover:underline">📜 Rules</button>
-  </div>
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden p-4">
+    <header class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Welcome to the NSFW Art Dashboard</h1>
+      <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Logout</button>
+    </header>
 
-  <!-- Auth Section -->
-  <div id="authSection" class="hidden flex flex-col items-center justify-center p-6">
-    <h2 class="text-2xl font-bold mb-4">Sign In or Create Account</h2>
-    <input id="username" type="text" placeholder="Username" class="mb-2 p-2 rounded bg-gray-800 text-white">
-    <input id="password" type="password" placeholder="Password" class="mb-4 p-2 rounded bg-gray-800 text-white">
-    <div class="space-x-4">
-      <button onclick="login()" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Login</button>
-      <button onclick="signup()" class="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700">Sign Up</button>
+    <nav class="mb-4 space-x-4">
+      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Home</button>
+      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Upload</button>
+      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Rules</button>
+    </nav>
+
+    <div class="mb-4">
+      <input type="text" placeholder="Search by tags or name..." class="w-full p-2 text-black rounded">
     </div>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="bg-gray-800 p-4 rounded shadow">Sample Art Post</div>
+      <div class="bg-gray-800 p-4 rounded shadow">Sample Art Post</div>
+      <div class="bg-gray-800 p-4 rounded shadow">Sample Art Post</div>
+    </section>
   </div>
 
-  <!-- Upload Section -->
-  <div id="uploadSection" class="hidden p-4">
-    <h2 class="text-xl font-bold mb-4">Upload Your Art</h2>
-    <input type="file" id="uploadFile" class="mb-2 text-black">
-    <input type="text" id="caption" placeholder="Caption" class="w-full mb-2 p-2 bg-gray-800 rounded">
-    <input type="text" id="tags" placeholder="Tags (comma-separated)" class="w-full mb-2 p-2 bg-gray-800 rounded">
-    <button onclick="uploadArt()" class="bg-green-600 px-4 py-2 rounded hover:bg-green-700">Upload</button>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
-  <!-- Gallery Section -->
-  <div id="gallerySection" class="hidden p-4">
-    <input type="text" id="searchTags" oninput="searchByTag()" placeholder="Search by tags or name..." class="w-full p-2 rounded bg-gray-700 text-white mb-4">
-    <div id="gallery" class="space-y-6"></div>
-  </div>
-
-  <!-- Rules Section -->
-  <div id="rulesSection" class="hidden p-4">
-    <h2 class="text-xl font-bold mb-2">Rules & Guidelines</h2>
-    <ul class="list-disc pl-6">
-      <li>You must be 18+ to use this site.</li>
-      <li>Do not upload real-life illegal or abusive content.</li>
-      <li>One like and one view per user is allowed per post.</li>
-      <li>Respect other creators in comments.</li>
-    </ul>
-  </div>
-
-  <script>
     const firebaseConfig = {
-  apiKey: "AIzaSyBUazYAZZkL7Z6_zUhXHJC6FHc_lZVlua0",
-  authDomain: "justfunit-c25dd.firebaseapp.com",
-  databaseURL: "https://justfunit-c25dd-default-rtdb.firebaseio.com",
-  projectId: "justfunit-c25dd",
-  storageBucket: "justfunit-c25dd.firebasestorage.app",
-  messagingSenderId: "340893927279",
-  appId: "1:340893927279:web:9de690e1bfc33e09a30a9a"
-};
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+      apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
+      authDomain: "justfunitcom.firebaseapp.com",
+      projectId: "justfunitcom",
+      storageBucket: "justfunitcom.firebasestorage.app",
+      messagingSenderId: "12321079878",
+      appId: "1:12321079878:web:301d5a953691b733278047"
+    };
 
-    let currentUser;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    function agree() {
-      document.getElementById('ageGate').style.display = 'none';
-      document.getElementById('authSection').style.display = 'flex';
-    }
+    const authContainer = document.getElementById("authContainer");
+    const dashboard = document.getElementById("dashboard");
+    const logoutBtn = document.getElementById("logoutBtn");
 
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+    // Show dashboard if logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authContainer.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+      } else {
+        authContainer.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+      }
+    });
 
-      auth.signInWithEmailAndPassword(username + "@example.com", password).then(() => initApp()).catch(alert);
-    }
+    // Sign In
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("loginUsername").value;
+      const password = document.getElementById("loginPassword").value;
+      const email = `${username}@artsite.com`;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        alert(error.message);
+      }
+    });
 
-    function signup() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+    // Sign Up
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("signupUsername").value;
+      const password = document.getElementById("signupPassword").value;
+      const email = `${username}@artsite.com`;
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: username });
+        alert("Account created! You can now log in.");
+      } catch (error) {
+        alert(error.message);
+      }
+    });
 
-      // Check if username already exists in Firestore
-      db.collection('users').where("username", "==", username).get().then(snapshot => {
-        if (!snapshot.empty) {
-          alert("Username is already taken.");
-        } else {
-          // Create new Firebase Auth user (using email trick)
-          auth.createUserWithEmailAndPassword(username + "@example.com", password).then(() => {
-            // Add user to Firestore
-            db.collection('users').add({
-              username: username,
-              uid: auth.currentUser.uid
-            });
-            initApp();
-          }).catch(alert);
-        }
-      }).catch(alert);
-    }
-
-    function initApp() {
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          currentUser = user;
-          document.getElementById('authSection').style.display = 'none';
-          document.getElementById('navTabs').classList.remove('hidden');
-          showSection('gallerySection');
-          loadGallery();
-        }
-      });
-    }
-
-    function showSection(id) {
-      ['uploadSection', 'gallerySection', 'rulesSection'].forEach(section => {
-        document.getElementById(section).style.display = (section === id) ? 'block' : 'none';
-      });
-    }
-
-    function uploadArt() {
-      const file = document.getElementById('uploadFile').files[0];
-      const caption = document.getElementById('caption').value;
-      const tags = document.getElementById('tags').value.split(',').map(t => t.trim().toLowerCase());
-      if (!file) return alert("Choose a file to upload.");
-
-      const ref = storage.ref('uploads/' + Date.now() + '-' + file.name);
-      ref.put(file).then(snapshot => {
-        ref.getDownloadURL().then(url => {
-          db.collection('posts').add({
-            url,
-            caption,
-            tags,
-            user: currentUser.email,
-            uid: currentUser.uid,
-            likes: [],
-            views: [],
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        });
-      });
-    }
-
-    function loadGallery(filteredTags = []) {
-      db.collection('posts').orderBy("createdAt", "desc").onSnapshot(snapshot => {
-        const gallery = document.getElementById('gallery');
-        gallery.innerHTML = '';
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if (filteredTags.length && !filteredTags.some(tag => data.tags.includes(tag))) return;
-          const isLiked = data.likes.includes(currentUser.uid);
-          const postId = doc.id;
-
-          const div = document.createElement('div');
-          div.className = 'bg-gray-800 p-4 rounded';
-          div.innerHTML = `
-            <p class="text-sm text-gray-400">Uploaded by: ${data.user}</p>
-            ${data.url.match(/\.(jpg|jpeg|png|gif)$/i) ? `<img src="${data.url}" class="rounded mb-2 max-h-96">` : `<video src="${data.url}" controls class="rounded mb-2 max-h-96"></video>`}
-            <p>${data.caption}</p>
-            <p class="text-sm text-gray-500">Tags: ${data.tags.join(', ')}</p>
-            <button onclick="likePost('${postId}')" class="${isLiked ? 'text-yellow-400' : 'text-white'}">❤️ ${data.likes.length}</button>
-            <p class="text-sm mt-1 text-gray-400">Views: ${data.views.length}</p>
-          `;
-          gallery.appendChild(div);
-
-          if (!data.views.includes(currentUser.uid)) {
-            db.collection('posts').doc(postId).update({
-              views: [...data.views, currentUser.uid]
-            });
-          }
-        });
-      });
-    }
-
-    function likePost(postId) {
-      const postRef = db.collection('posts').doc(postId);
-      postRef.get().then(doc => {
-        const data = doc.data();
-        if (!data.likes.includes(currentUser.uid)) {
-          postRef.update({ likes: [...data.likes, currentUser.uid] });
-        }
-      });
-    }
-
-    function searchByTag() {
-      const value = document.getElementById('searchTags').value.trim().toLowerCase();
-      const tags = value.split(',').map(t => t.trim()).filter(Boolean);
-      loadGallery(tags);
-    }
+    // Logout
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
   </script>
 </body>
 </html>
