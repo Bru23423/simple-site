@@ -2,29 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🔥 NSFW Art Gallery</title>
+  <title>GIF / Image / Video Gallery</title>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #1f1f1f;
+      background-color: #1e1e1e;
       color: #fff;
+      font-family: sans-serif;
       margin: 0;
       padding: 2rem;
       text-align: center;
     }
-
     h1 {
+      color: #ff69b4;
       font-size: 2.5rem;
-      color: #ff66b2;
     }
-
-    #uploadForm {
-      margin-top: 2rem;
-    }
-
     input, button {
       padding: 0.7rem;
       margin: 0.5rem;
@@ -32,13 +26,11 @@
       border: none;
       font-size: 1rem;
     }
-
     button {
-      background-color: #ff66b2;
-      color: white;
+      background: #ff69b4;
+      color: #fff;
       cursor: pointer;
     }
-
     .gallery {
       margin-top: 2rem;
       display: flex;
@@ -46,21 +38,18 @@
       justify-content: center;
       gap: 20px;
     }
-
     .gallery-item {
       background: #2c2c2c;
-      border: 1px solid #444;
       padding: 1rem;
       border-radius: 10px;
       max-width: 300px;
+      word-wrap: break-word;
     }
-
     img, video {
       max-width: 100%;
       max-height: 300px;
       border-radius: 6px;
     }
-
     #ageModal {
       position: fixed;
       top: 0; left: 0;
@@ -70,19 +59,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 10;
-      color: white;
+      z-index: 999;
     }
-
     #ageModal h2 {
-      color: #ff66b2;
+      color: #ff69b4;
       font-size: 2rem;
-    }
-
-    #ageModal button {
-      background: #ff66b2;
-      color: white;
-      margin-top: 1rem;
     }
   </style>
 </head>
@@ -90,35 +71,41 @@
 
 <div id="ageModal">
   <h2>🔞 Are you 18 or older?</h2>
-  <p>This site may contain adult content.</p>
+  <p>This site may contain NSFW content.</p>
   <button onclick="verifyAge()">Yes, I am 18+</button>
 </div>
 
-<h1>NSFW Art Gallery</h1>
+<h1>🎨 GIF / Image / Video Uploader</h1>
 
 <form id="uploadForm">
-  <input type="file" id="fileInput" accept="image/*,video/*" />
+  <input type="file" id="fileInput" accept="image/*,video/mp4" />
   <button type="submit">Upload</button>
 </form>
 
 <div class="gallery" id="gallery"></div>
 
 <script>
-  // ✅ Firebase config (replace with your actual keys!)
+  // ✅ Replace this with your Firebase project config
   const firebaseConfig = {
-    apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
-    authDomain: "justfunitcom.firebaseapp.com",
-    projectId: "justfunitcom",
-    storageBucket: "justfunitcom.firebasestorage.app",
-    messagingSenderId: "12321079878",
-    appId: "1:12321079878:web:301d5a953691b733278047"
-  };
+  apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
+  authDomain: "justfunitcom.firebaseapp.com",
+  projectId: "justfunitcom",
+  storageBucket: "justfunitcom.firebasestorage.app",
+  messagingSenderId: "12321079878",
+  appId: "1:12321079878:web:301d5a953691b733278047"
+};
 
   firebase.initializeApp(firebaseConfig);
   const storage = firebase.storage();
   const db = firebase.firestore();
 
-  // ✅ Upload Logic
+  // Age gate
+  function verifyAge() {
+    document.getElementById('ageModal').style.display = 'none';
+    loadGallery();
+  }
+
+  // Upload handler
   const form = document.getElementById('uploadForm');
   const fileInput = document.getElementById('fileInput');
   const gallery = document.getElementById('gallery');
@@ -126,10 +113,7 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const file = fileInput.files[0];
-    if (!file) {
-      alert('Please choose a file');
-      return;
-    }
+    if (!file) return alert('Please choose a file.');
 
     const fileRef = storage.ref().child(`uploads/${Date.now()}_${file.name}`);
     await fileRef.put(file);
@@ -142,9 +126,10 @@
     });
 
     form.reset();
-    loadGallery(); // refresh
+    loadGallery();
   });
 
+  // Load gallery
   async function loadGallery() {
     gallery.innerHTML = '';
     const snap = await db.collection('uploads').orderBy('timestamp', 'desc').get();
@@ -152,23 +137,16 @@
       const data = doc.data();
       const div = document.createElement('div');
       div.className = 'gallery-item';
+
       if (data.type.startsWith('video')) {
         div.innerHTML = `<video controls src="${data.url}"></video>`;
       } else {
-        div.innerHTML = `<img src="${data.url}" alt="Art">`;
+        div.innerHTML = `<img src="${data.url}" alt="Upload">`;
       }
+
       gallery.appendChild(div);
     });
   }
-
-  // ✅ Age Verification
-  function verifyAge() {
-    document.getElementById('ageModal').style.display = 'none';
-    loadGallery();
-  }
-
-  // Optional: If you want to remember the age gate for users
-  // localStorage.setItem('verified18', 'true'); and check on load
 </script>
 
 </body>
