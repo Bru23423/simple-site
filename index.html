@@ -8,54 +8,70 @@
         /* Basic Page Style */
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        /* Overlay Style */
+        /* Full-screen Background */
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://via.placeholder.com/1920x1080'); /* Replace with your image */
+            background-size: cover;
+            filter: blur(10px);
+            z-index: 0;
+        }
+
+        /* Overlay for Age Confirmation */
         #ageConfirmationOverlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
             text-align: center;
-            visibility: visible;
-            opacity: 1;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
         }
 
-        /* Blurring the content */
-        #content {
-            filter: blur(5px);
-            pointer-events: none;
+        /* Age Confirmation Content */
+        .confirmation-content {
+            max-width: 500px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
         }
 
-        /* Button Styles */
+        .confirmation-content h1 {
+            font-size: 24px;
+        }
+
+        .confirmation-content p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
         .button {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 18px;
             cursor: pointer;
+            border: none;
             border-radius: 5px;
-            margin-top: 20px;
+            transition: background-color 0.3s ease;
         }
 
         .button:hover {
             background-color: #45a049;
-        }
-
-        /* Hide overlay when confirmed */
-        .confirmed {
-            visibility: hidden;
-            opacity: 0;
         }
 
         .rules {
@@ -63,13 +79,25 @@
             font-size: 14px;
         }
 
+        /* Main Content Style */
+        #content {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
 
+    <!-- Background Image with Blur Effect -->
+    <div id="background"></div>
+
     <!-- Age Confirmation Overlay -->
     <div id="ageConfirmationOverlay">
-        <div>
+        <div class="confirmation-content">
             <h1>Age Verification</h1>
             <p>You must be 18+ years old to access this content.</p>
             <p class="rules">By entering this site, you agree to our <a href="#" style="color: #f1c40f;">Terms and Conditions</a> and acknowledge that the content is adult-oriented.</p>
@@ -77,25 +105,31 @@
         </div>
     </div>
 
-    <!-- Main Content (Initially Blurred) -->
+    <!-- Main Content (Initially Unclickable and Blurred) -->
     <div id="content">
         <h1>Welcome to Our Website</h1>
         <p>This is adult content. You need to verify your age before viewing it.</p>
+        <p>Once you confirm, you can freely explore the site.</p>
         <!-- More content goes here -->
     </div>
 
     <script>
-        // Function to confirm age and remove overlay
+        // Function to confirm age and let the user enter the site
         function confirmAge() {
-            // Hide the overlay
-            document.getElementById('ageConfirmationOverlay').classList.add('confirmed');
-            // Remove the blur effect from the main content
+            // Remove the age verification overlay
+            document.getElementById('ageConfirmationOverlay').style.display = 'none';
+
+            // Remove the blur effect on the background
+            document.getElementById('background').style.filter = 'none';
+
+            // Remove the blur effect on the main content
             document.getElementById('content').style.filter = 'none';
         }
     </script>
 
 </body>
 </html>
+
 
 Credits: Beachside Bunnies 
     <div class="video-container">
