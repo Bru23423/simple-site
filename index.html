@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Art Gallery - Upload Artwork</title>
+    <title>Adult Art Gallery - Upload and Manage Your Posts</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,7 +20,7 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        .art-form input[type="file"] {
+        .art-form input[type="file"], .art-form input[type="text"], .art-form textarea {
             margin: 10px;
             padding: 10px;
             width: 80%;
@@ -37,6 +37,16 @@
         .art-form button:hover {
             background-color: #45a049;
         }
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 80%;
+            max-width: 600px;
+        }
         .gallery {
             display: flex;
             flex-wrap: wrap;
@@ -49,6 +59,7 @@
             background-color: white;
             width: 200px;
             text-align: center;
+            position: relative;
         }
         .art-item img, .art-item video, .art-item gif {
             max-width: 100%;
@@ -57,35 +68,88 @@
         .art-item p {
             margin: 5px 0;
         }
+        .art-item .tags {
+            margin-top: 10px;
+            color: #666;
+        }
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <h1>Adult Art Gallery (18+ Content)</h1>
 
-    <!-- Form for uploading art -->
-    <div class="art-form">
-        <input type="file" id="artFile" accept="image/*,video/*,gif/*" required>
-        <button id="saveDataBtn">Upload Artwork</button>
+    <!-- Age Verification Form -->
+    <div id="age-verification">
+        <h2>Please verify your age to continue</h2>
+        <input type="number" id="age-input" placeholder="Enter your age">
+        <button onclick="verifyAge()">Verify Age</button>
     </div>
 
-    <!-- Gallery Section -->
-    <h2>Art Gallery</h2>
-    <div id="gallery" class="gallery"></div>
+    <!-- Content Section (Hidden until age verification) -->
+    <div id="content" style="display:none;">
+        <!-- Form for uploading art -->
+        <div class="art-form">
+            <input type="text" id="artTitle" placeholder="Enter Artwork Title" required>
+            <textarea id="artDescription" placeholder="Enter Artwork Description" rows="4" required></textarea>
+            <input type="text" id="artTags" placeholder="Enter Tags (comma separated)" required>
+            <input type="file" id="artFile" accept="image/*,video/*,gif/*" required>
+            <button id="saveDataBtn">Upload Artwork</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="searchTags" placeholder="Search by Tags" oninput="filterGallery()">
+        </div>
+
+        <!-- Gallery Section -->
+        <h2>Art Gallery</h2>
+        <div id="gallery" class="gallery"></div>
+    </div>
 
     <script>
+        // Function to verify user's age
+        function verifyAge() {
+            const age = document.getElementById('age-input').value;
+            if (age >= 18) {
+                // Allow access to the content
+                document.getElementById('age-verification').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } else {
+                // Redirect or show a warning for underage users
+                alert("You must be 18 or older to access this content.");
+                window.location.href = "https://www.google.com"; // Redirecting to Google for underage users
+            }
+        }
+
         // Function to save artwork data to LocalStorage
         document.getElementById('saveDataBtn').addEventListener('click', () => {
+            const title = document.getElementById('artTitle').value;
+            const description = document.getElementById('artDescription').value;
+            const tags = document.getElementById('artTags').value.split(',').map(tag => tag.trim());
             const artFileInput = document.getElementById('artFile');
             const file = artFileInput.files[0];
 
-            if (file) {
+            if (title && description && tags.length > 0 && file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const fileData = {
-                        name: file.name,
+                        id: generateUniqueId(),
+                        title: title,
+                        description: description,
+                        tags: tags,
                         type: file.type,
-                        content: event.target.result // This is the file data (base64 encoded)
+                        content: event.target.result, // This is the file data (base64 encoded)
+                        ownerId: localStorage.getItem('userId') // Store the uploader's unique ID
                     };
 
                     // Get saved data from LocalStorage or initialize an empty array
@@ -97,7 +161,10 @@
                     // Save updated artwork data back to LocalStorage
                     localStorage.setItem('artworkData', JSON.stringify(artworkData));
 
-                    // Clear the input field
+                    // Clear the input fields
+                    document.getElementById('artTitle').value = '';
+                    document.getElementById('artDescription').value = '';
+                    document.getElementById('artTags').value = '';
                     artFileInput.value = '';
 
                     // Display the updated gallery
@@ -107,9 +174,14 @@
                 // Read the file as a data URL (base64 encoded)
                 reader.readAsDataURL(file);
             } else {
-                alert('Please select a file to upload.');
+                alert('Please fill out all fields and select a file.');
             }
         });
+
+        // Function to generate a unique user ID (For demo purposes, using a random ID)
+        function generateUniqueId() {
+            return 'user-' + Math.random().toString(36).substr(2, 9);
+        }
 
         // Function to display saved artwork data in the gallery
         function displayGallery() {
@@ -125,32 +197,123 @@
                 artItem.classList.add('art-item');
 
                 const title = document.createElement('h3');
-                title.innerText = artwork.name;
+                title.innerText = artwork.title;
 
                 // Check the type of the file (image, gif, or video) and display accordingly
                 let mediaElement;
                 if (artwork.type.startsWith('image/')) {
                     mediaElement = document.createElement('img');
                     mediaElement.src = artwork.content; // Base64 encoded content
-                    mediaElement.alt = artwork.name;
+                    mediaElement.alt = artwork.title;
                 } else if (artwork.type.startsWith('video/')) {
                     mediaElement = document.createElement('video');
                     mediaElement.src = artwork.content; // Base64 encoded content
                     mediaElement.controls = true;
-                    mediaElement.alt = artwork.name;
+                    mediaElement.alt = artwork.title;
                 } else if (artwork.type === 'image/gif') {
                     mediaElement = document.createElement('img');
                     mediaElement.src = artwork.content; // Base64 encoded content
-                    mediaElement.alt = artwork.name;
+                    mediaElement.alt = artwork.title;
                 }
+
+                const description = document.createElement('p');
+                description.innerText = artwork.description;
+
+                const tags = document.createElement('p');
+                tags.classList.add('tags');
+                tags.innerText = `Tags: ${artwork.tags.join(', ')}`;
+
+                // Delete button visible only to the owner
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('delete-button');
+                deleteButton.innerText = 'Delete';
+                deleteButton.style.display = (artwork.ownerId === localStorage.getItem('userId')) ? 'block' : 'none';
+                deleteButton.onclick = function() {
+                    if (confirm('Are you sure you want to delete this post?')) {
+                        deletePost(artwork.id);
+                    }
+                };
 
                 // Append elements to the art item
                 artItem.appendChild(title);
                 artItem.appendChild(mediaElement);
+                artItem.appendChild(description);
+                artItem.appendChild(tags);
+                artItem.appendChild(deleteButton);
 
                 // Append the art item to the gallery
                 gallery.appendChild(artItem);
             });
+        }
+
+        // Function to delete a post
+        function deletePost(postId) {
+            let artworkData = JSON.parse(localStorage.getItem('artworkData')) || [];
+            artworkData = artworkData.filter(artwork => artwork.id !== postId);
+            localStorage.setItem('artworkData', JSON.stringify(artworkData));
+
+            // Refresh the gallery
+            displayGallery();
+        }
+
+        // Function to filter gallery based on tag search
+        function filterGallery() {
+            const searchQuery = document.getElementById('searchTags').value.toLowerCase();
+            const gallery = document.getElementById('gallery');
+            const artworkData = JSON.parse(localStorage.getItem('artworkData')) || [];
+
+            // Filter artwork based on search query
+            const filteredArtwork = artworkData.filter(artwork => 
+                artwork.tags.some(tag => tag.toLowerCase().includes(searchQuery))
+            );
+
+            // Clear the gallery and display filtered artwork
+            gallery.innerHTML = '';
+            filteredArtwork.forEach(artwork => {
+                const artItem = document.createElement('div');
+                artItem.classList.add('art-item');
+
+                const title = document.createElement('h3');
+                title.innerText = artwork.title;
+
+                // Check the type of the file (image, gif, or video) and display accordingly
+                let mediaElement;
+                if (artwork.type.startsWith('image/')) {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = artwork.content;
+                    mediaElement.alt = artwork.title;
+                } else if (artwork.type.startsWith('video/')) {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = artwork.content;
+                    mediaElement.controls = true;
+                    mediaElement.alt = artwork.title;
+                } else if (artwork.type === 'image/gif') {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = artwork.content;
+                    mediaElement.alt = artwork.title;
+                }
+
+                const description = document.createElement('p');
+                description.innerText = artwork.description;
+
+                const tags = document.createElement('p');
+                tags.classList.add('tags');
+                tags.innerText = `Tags: ${artwork.tags.join(', ')}`;
+
+                // Append elements to the art item
+                artItem.appendChild(title);
+                artItem.appendChild(mediaElement);
+                artItem.appendChild(description);
+                artItem.appendChild(tags);
+
+                // Append the art item to the gallery
+                gallery.appendChild(artItem);
+            });
+        }
+
+        // Generate a unique user ID and store it in LocalStorage for demo purposes
+        if (!localStorage.getItem('userId')) {
+            localStorage.setItem('userId', generateUniqueId());
         }
 
         // Display the gallery on page load
