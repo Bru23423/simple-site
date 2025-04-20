@@ -22,6 +22,8 @@
     }
 
     .container {
+      display: flex;
+      justify-content: space-between;
       max-width: 800px;
       margin: 20px auto;
       padding: 20px;
@@ -32,10 +34,8 @@
     }
 
     .search-section {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-bottom: 20px;
+      flex: 1;
+      margin-right: 20px;
     }
 
     .search-section img {
@@ -67,6 +67,10 @@
 
     input[type="submit"]:hover {
       background-color: #555;
+    }
+
+    .right-image {
+      width: 250px;
     }
 
     .results {
@@ -201,8 +205,13 @@
       </form>
     </div>
 
-    <div class="results" id="searchResults"></div>
+    <!-- Right Image -->
+    <div class="right-image">
+      <img src="22883830.gif" alt="Right Side Image" />
+    </div>
   </div>
+
+  <div class="results" id="searchResults"></div>
 
   <script>
     const ageWarningModal = document.getElementById("ageWarning");
