@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sex roll</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            opacity: 0; /* Hide content initially */
+            transition: opacity 0.5s ease;
+        }
+        .result {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+        button {
+            font-size: 1.5rem;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .chance-info {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #555;
+        }
+        
+        /* Modal Styles */
+        #ageModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #ageModalContent {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+        }
+        #ageModal button {
+            margin-top: 20px;
+            background-color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
 
+    <!-- Age Verification Modal -->
+    <div id="ageModal">
+        <div id="ageModalContent">
+            <h2>Age Verification</h2>
+            <p>You must be 18 or older to play this game.</p>
+            <button id="ageConfirmBtn">I am 18 or older</button>
+        </div>
+    </div>
+
+    <!-- Game Content (hidden initially) -->
+    <div class="container" id="gameContainer">
+        <h1>Click to Roll</h1>
+        <button id="rollButton">Roll the Dice</button>
+        <div class="result" id="result">?</div>
+        <div class="chance-info">
+            <p>have fun (:</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to simulate the roll
+        function rollDice() {
+            const outcome = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('result').textContent = outcome;
+        }
+
+        // Show the age verification modal when the page loads
+        window.onload = function() {
+            document.getElementById('ageModal').style.display = 'flex';
+        };
+
+        // Age confirmation button functionality
+        document.getElementById('ageConfirmBtn').addEventListener('click', function() {
+            // Close the age modal
+            document.getElementById('ageModal').style.display = 'none';
+            
+            // Show the game content
+            const gameContainer = document.getElementById('gameContainer');
+            gameContainer.style.opacity = 1; // Reveal the game container smoothly
+        });
+
+        // Add event listener to the roll button (game functionality)
+        document.getElementById('rollButton').addEventListener('click', rollDice);
+    </script>
+
+</body>
+</html>
