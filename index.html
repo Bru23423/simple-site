@@ -56,6 +56,11 @@
     #confirm-btn:hover {
       background-color: #cc0000;
     }
+
+    #main-content {
+      display: none;
+      padding: 40px;
+    }
   </style>
 </head>
 <body>
@@ -68,7 +73,29 @@
     <button id="confirm-btn">I am 18 or older</button>
   </div>
 
-  <!-- Your actual website content goes here -->
-  <div id="main-content" style="display: none;">
-    <h1>Welcome to the site!</h1>
-    <p>This is your main content after confirming age.</p>
+  <div id="main-content">
+    <h1>Welcome to the Site</h1>
+    <p>This is your main website content.</p>
+  </div>
+
+  <script>
+    // Check if user has already confirmed age
+    if (localStorage.getItem("ageVerified") === "true") {
+      document.getElementById("age-warning").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+      document.body.style.overflow = "auto";
+    }
+
+    document.getElementById("confirm-btn").addEventListener("click", function () {
+      // Save confirmation
+      localStorage.setItem("ageVerified", "true");
+
+      // Hide age warning and show content
+      document.getElementById("age-warning").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+      document.body.style.overflow = "auto";
+    });
+  </script>
+
+</body>
+</html>
