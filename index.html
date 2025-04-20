@@ -176,6 +176,12 @@
     #darkModeToggle:hover {
       background-color: #555;
     }
+
+    /* Apply blur effect */
+    body.blurred {
+      filter: blur(5px);
+      pointer-events: none; /* Disable interactions */
+    }
   </style>
 </head>
 <body>
@@ -219,6 +225,7 @@
 
     ageConfirmButton.addEventListener("click", () => {
       ageWarningModal.style.display = "none";
+      document.body.classList.remove("blurred"); // Remove blur when the age confirmation is clicked
     });
 
     document.getElementById("searchForm").addEventListener("submit", function (event) {
@@ -279,6 +286,13 @@
         resultItem.classList.toggle("dark-mode");
       }
     });
+
+    // Add blur effect when the page loads
+    document.body.classList.add("blurred");
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
