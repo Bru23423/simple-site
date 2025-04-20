@@ -31,6 +31,22 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
+    .search-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .search-section img {
+      width: 150px;
+      border-radius: 8px;
+    }
+
+    .search-section form {
+      flex: 1;
+    }
+
     input[type="text"] {
       width: 80%;
       padding: 10px;
@@ -81,7 +97,6 @@
       text-decoration: underline;
     }
 
-    /* Dark Mode styles */
     body.dark-mode {
       background-color: #121212;
       color: white;
@@ -101,7 +116,6 @@
       color: #f4f4f4;
     }
 
-    /* Age warning modal styles */
     #ageWarning {
       position: fixed;
       top: 0;
@@ -142,7 +156,6 @@
       background-color: #555;
     }
 
-    /* Dark mode toggle button */
     #darkModeToggle {
       position: fixed;
       top: 20px;
@@ -164,13 +177,12 @@
 <body>
   <button id="darkModeToggle">Switch to Dark Mode</button>
 
-  <!-- Age Warning Modal -->
   <div id="ageWarning">
     <div class="modal-content">
       <h2>Warning!</h2>
       <p>
         You must be 18+ to enter this website.
-        <h3> Rule 34 content is strictly 18+ only, as it involves explicit adult material that is legally and ethically intended for mature audiences.</h3>
+        <h3>Rule 34 content is strictly 18+ only, as it involves explicit adult material that is legally and ethically intended for mature audiences.</h3>
       </p>
       <button id="ageConfirm">I am 18 or older</button>
     </div>
@@ -181,10 +193,13 @@
   </header>
 
   <div class="container">
-    <form id="searchForm">
-      <input type="text" id="searchQuery" placeholder="Enter search term" required />
-      <input type="submit" value="Search" />
-    </form>
+    <div class="search-section">
+      <img src="26342022.gif" alt="Image" />
+      <form id="searchForm">
+        <input type="text" id="searchQuery" placeholder="Enter search term" required />
+        <input type="submit" value="Search" />
+      </form>
+    </div>
 
     <div class="results" id="searchResults"></div>
   </div>
@@ -219,7 +234,7 @@
       if (results.length === 0) {
         htmlContent = "No results found.";
       } else {
-        const result = results[0]; // only one result
+        const result = results[0];
         htmlContent = `
           <div class="result-item">
             <a href="${result.url}" target="_blank">
@@ -233,13 +248,11 @@
       const container = document.getElementById("searchResults");
       container.innerHTML = htmlContent;
 
-      // Apply dark mode if active
       if (document.body.classList.contains("dark-mode")) {
         container.querySelector(".result-item").classList.add("dark-mode");
       }
     }
 
-    // Dark mode toggle
     const darkModeToggle = document.getElementById("darkModeToggle");
     const body = document.body;
     const container = document.querySelector(".container");
@@ -248,39 +261,13 @@
       body.classList.toggle("dark-mode");
       container.classList.toggle("dark-mode");
 
-      // Update button text
       darkModeToggle.textContent = body.classList.contains("dark-mode")
         ? "Switch to Light Mode"
         : "Switch to Dark Mode";
 
-      // Toggle dark mode on result item if exists
       const resultItem = document.querySelector(".result-item");
       if (resultItem) {
         resultItem.classList.toggle("dark-mode");
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Left Side GIF</title>
-  <style>
-    .left-gif {
-      float: left;
-      margin-right: 20px; /* optional spacing from other content */
-    }
-  </style>
-</head>
-<body>
-
-  <img src="26342022.gif" alt="GIF" class="left-gif">
-
-  <!-- Example content next to it -->
-  <div>
-    <h2>Welcome to the site!</h2>
-    <p>This is some sample content that appears to the right of the GIF.</p>
-  </div>
-
-</body>
-</html>
       }
     });
   </script>
