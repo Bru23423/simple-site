@@ -92,17 +92,26 @@
             background-color: #666;
         }
 
-        /* Toggle Button for Modes */
-        .mode-toggle {
+        /* Mode Toggle Buttons - Container */
+        .mode-buttons-container {
+            display: flex;
+            justify-content: space-between;  /* Space the buttons apart */
             position: fixed;
             top: 20px;
-            right: 20px;
+            width: 90%;  /* Make it occupy most of the width */
+            padding: 0 10px;
+        }
+
+        /* Individual Toggle Button Styles */
+        .mode-toggle {
             background-color: #4CAF50;
             color: white;
             border: none;
             padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
+            flex-grow: 1;
+            margin: 0 10px;  /* Add spacing between the buttons */
         }
         .mode-toggle:hover {
             background-color: #45a049;
@@ -112,82 +121,84 @@
         body.safety-mode #gif {
             display: none;
         }
-
     </style>
 </head>
 <body>
 
-    <!-- Age Verification Modal -->
-    <div id="ageModal">
-        <div id="ageModalContent">
-            <h2>Age Verification</h2>
-            <p>You must be 18 or older to play this game.</p>
-            <button id="ageConfirmBtn">I am 18 or older</button>
-        </div>
+<!-- Age Verification Modal -->
+<div id="ageModal">
+    <div id="ageModalContent">
+        <h2>Age Verification</h2>
+        <p>You must be 18 or older to play this game.</p>
+        <button id="ageConfirmBtn">I am 18 or older</button>
     </div>
+</div>
 
-    <!-- Game Content (hidden initially) -->
-    <div class="container" id="gameContainer">
-        <h1>Sex roll</h1>
-        <button id="rollButton">Roll the Dice</button>
-        <div class="result" id="result">?</div>
-        <div class="chance-info">
-            <p></p>
-        </div>
+<!-- Game Content (hidden initially) -->
+<div class="container" id="gameContainer">
+    <h1>Sex roll</h1>
+    <button id="rollButton">Roll the Dice</button>
+    <div class="result" id="result">?</div>
+    <div class="chance-info">
+        <p></p>
     </div>
+</div>
 
-    <!-- Left side GIF -->
-    <img src="22883830.gif" alt="GIF" id="gif">
+<!-- Left side GIF -->
+<img src="22883830.gif" alt="GIF" id="gif">
 
-    <!-- Mode Toggle Buttons -->
+<!-- Mode Toggle Buttons Container -->
+<div class="mode-buttons-container">
     <button class="mode-toggle" id="darkModeToggle">Toggle Dark/Light Mode</button>
     <button class="mode-toggle" id="safetyModeToggle">Toggle Safety Mode</button>
+</div>
 
-    <script>
-        // Function to simulate the roll and display text outcomes
-        function rollDice() {
-            const outcomes = [
-                "You won!",
-                "Try again!",
-                "Lucky!",
-                "Better luck next time!",
-                "You are the chosen one!",
-                "So close, try again!"
-            ];
+<script>
+    // Function to simulate the roll and display text outcomes
+    function rollDice() {
+        const outcomes = [
+            "You won!",
+            "Try again!",
+            "Lucky!",
+            "Better luck next time!",
+            "You are the chosen one!",
+            "So close, try again!"
+        ];
 
-            // Randomly choose a text outcome from the list
-            const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
-            document.getElementById('result').textContent = outcome;
-        }
+        // Randomly choose a text outcome from the list
+        const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+        document.getElementById('result').textContent = outcome;
+    }
 
-        // Show the age verification modal when the page loads
-        window.onload = function() {
-            document.getElementById('ageModal').style.display = 'flex';
-        };
+    // Show the age verification modal when the page loads
+    window.onload = function() {
+        document.getElementById('ageModal').style.display = 'flex';
+    };
 
-        // Age confirmation button functionality
-        document.getElementById('ageConfirmBtn').addEventListener('click', function() {
-            // Close the age modal
-            document.getElementById('ageModal').style.display = 'none';
-            
-            // Show the game content
-            const gameContainer = document.getElementById('gameContainer');
-            gameContainer.style.opacity = 1; // Reveal the game container smoothly
-        });
+    // Age confirmation button functionality
+    document.getElementById('ageConfirmBtn').addEventListener('click', function() {
+        // Close the age modal
+        document.getElementById('ageModal').style.display = 'none';
 
-        // Add event listener to the roll button (game functionality)
-        document.getElementById('rollButton').addEventListener('click', rollDice);
+        // Show the game content
+        const gameContainer = document.getElementById('gameContainer');
+        gameContainer.style.opacity = 1; // Reveal the game container smoothly
+    });
 
-        // Toggle Dark/Light Mode
-        document.getElementById('darkModeToggle').addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-        });
+    // Add event listener to the roll button (game functionality)
+    document.getElementById('rollButton').addEventListener('click', rollDice);
 
-        // Toggle Safety Mode (Hide GIF)
-        document.getElementById('safetyModeToggle').addEventListener('click', function() {
-            document.body.classList.toggle('safety-mode');
-        });
-    </script>
+    // Toggle Dark/Light Mode
+    document.getElementById('darkModeToggle').addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    // Toggle Safety Mode (Hide GIF)
+    document.getElementById('safetyModeToggle').addEventListener('click', function() {
+        document.body.classList.toggle('safety-mode');
+    });
+</script>
 
 </body>
 </html>
+
