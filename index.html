@@ -77,7 +77,7 @@
             transform: translateY(-50%);
             width: 300px;
             height: auto;
-            transition: filter 0.3s ease;
+            transition: display 0.3s ease;
         }
 
         /* Dark Mode Styles */
@@ -90,11 +90,6 @@
         }
         body.dark-mode button:hover {
             background-color: #666;
-        }
-
-        /* Safety Mode (blur the gif) */
-        body.safety-mode #gif {
-            filter: blur(8px); /* Blurring the GIF */
         }
 
         /* Toggle Button for Modes */
@@ -112,6 +107,12 @@
         .mode-toggle:hover {
             background-color: #45a049;
         }
+
+        /* Hide the GIF in Safety Mode */
+        body.safety-mode #gif {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -127,7 +128,7 @@
 
     <!-- Game Content (hidden initially) -->
     <div class="container" id="gameContainer">
-        <h1>Sex roll (click to roll)</h1>
+        <h1>Sex roll</h1>
         <button id="rollButton">Roll the Dice</button>
         <div class="result" id="result">?</div>
         <div class="chance-info">
@@ -138,8 +139,9 @@
     <!-- Left side GIF -->
     <img src="22883830.gif" alt="GIF" id="gif">
 
-    <!-- Mode Toggle Button (Light/Dark/Safety) -->
-    <button class="mode-toggle" id="modeToggleBtn">Toggle Light/Dark/Safety Mode</button>
+    <!-- Mode Toggle Buttons -->
+    <button class="mode-toggle" id="darkModeToggle">Toggle Dark/Light Mode</button>
+    <button class="mode-toggle" id="safetyModeToggle">Toggle Safety Mode</button>
 
     <script>
         // Function to simulate the roll and display text outcomes
@@ -176,12 +178,13 @@
         // Add event listener to the roll button (game functionality)
         document.getElementById('rollButton').addEventListener('click', rollDice);
 
-        // Mode toggle (Light/Dark/Safety)
-        document.getElementById('modeToggleBtn').addEventListener('click', function() {
-            // Toggle Light/Dark Mode
+        // Toggle Dark/Light Mode
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
             document.body.classList.toggle('dark-mode');
+        });
 
-            // Toggle Safety Mode
+        // Toggle Safety Mode (Hide GIF)
+        document.getElementById('safetyModeToggle').addEventListener('click', function() {
             document.body.classList.toggle('safety-mode');
         });
     </script>
