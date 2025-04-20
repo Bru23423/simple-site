@@ -1,3 +1,201 @@
-<h1>This website is still being made</h1>
-join our discord server for idea's or anything idk.
-<h1>https://discord.gg/ZushmJ6yEp<h1> (copy and paste it and type it)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rule 34 Search Engine</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0d0d0d;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      height: 100vh;
+    }
+
+    .left {
+      width: 60%;
+      padding: 40px;
+    }
+
+    .title {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #ff4dd2;
+      text-shadow: 0 0 10px #ff4dd2;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    input[type="text"] {
+      padding: 15px;
+      font-size: 1.2em;
+      width: 70%;
+      border: none;
+      border-radius: 10px;
+      background-color: #1e1e1e;
+      color: #fff;
+      outline: none;
+    }
+
+    button {
+      padding: 15px 25px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff4dd2;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e600ac;
+    }
+
+    .gif-container {
+      width: 40%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .gif-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 77, 210, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .left, .gif-container {
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .search-box {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+      }
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal {
+      background: #1a1a1a;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 500px;
+      box-shadow: 0 0 20px #ff4dd2;
+    }
+
+    .modal h2 {
+      color: #ff4dd2;
+      margin-bottom: 20px;
+    }
+
+    .modal p {
+      font-size: 1.1em;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .modal button {
+      padding: 12px 30px;
+      font-size: 1em;
+      background-color: #ff4dd2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .modal button:hover {
+      background-color: #e600ac;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Age Agreement Modal -->
+  <div id="ageModal" class="modal-overlay">
+    <div class="modal">
+      <h2>⚠️ NSFW Warning</h2>
+      <p>This site contains adult content. You must be 18+ and agree to the rules before continuing.</p>
+      <button id="agreeBtn">I am 18+ and Agree</button>
+    </div>
+  </div>
+
+  <div class="left">
+    <div class="title">NSFW Tag Search</div>
+    <form id="searchForm">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search anything..." required />
+        <button type="submit">Search</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="gif-container">
+    <img src="22883830.gif" alt="NSFW gif" />
+  </div>
+
+  <script>
+    // Age Agreement Check
+    const ageModal = document.getElementById('ageModal');
+    const agreeBtn = document.getElementById('agreeBtn');
+
+    if (localStorage.getItem('agreedToNSFW') !== 'true') {
+      ageModal.style.display = 'flex';
+    } else {
+      ageModal.style.display = 'none';
+    }
+
+    agreeBtn.addEventListener('click', () => {
+      localStorage.setItem('agreedToNSFW', 'true');
+      ageModal.style.display = 'none';
+    });
+
+    // Search Redirect
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const query = document.getElementById('searchInput').value.trim();
+      if (query !== "") {
+        const encodedQuery = encodeURIComponent(query);
+        window.location.href = `https://rule34.xxx/index.php?page=post&s=list&tags=${encodedQuery}`;
+      }
+    });
+  </script>
+</body>
+</html>
