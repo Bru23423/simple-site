@@ -1,1 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule 34 Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input[type="submit"]:hover {
+            background-color: #555;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .result-item img {
+            width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .result-item a {
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .result-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dark Mode styles */
+        body.dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        .container.dark-mode {
+            background-color: #1e1e1e;
+        }
+        .result-item.dark-mode {
+            background-color: #333;
+        }
+        .result-item a.dark-mode {
+            color: #f4f4f4;
+        }
+
+        /* Age warning modal styles */
+        #ageWarning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            width: 80%;
+        }
+
+        .modal-content h2 {
+            margin: 20px 0;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #555;
+        }
+
+        /* Dark mode toggle button */
+        #darkModeToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #darkModeToggle:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle Button -->
+    <button id="darkModeToggle">Switch to Dark Mode</button>
+
+    <!-- Age Warning Modal -->
+    <div id="ageWarning">
+        <div class="modal-content">
+            <h2>Warning!</h2>
+            <p>You must be 18+ to enter this website. <h3> Rule 34 content is strictly 18+ only, as it involves explicit adult material that is legally and ethically intended for mature audiences.</h3></p>
+            <button id="ageConfirm">I am 18 or older</button>
+        </div>
+    </div>
+
+    <header>
+        <h1>Rule 34 Search Engine</h1>
+    </header>
+
+    <div class="container">
+        <form id="searchForm">
+            <input type="text" id="searchQuery" placeholder="Enter search term" required>
+            <input type="submit" value="Search">
+        </form>
+
+        <div class="results" id="searchResults"></div>
+    </div>
+
+    <script>
+        // Show age warning modal
+        const ageWarningModal = document.getElementById("ageWarning");
+        const ageConfirmButton = document.getElementById("ageConfirm");
+
+        // When the user clicks the "I am 18 or older" button
+        ageConfirmButton.addEventListener("click", function() {
+            // Hide the age warning modal
+            ageWarningModal.style.display = "none";
+        });
+
+        document.getElementById("searchForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const query = document.getElementById("searchQuery").value;
+            searchRule34(query);
+        });
+
+        function searchRule34(query) {
+            // Example URL for Rule 34 image search (You may need to find a proper API or RSS feed)
+            const searchURL = `https://rule34.xxx/index.php?page=post&s=list&tags=${encodeURIComponent(query)}`;
+
+            // Clear previous results
+            document.getElementById("searchResults").innerHTML = "Searching...";
+
+            // In a real application, you'd use an API to fetch actual results here
+            // For this example, we'll just generate a static link to Rule34
+
+            // Mock results with image URLs
+            const mockResults = [
+                { title: `Result 1 for "${query}"`, url: `${searchURL}&pid=1`, imgUrl: `https://rule34.xxx//images/1.jpg` },
+                { title: `Result 2 for "${query}"`, url: `${searchURL}&pid=2`, imgUrl: `https://rule34.xxx//images/2.jpg` },
+                { title: `Result 3 for "${query}"`, url: `${searchURL}&pid=3`, imgUrl: `https://rule34.xxx//images/3.jpg` }
+            ];
+
+            displayResults(mockResults);
+        }
+
+        function displayResults(results) {
+            let htmlContent = '';
+            if (results.length === 0) {
+                htmlContent = "No results found.";
+            } else {
+                results.forEach(result => {
+                    htmlContent += `
+                        <div class="result-item">
+                            <a href="${result.url}" target="_blank">
+                                <img src="${result.imgUrl}" alt="Image">
+                                <br>
+                                <strong>${result.title}</strong>
+                            </a>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById("searchResults").innerHTML = htmlContent;
+        }
+
+        // Dark/Light mode toggle
+        const darkModeToggle = document.getElementById("darkModeToggle");
+        const body = document.body;
+        const container = document.querySelector(".container");
+
+        darkModeToggle.addEventListener("click", function() {
+            body.classList.toggle("dark-mode");
+            container.classList.toggle("dark-mode");
+
+            // Toggle the button text
+            if (body.classList.contains("dark-mode")) {
+                darkModeToggle.textContent = "Switch to Light Mode";
+            } else {
+                darkModeToggle.textContent = "Switch to Dark Mode";
+            }
+
+            // Toggle dark mode on result items
+            const resultItems = document.querySelectorAll(".result-item");
+            resultItems.forEach(item => {
+                item.classList.toggle("dark-mode");
+            });
+        });
+    </script>
+</body>
+</html>
 
