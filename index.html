@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sex roll</title>
+    <title>Roll the Dice Game</title>
     <style>
+        /* Base styles for both light and dark modes */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f4f4f9;
             margin: 0;
             padding: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             display: flex;
@@ -18,14 +20,14 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            opacity: 0; /* Hide content initially */
+            opacity: 0; /* Hidden until age confirmed */
             transition: opacity 0.5s ease;
         }
         .result {
             font-size: 3rem;
             font-weight: bold;
-            color: #333;
             margin-top: 20px;
+            transition: color 0.3s;
         }
         button {
             font-size: 1.5rem;
@@ -45,7 +47,7 @@
             margin-top: 20px;
             color: #555;
         }
-        
+
         /* Modal Styles */
         #ageModal {
             display: none;
@@ -66,9 +68,49 @@
             text-align: center;
             width: 300px;
         }
-        #ageModal button {
-            margin-top: 20px;
+
+        /* Left side GIF */
+        #gif {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: auto;
+            transition: filter 0.3s ease;
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+        body.dark-mode button {
+            background-color: #444;
+        }
+        body.dark-mode button:hover {
+            background-color: #666;
+        }
+
+        /* Safety Mode (blur the gif) */
+        body.safety-mode #gif {
+            filter: blur(8px); /* Blurring the GIF */
+        }
+
+        /* Toggle Button for Modes */
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
             background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .mode-toggle:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -85,18 +127,34 @@
 
     <!-- Game Content (hidden initially) -->
     <div class="container" id="gameContainer">
-        <h1>Click to Roll</h1>
+        <h1>Sex roll (click to roll)</h1>
         <button id="rollButton">Roll the Dice</button>
         <div class="result" id="result">?</div>
         <div class="chance-info">
-            <p>have fun (:</p>
+            <p></p>
         </div>
     </div>
 
+    <!-- Left side GIF -->
+    <img src="22883830.gif" alt="GIF" id="gif">
+
+    <!-- Mode Toggle Button (Light/Dark/Safety) -->
+    <button class="mode-toggle" id="modeToggleBtn">Toggle Light/Dark/Safety Mode</button>
+
     <script>
-        // Function to simulate the roll
+        // Function to simulate the roll and display text outcomes
         function rollDice() {
-            const outcome = Math.floor(Math.random() * 6) + 1;
+            const outcomes = [
+                "You won!",
+                "Try again!",
+                "Lucky!",
+                "Better luck next time!",
+                "You are the chosen one!",
+                "So close, try again!"
+            ];
+
+            // Randomly choose a text outcome from the list
+            const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
             document.getElementById('result').textContent = outcome;
         }
 
@@ -117,6 +175,15 @@
 
         // Add event listener to the roll button (game functionality)
         document.getElementById('rollButton').addEventListener('click', rollDice);
+
+        // Mode toggle (Light/Dark/Safety)
+        document.getElementById('modeToggleBtn').addEventListener('click', function() {
+            // Toggle Light/Dark Mode
+            document.body.classList.toggle('dark-mode');
+
+            // Toggle Safety Mode
+            document.body.classList.toggle('safety-mode');
+        });
     </script>
 
 </body>
