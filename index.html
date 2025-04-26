@@ -264,6 +264,40 @@
     document.body.style.overflow = 'auto'; // Allow scrolling again
   }
 </script>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image in Bottom Left</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Style for the image */
+    .bottom-left-image {
+      position: fixed; /* Fixed positioning to keep it in the same place even when scrolling */
+      left: 0; /* Align to the left */
+      bottom: 0; /* Align to the bottom */
+      width: 150px; /* Adjust the size of the image */
+      height: auto; /* Maintain aspect ratio */
+      margin: 20px; /* Optional, to give some spacing from the edges */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- The image that will appear in the bottom-left corner -->
+  <img src="image-removebg-preview (20).png" alt="Bottom Left Image" class="bottom-left-image">
+
+</body>
+</html>
+
 
 </body>
 </html>
