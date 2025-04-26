@@ -1,1 +1,210 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Story Wiki - Home</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* prevent scrolling while warning is active */
+    }
+
+    #warning {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .highlight {
+      color: red;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .rules {
+      display: none;
+      background-color: #2c2c2c;
+      padding: 20px;
+      margin-top: 20px;
+      text-align: left;
+      border: 1px solid #444;
+      border-radius: 8px;
+      max-width: 600px;
+    }
+
+    .agree-button {
+      margin-top: 30px;
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .agree-button:hover {
+      background-color: darkred;
+    }
+
+    header {
+      background-color: #1e1e1e;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      display: none; /* Hide main content until user agrees */
+    }
+
+    article {
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #333;
+    }
+
+    h2 {
+      color: #66ccff;
+    }
+
+    a {
+      color: red;
+      text-decoration: none;
+      font-size: 20px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    nav {
+      background-color: #1e1e1e;
+      padding: 10px;
+      text-align: center;
+      border-top: 1px solid #333;
+      display: none; /* Hide nav too */
+    }
+
+    nav a {
+      margin: 0 10px;
+      color: #66ccff;
+      text-decoration: none;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .random-button {
+      display: block;
+      margin: 30px auto;
+      padding: 12px 24px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .random-button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="warning">
+    <h1 style="color: red;">WARNING</h1>
+    <p>Please <span class="highlight" onclick="toggleRules()">read the rules</span> before entering.</p>
+
+    <div id="rules" class="rules">
+      <h2 style="color: red;">Rules & Warnings</h2>
+      <ul>
+        <li>This site may contain NSFW (Not Safe For Work) material.</li>
+        <li>Stories may involve adult content, violence, or graphic themes.</li>
+        <li>You must be 18 years or older to enter.</li>
+        <li>Respect the content and creators.</li>
+        <li>By entering, you acknowledge that you are willing to view mature material.</li>
+      </ul>
+    </div>
+
+    <button class="agree-button" onclick="enterSite()">I Agree - Enter</button>
+  </div>
+
+  <header>
+    Story Wiki
+  </header>
+
+  <main>
+    <article>
+      <h2><a href="story1.html">Story Title 1</a></h2>
+      <p>Summary of Story 1. (Click the title to read)</p>
+    </article>
+
+    <article>
+      <h2><a href="story2.html">Story Title 2</a></h2>
+      <p>Summary of Story 2. (Click the title to read)</p>
+    </article>
+
+    <article>
+      <h2><a href="story3.html">Story Title 3</a></h2>
+      <p>Summary of Story 3. (Click the title to read)</p>
+    </article>
+
+    <button class="random-button" onclick="randomStory()">🎲 Random Story</button>
+  </main>
+
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="#">All Stories</a>
+    <a href="#" onclick="randomStory()">Random Story</a>
+    <a href="#">Contact</a>
+  </nav>
+
+  <script>
+    function toggleRules() {
+      const rules = document.getElementById('rules');
+      if (rules.style.display === "none" || rules.style.display === "") {
+        rules.style.display = "block";
+      } else {
+        rules.style.display = "none";
+      }
+    }
+
+    function enterSite() {
+      document.getElementById('warning').style.display = 'none';
+      document.querySelector('main').style.display = 'block';
+      document.querySelector('nav').style.display = 'block';
+      document.body.style.overflow = 'auto'; // allow scrolling again
+    }
+
+    function randomStory() {
+      const stories = ["story1.html", "story2.html", "story3.html"];
+      const randomIndex = Math.floor(Math.random() * stories.length);
+      window.location.href = stories[randomIndex];
+    }
+  </script>
+
+</body>
+</html>
