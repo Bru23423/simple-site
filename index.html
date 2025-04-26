@@ -3,7 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Story Wiki - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Story Website</title>
   <style>
     body {
       background-color: #121212;
@@ -11,70 +12,21 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      overflow: hidden; /* prevent scrolling while warning is active */
-    }
-
-    #warning {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #121212;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 1000;
-    }
-
-    .highlight {
-      color: red;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .rules {
-      display: none;
-      background-color: #2c2c2c;
-      padding: 20px;
-      margin-top: 20px;
-      text-align: left;
-      border: 1px solid #444;
-      border-radius: 8px;
-      max-width: 600px;
-    }
-
-    .agree-button {
-      margin-top: 30px;
-      padding: 12px 24px;
-      font-size: 18px;
-      background-color: red;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .agree-button:hover {
-      background-color: darkred;
     }
 
     header {
       background-color: #1e1e1e;
       padding: 20px;
       text-align: center;
-      font-size: 24px;
+      font-size: 32px;
       font-weight: bold;
       border-bottom: 1px solid #333;
     }
 
     main {
-      padding: 20px;
       max-width: 800px;
-      margin: auto;
-      display: none; /* Hide main content until user agrees */
+      margin: 40px auto;
+      padding: 20px;
     }
 
     article {
@@ -85,28 +37,34 @@
 
     h2 {
       color: #66ccff;
+      cursor: pointer;
     }
 
-    a {
-      color: red;
-      text-decoration: none;
-      font-size: 20px;
+    p {
+      font-size: 18px;
+      line-height: 1.6;
     }
 
-    a:hover {
-      text-decoration: underline;
+    .story-content {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+      border-radius: 8px;
     }
 
     nav {
-      background-color: #1e1e1e;
-      padding: 10px;
       text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      background-color: #1e1e1e;
       border-top: 1px solid #333;
-      display: none; /* Hide nav too */
     }
 
     nav a {
-      margin: 0 10px;
+      margin: 0 15px;
+      font-size: 18px;
       color: #66ccff;
       text-decoration: none;
     }
@@ -115,96 +73,197 @@
       text-decoration: underline;
     }
 
-    .random-button {
+    .back-button {
       display: block;
-      margin: 30px auto;
-      padding: 12px 24px;
-      background-color: #444;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: red;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       font-size: 18px;
       cursor: pointer;
     }
 
-    .random-button:hover {
-      background-color: #666;
+    .back-button:hover {
+      background-color: darkred;
+    }
+
+    /* Age warning popup */
+    #ageWarning {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      padding-top: 100px;
+      z-index: 9999;
+    }
+
+    #ageWarningContent {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 8px;
+      width: 80%;
+      margin: 0 auto;
+    }
+
+    .highlight {
+      color: blue;
+      font-weight: bold;
+    }
+
+    #ageWarning button {
+      margin-top: 20px;
+      padding: 10px 30px;
+      background-color: green;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #ageWarning button:hover {
+      background-color: darkgreen;
     }
   </style>
 </head>
+
 <body>
 
-  <div id="warning">
-    <h1 style="color: red;">WARNING</h1>
-    <p>Please <span class="highlight" onclick="toggleRules()">read the rules</span> before entering.</p>
+<!-- Age Warning Modal -->
+<div id="ageWarning">
+  <div id="ageWarningContent">
+    <h2>Please Read the Rules</h2>
+    <p>This website contains adult content. By entering, you confirm that you are at least 18 years old.</p>
+    <p class="highlight">NSFW content, including explicit sexual material, is present. Enter at your own discretion.</p>
+    <button onclick="acceptAgeWarning()">I Agree - Enter</button>
+  </div>
+</div>
 
-    <div id="rules" class="rules">
-      <h2 style="color: red;">Rules & Warnings</h2>
-      <ul>
-        <li>This site may contain NSFW (Not Safe For Work) material.</li>
-        <li>Stories may involve adult content, violence, or graphic themes.</li>
-        <li>You must be 18 years or older to enter.</li>
-        <li>Respect the content and creators.</li>
-        <li>By entering, you acknowledge that you are willing to view mature material.</li>
-      </ul>
-    </div>
+<!-- Main Content -->
+<header>
+  📖 Story Collection
+</header>
 
-    <button class="agree-button" onclick="enterSite()">I Agree - Enter</button>
+<main id="story-list">
+  <article>
+    <h2 onclick="showStory('story1')">The Mysterious Forest</h2>
+    <p>A glimpse into a world of unknown creatures and hidden magic.</p>
+  </article>
+
+  <article>
+    <h2 onclick="showStory('story2')">A Journey Through Time</h2>
+    <p>What happens when you stumble upon a machine that bends reality?</p>
+  </article>
+
+  <article>
+    <h2 onclick="showStory('story3')">The Last Guardian</h2>
+    <p>A tale of the final protector of an ancient world.</p>
+  </article>
+
+  <article>
+    <h2 onclick="showStory('story4')">The Secret of the Ocean</h2>
+    <p>Deep beneath the waves lies a mystery waiting to be discovered.</p>
+  </article>
+
+  <article>
+    <h2 onclick="showStory('story5')">The Warlock's Curse</h2>
+    <p>An ancient curse threatens to destroy an entire kingdom.</p>
+  </article>
+
+  <article>
+    <h2 onclick="showStory('story6')">The Lost Civilization</h2>
+    <p>A forgotten civilization holds secrets that could change history forever.</p>
+  </article>
+</main>
+
+<!-- Story Pages (Hidden at first) -->
+<div id="story-pages" style="display:none; max-width:800px; margin:40px auto; padding:20px;">
+  <div id="story1" class="story-content">
+    <h1>The Mysterious Forest</h1>
+    <p><i>By YourNameHere</i></p>
+    <p>Deep within the mountains lies a forest shrouded in mist...</p>
+    <p>Legend speaks of creatures that watch from the shadows...</p>
+    <p>Only the bravest venture forth, seeking the truth, but not all return.</p>
   </div>
 
-  <header>
-    Story Wiki
-  </header>
+  <div id="story2" class="story-content">
+    <h1>A Journey Through Time</h1>
+    <p><i>By YourNameHere</i></p>
+    <p>One rainy evening, Alex stumbled into a hidden lab...</p>
+    <p>Inside was a device — humming, glowing — ready to change history itself.</p>
+    <p>Would you risk it all to travel beyond the present?</p>
+  </div>
 
-  <main>
-    <article>
-      <h2><a href="story1.html">Story Title 1</a></h2>
-      <p>Summary of Story 1. (Click the title to read)</p>
-    </article>
+  <div id="story3" class="story-content">
+    <h1>The Last Guardian</h1>
+    <p><i>By YourNameHere</i></p>
+    <p>As the ancient world crumbled, one protector remained steadfast...</p>
+    <p>Armed with wisdom and an unbreakable will, the last guardian faced destiny.</p>
+  </div>
 
-    <article>
-      <h2><a href="story2.html">Story Title 2</a></h2>
-      <p>Summary of Story 2. (Click the title to read)</p>
-    </article>
+  <div id="story4" class="story-content">
+    <h1>The Secret of the Ocean</h1>
+    <p><i>By YourNameHere</i></p>
+    <p>In the deep ocean, hidden beneath the waves, lies a secret no one has ever uncovered...</p>
+    <p>Will you be the one to unravel the mysteries of the sea?</p>
+  </div>
 
-    <article>
-      <h2><a href="story3.html">Story Title 3</a></h2>
-      <p>Summary of Story 3. (Click the title to read)</p>
-    </article>
+  <div id="story5" class="story-content">
+    <h1>The Warlock's Curse</h1>
+    <p><i>By YourNameHere</i></p>
+    <p>In an ancient kingdom, a warlock’s curse spreads darkness across the land...</p>
+    <p>Only one person has the power to break the curse—will they succeed?</p>
+  </div>
 
-    <button class="random-button" onclick="randomStory()">🎲 Random Story</button>
-  </main>
+  <div id="story6" class="story-content">
+    <h1>The Lost Civilization</h1>
+    <p><i>By YourNameHere</i></p>
+    <p>Long ago, an entire civilization vanished without a trace. But some believe it still exists...</p>
+    <p>Will you discover the hidden secrets of the Lost Civilization?</p>
+  </div>
 
-  <nav>
-    <a href="home.html">Home</a>
-    <a href="#">All Stories</a>
-    <a href="#" onclick="randomStory()">Random Story</a>
-    <a href="#">Contact</a>
-  </nav>
+  <button class="back-button" onclick="backToList()">← Back to Stories</button>
+</div>
 
-  <script>
-    function toggleRules() {
-      const rules = document.getElementById('rules');
-      if (rules.style.display === "none" || rules.style.display === "") {
-        rules.style.display = "block";
-      } else {
-        rules.style.display = "none";
-      }
+<nav>
+  <a href="#" onclick="backToList()">Home</a>
+  <a href="#">All Stories</a>
+  <a href="#">Contact</a>
+</nav>
+
+<script>
+  // Show story
+  function showStory(storyId) {
+    document.getElementById('story-list').style.display = 'none';
+    document.getElementById('story-pages').style.display = 'block';
+    let stories = document.getElementsByClassName('story-content');
+    for (let story of stories) {
+      story.style.display = 'none';
     }
+    document.getElementById(storyId).style.display = 'block';
+    window.scrollTo(0, 0); // Scroll to top when opening story
+  }
 
-    function enterSite() {
-      document.getElementById('warning').style.display = 'none';
-      document.querySelector('main').style.display = 'block';
-      document.querySelector('nav').style.display = 'block';
-      document.body.style.overflow = 'auto'; // allow scrolling again
-    }
+  // Back to list of stories
+  function backToList() {
+    document.getElementById('story-list').style.display = 'block';
+    document.getElementById('story-pages').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
 
-    function randomStory() {
-      const stories = ["story1.html", "story2.html", "story3.html"];
-      const randomIndex = Math.floor(Math.random() * stories.length);
-      window.location.href = stories[randomIndex];
-    }
-  </script>
+  // Accept the age warning
+  function acceptAgeWarning() {
+    document.getElementById('ageWarning').style.display = 'none'; // Hide age warning modal
+    document.body.style.overflow = 'auto'; // Allow scrolling again
+  }
+</script>
 
 </body>
 </html>
