@@ -2,260 +2,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Drawing/Canvas</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSFW Content Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2f2f2f;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
 
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background: #fff;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      flex-wrap: wrap;
-    }
+        header {
+            background-color: #444;
+            padding: 20px;
+            text-align: center;
+        }
 
-    canvas {
-      flex: 1;
-      cursor: crosshair;
-      background: #fff;
-      display: block;
-    }
+        header h1 {
+            color: #f5f5f5;
+            font-size: 2.5em;
+        }
 
-    .btn {
-      padding: 6px 10px;
-      font-size: 16px;
-      background: #eee;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+        nav {
+            background-color: #333;
+            padding: 10px;
+            text-align: center;
+        }
 
-    .btn:hover {
-      background: #ddd;
-    }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 15px;
+            border-radius: 5px;
+            background-color: #666;
+            transition: background-color 0.3s;
+        }
 
-    .spacer {
-      flex: 1;
-    }
+        nav a:hover {
+            background-color: #888;
+        }
 
-    select, input[type="range"], input[type="color"] {
-      margin-left: 5px;
-    }
-  </style>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .upload-section,
+        .view-section,
+        .rules-section {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .upload-section h2,
+        .view-section h2,
+        .rules-section h2 {
+            color: #f5f5f5;
+        }
+
+        .upload-section input,
+        .upload-section textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #555;
+            color: white;
+        }
+
+        .upload-section button {
+            padding: 10px 20px;
+            background-color: #f44336;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .upload-section button:hover {
+            background-color: #d32f2f;
+        }
+
+        .view-section img,
+        .view-section video {
+            max-width: 100%;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #444;
+            color: white;
+        }
+
+        .footer a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        .age-verification-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .age-verification-popup.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .age-verification-popup .popup-content {
+            background-color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .age-verification-popup .popup-content h2 {
+            color: #333;
+        }
+
+        .age-verification-popup .popup-content button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
 </head>
 <body>
-  <div class="toolbar">
-    <button class="btn" onclick="undo()"><i class="fas fa-undo"></i> Undo</button>
-    <button class="btn" onclick="redo()"><i class="fas fa-redo"></i> Redo</button>
 
-    <label class="btn">
-      <i class="fas fa-paint-brush"></i>
-      <select id="brushType">
-        <option value="pencil">✏️ Pencil</option>
-        <option value="pen">🖋️ Pen</option>
-        <option value="marker">🖍️ Marker</option>
-        <option value="texture">🎨 Texture</option>
-      </select>
-    </label>
+    <!-- Header -->
+    <header>
+        <h1>NSFW Content Website</h1>
+    </header>
 
-    <label class="btn">
-      <i class="fas fa-tint"></i>
-      <input type="color" id="colorPicker" value="#000000">
-    </label>
+    <!-- Navigation -->
+    <nav>
+        <a href="#upload-section">Upload</a>
+        <a href="#view-section">View Content</a>
+        <a href="#rules-section">Rules</a>
+    </nav>
 
-    <label class="btn">
-      <i class="fas fa-sliders-h"></i> Size
-      <input type="range" id="brushSize" min="1" max="50" value="5">
-    </label>
+    <!-- Age Verification Popup -->
+    <div class="age-verification-popup" id="ageVerificationPopup">
+        <div class="popup-content">
+            <h2>Are you 18 or older?</h2>
+            <p>This website contains NSFW content. You must be 18 or older to access this site.</p>
+            <button id="ageVerifyBtn">Yes, I am 18+</button>
+        </div>
+    </div>
 
-    <label class="btn">
-      <i class="fas fa-eye"></i> Opacity
-      <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.85">
-    </label>
+    <!-- Main Content -->
+    <div class="content">
 
-    <button class="btn" onclick="toggleSpeed()" id="speedBtn">
-      <i class="fas fa-tachometer-alt"></i> <span id="speedLabel">🐢 Slow</span>
-    </button>
+        <!-- Upload Section -->
+        <section id="upload-section" class="upload-section">
+            <h2>Upload Your NSFW Content</h2>
+            <form id="uploadForm">
+                <label for="fileInput">Select Image or Video</label>
+                <input type="file" id="fileInput" name="fileInput" accept="image/*,video/*" required>
 
-    <button class="btn" onclick="confirmClear()"><i class="fas fa-eraser"></i> Clear</button>
+                <label for="description">Description (Optional)</label>
+                <textarea id="description" name="description" rows="4" placeholder="Add a description for your content (Optional)"></textarea>
 
-    <div class="spacer"></div>
+                <button type="submit">Upload</button>
+            </form>
+        </section>
 
-    <button class="btn" onclick="downloadCanvas()"><i class="fas fa-download"></i> Download</button>
-  </div>
+        <!-- View Section -->
+        <section id="view-section" class="view-section">
+            <h2>View Uploaded Content</h2>
+            <div id="contentDisplay"></div>
+        </section>
 
-  <canvas id="canvas"></canvas>
+        <!-- Rules Section -->
+        <section id="rules-section" class="rules-section">
+            <h2>Website Rules</h2>
+            <ul>
+                <li>All content is NSFW. Proceed only if you are 18 or older.</li>
+                <li>Do not upload illegal content.</li>
+                <li>Respect the community guidelines.</li>
+                <li>Only upload content you have the rights to share.</li>
+            </ul>
+        </section>
 
-  <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    let drawing = false;
-    let paths = [];
-    let undone = [];
-    let currentPath = [];
+    </div>
 
-    let color = document.getElementById("colorPicker").value;
-    let size = document.getElementById("brushSize").value;
-    let brushType = document.getElementById("brushType").value;
-    let opacity = parseFloat(document.getElementById("opacity").value);
-    let delay = 20; // Start slow
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 NSFW Content Website. All rights reserved.</p>
+    </footer>
 
-    function resizeCanvas() {
-      const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - document.querySelector('.toolbar').offsetHeight;
-      ctx.putImageData(image, 0, 0);
-    }
+    <!-- Firebase and JS -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    
+    <script>
+        // Firebase configuration (replace with your own)
+        const firebaseConfig = {
+  apiKey: "AIzaSyArz5gAM8rFOK8NiH2skrTFldVEiqkkbU8",
+  authDomain: "justfunitcom.firebaseapp.com",
+  projectId: "justfunitcom",
+  storageBucket: "justfunitcom.appspot.com",
+  messagingSenderId: "12321079878",
+  appId: "1:12321079878:web:301d5a953691b733278047"
+};
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+        const db = firebase.firestore();
 
-    canvas.addEventListener("mousedown", (e) => {
-      drawing = true;
-      currentPath = [{ x: e.offsetX, y: e.offsetY, color, size, opacity, brushType }];
-    });
+        // Handle age verification
+        const ageVerifyBtn = document.getElementById('ageVerifyBtn');
+        const ageVerificationPopup = document.getElementById('ageVerificationPopup');
 
-    canvas.addEventListener("mousemove", (e) => {
-      if (!drawing) return;
-
-      setTimeout(() => {
-        const point = {
-          x: e.offsetX,
-          y: e.offsetY,
-          color,
-          size,
-          opacity,
-          brushType
+        window.onload = () => {
+            ageVerificationPopup.classList.add('active');
         };
 
-        const last = currentPath[currentPath.length - 1];
+        ageVerifyBtn.addEventListener('click', () => {
+            ageVerificationPopup.classList.remove('active');
+        });
 
-        ctx.strokeStyle = point.color;
-        ctx.lineWidth = point.size;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.globalAlpha = point.opacity;
+        // Handle file upload
+        document.getElementById('uploadForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const description = document.getElementById('description').value;
 
-        switch (point.brushType) {
-          case 'pencil':
-            ctx.globalAlpha = point.opacity;
-            break;
-          case 'pen':
-            ctx.lineWidth *= 0.7;
-            break;
-          case 'marker':
-            ctx.globalAlpha = point.opacity * 0.6;
-            break;
-          case 'texture':
-            ctx.setLineDash([2, 5]);
-            break;
+            if (!file) {
+                alert('Please select a file to upload.');
+                return;
+            }
+
+            const storageRef = storage.ref('nsfw_content/' + file.name);
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed', (snapshot) => {
+                // Upload progress (optional)
+            }, (error) => {
+                console.error('Error uploading file:', error);
+                alert('Error uploading file.');
+            }, () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    // Save the metadata to Firestore
+                    db.collection('nsfw_content').add({
+                        url: downloadURL,
+                        description: description,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        alert('Upload successful!');
+                        document.getElementById('uploadForm').reset();
+                        loadContent();  // Reload content after upload
+                    }).catch((error) => {
+                        console.error('Error saving to Firestore:', error);
+                    });
+                });
+            });
+        });
+
+        // Load content from Firestore
+        function loadContent() {
+            db.collection('nsfw_content').orderBy('timestamp', 'desc').get().then((querySnapshot) => {
+                const contentDisplay = document.getElementById('contentDisplay');
+                contentDisplay.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const contentElement = document.createElement('div');
+                    const contentDescription = document.createElement('p');
+                    contentDescription.textContent = data.description || 'No description provided.';
+                    
+                    if (data.url.includes('image')) {
+                        const img = document.createElement('img');
+                        img.src = data.url;
+                        contentElement.appendChild(img);
+                    } else if (data.url.includes('video')) {
+                        const video = document.createElement('video');
+                        video.src = data.url;
+                        video.controls = true;
+                        contentElement.appendChild(video);
+                    }
+
+                    contentElement.appendChild(contentDescription);
+                    contentDisplay.appendChild(contentElement);
+                });
+            });
         }
 
-        ctx.beginPath();
-        ctx.moveTo(last.x, last.y);
-        ctx.lineTo(point.x, point.y);
-        ctx.stroke();
-        ctx.setLineDash([]); // reset
+        // Load content initially
+        loadContent();
+    </script>
 
-        currentPath.push(point);
-      }, delay);
-    });
-
-    canvas.addEventListener("mouseup", () => {
-      if (drawing) {
-        drawing = false;
-        paths.push(currentPath);
-        undone = [];
-      }
-    });
-
-    function redraw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const path of paths) {
-        for (let i = 1; i < path.length; i++) {
-          let p = path[i];
-          let prev = path[i - 1];
-          ctx.strokeStyle = p.color;
-          ctx.lineWidth = p.size;
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          ctx.globalAlpha = p.opacity;
-
-          if (p.brushType === "texture") ctx.setLineDash([2, 5]);
-          else ctx.setLineDash([]);
-
-          ctx.beginPath();
-          ctx.moveTo(prev.x, prev.y);
-          ctx.lineTo(p.x, p.y);
-          ctx.stroke();
-        }
-        ctx.setLineDash([]);
-      }
-    }
-
-    function undo() {
-      if (paths.length > 0) {
-        undone.push(paths.pop());
-        redraw();
-      }
-    }
-
-    function redo() {
-      if (undone.length > 0) {
-        paths.push(undone.pop());
-        redraw();
-      }
-    }
-
-    function confirmClear() {
-      if (confirm("Are you sure you want to clear the canvas?")) {
-        clearCanvas();
-      }
-    }
-
-    function clearCanvas() {
-      paths = [];
-      undone = [];
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function downloadCanvas() {
-      const link = document.createElement("a");
-      link.download = "drawing.png";
-      link.href = canvas.toDataURL();
-      link.click();
-    }
-
-    function toggleSpeed() {
-      delay = delay === 0 ? 20 : 0;
-      document.getElementById("speedLabel").textContent = delay === 0 ? "🐇 Fast" : "🐢 Slow";
-    }
-
-    // Live updates
-    document.getElementById("colorPicker").addEventListener("input", (e) => color = e.target.value);
-    document.getElementById("brushSize").addEventListener("input", (e) => size = e.target.value);
-    document.getElementById("opacity").addEventListener("input", (e) => opacity = parseFloat(e.target.value));
-    document.getElementById("brushType").addEventListener("change", (e) => brushType = e.target.value);
-
-    document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.key === "z") undo();
-      if (e.ctrlKey && e.key === "y") redo();
-    });
-  </script>
 </body>
 </html>
