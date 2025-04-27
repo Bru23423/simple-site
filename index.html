@@ -1,1 +1,261 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎨 My Drawing App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      background: #fff;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      flex-wrap: wrap;
+    }
+
+    canvas {
+      flex: 1;
+      cursor: crosshair;
+      background: #fff;
+      display: block;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      font-size: 16px;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn:hover {
+      background: #ddd;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    select, input[type="range"], input[type="color"] {
+      margin-left: 5px;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="btn" onclick="undo()"><i class="fas fa-undo"></i> Undo</button>
+    <button class="btn" onclick="redo()"><i class="fas fa-redo"></i> Redo</button>
+
+    <label class="btn">
+      <i class="fas fa-paint-brush"></i>
+      <select id="brushType">
+        <option value="pencil">✏️ Pencil</option>
+        <option value="pen">🖋️ Pen</option>
+        <option value="marker">🖍️ Marker</option>
+        <option value="texture">🎨 Texture</option>
+      </select>
+    </label>
+
+    <label class="btn">
+      <i class="fas fa-tint"></i>
+      <input type="color" id="colorPicker" value="#000000">
+    </label>
+
+    <label class="btn">
+      <i class="fas fa-sliders-h"></i> Size
+      <input type="range" id="brushSize" min="1" max="50" value="5">
+    </label>
+
+    <label class="btn">
+      <i class="fas fa-eye"></i> Opacity
+      <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.85">
+    </label>
+
+    <button class="btn" onclick="toggleSpeed()" id="speedBtn">
+      <i class="fas fa-tachometer-alt"></i> <span id="speedLabel">🐢 Slow</span>
+    </button>
+
+    <button class="btn" onclick="confirmClear()"><i class="fas fa-eraser"></i> Clear</button>
+
+    <div class="spacer"></div>
+
+    <button class="btn" onclick="downloadCanvas()"><i class="fas fa-download"></i> Download</button>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+    let paths = [];
+    let undone = [];
+    let currentPath = [];
+
+    let color = document.getElementById("colorPicker").value;
+    let size = document.getElementById("brushSize").value;
+    let brushType = document.getElementById("brushType").value;
+    let opacity = parseFloat(document.getElementById("opacity").value);
+    let delay = 20; // Start slow
+
+    function resizeCanvas() {
+      const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - document.querySelector('.toolbar').offsetHeight;
+      ctx.putImageData(image, 0, 0);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    canvas.addEventListener("mousedown", (e) => {
+      drawing = true;
+      currentPath = [{ x: e.offsetX, y: e.offsetY, color, size, opacity, brushType }];
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!drawing) return;
+
+      setTimeout(() => {
+        const point = {
+          x: e.offsetX,
+          y: e.offsetY,
+          color,
+          size,
+          opacity,
+          brushType
+        };
+
+        const last = currentPath[currentPath.length - 1];
+
+        ctx.strokeStyle = point.color;
+        ctx.lineWidth = point.size;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.globalAlpha = point.opacity;
+
+        switch (point.brushType) {
+          case 'pencil':
+            ctx.globalAlpha = point.opacity;
+            break;
+          case 'pen':
+            ctx.lineWidth *= 0.7;
+            break;
+          case 'marker':
+            ctx.globalAlpha = point.opacity * 0.6;
+            break;
+          case 'texture':
+            ctx.setLineDash([2, 5]);
+            break;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+        ctx.setLineDash([]); // reset
+
+        currentPath.push(point);
+      }, delay);
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (drawing) {
+        drawing = false;
+        paths.push(currentPath);
+        undone = [];
+      }
+    });
+
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const path of paths) {
+        for (let i = 1; i < path.length; i++) {
+          let p = path[i];
+          let prev = path[i - 1];
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = p.size;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.globalAlpha = p.opacity;
+
+          if (p.brushType === "texture") ctx.setLineDash([2, 5]);
+          else ctx.setLineDash([]);
+
+          ctx.beginPath();
+          ctx.moveTo(prev.x, prev.y);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+      }
+    }
+
+    function undo() {
+      if (paths.length > 0) {
+        undone.push(paths.pop());
+        redraw();
+      }
+    }
+
+    function redo() {
+      if (undone.length > 0) {
+        paths.push(undone.pop());
+        redraw();
+      }
+    }
+
+    function confirmClear() {
+      if (confirm("Are you sure you want to clear the canvas?")) {
+        clearCanvas();
+      }
+    }
+
+    function clearCanvas() {
+      paths = [];
+      undone = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function downloadCanvas() {
+      const link = document.createElement("a");
+      link.download = "drawing.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    function toggleSpeed() {
+      delay = delay === 0 ? 20 : 0;
+      document.getElementById("speedLabel").textContent = delay === 0 ? "🐇 Fast" : "🐢 Slow";
+    }
+
+    // Live updates
+    document.getElementById("colorPicker").addEventListener("input", (e) => color = e.target.value);
+    document.getElementById("brushSize").addEventListener("input", (e) => size = e.target.value);
+    document.getElementById("opacity").addEventListener("input", (e) => opacity = parseFloat(e.target.value));
+    document.getElementById("brushType").addEventListener("change", (e) => brushType = e.target.value);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "z") undo();
+      if (e.ctrlKey && e.key === "y") redo();
+    });
+  </script>
+</body>
+</html>
