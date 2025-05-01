@@ -1,1 +1,272 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NSFW Drawing Website</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid white;
+      background-color: #333;
+      cursor: crosshair;
+    }
+    .toolbar {
+      margin: 20px 0;
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 10px;
+      color: #121212;
+    }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .artCard {
+      border: 1px solid #444;
+      background: #222;
+      padding: 10px;
+      margin: 10px;
+      width: 220px;
+    }
+    .artCard img {
+      width: 200px;
+      height: auto;
+      display: block;
+      margin: auto;
+    }
+    #rules {
+      background-color: #1c1c1c;
+      padding: 15px;
+      border: 1px solid #333;
+      max-width: 600px;
+      margin: auto;
+    }
+    #gallerySection {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>NSFW Drawing Website</h1>
+<p>Draw your NSFW art and share it with others!</p>
+
+<!-- Drawing Canvas -->
+<canvas id="drawingCanvas" width="600" height="400"></canvas>
+
+<div class="toolbar">
+  <label for="brushColor">Brush Color:</label>
+  <input type="color" id="brushColor" value="#000000">
+  
+  <label for="brushSize">Brush Size:</label>
+  <input type="range" id="brushSize" min="1" max="10" value="5">
+  
+  <label for="bgColor">Canvas Background Color:</label>
+  <input type="color" id="bgColor" value="#333333">
+  
+  <button onclick="clearCanvas()">Clear</button>
+  <button onclick="undo()">Undo</button>
+  <button onclick="redo()">Redo</button>
+  <button onclick="saveArt()">Save to Gallery</button>
+</div>
+
+<!-- Tags and Age Verification -->
+<div>
+  <input type="text" id="tagsInput" placeholder="Enter tags (comma separated)">
+  <button onclick="submitArt()" id="submitBtn" disabled>Submit Artwork</button>
+</div>
+
+<div id="rules">
+  <h3>Artwork Rules</h3>
+  <ul>
+    <li>Only 18+ artwork allowed.</li>
+    <li>No hate speech or offensive content.</li>
+    <li>Follow community guidelines.</li>
+  </ul>
+</div>
+
+<!-- Gallery Section -->
+<div id="gallerySection">
+  <h2>Gallery</h2>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<script>
+  // Variables
+  const canvas = document.getElementById("drawingCanvas");
+  const ctx = canvas.getContext("2d");
+  let drawing = false;
+  let brushColor = "#000000";
+  let brushSize = 5;
+  let lastX = 0;
+  let lastY = 0;
+  let undoStack = [];
+  let redoStack = [];
+  const gallerySection = document.getElementById("gallery");
+  let lastUploadTime = 0;  // For cooldown
+  let cooldownTime = 10000;  // Cooldown time in ms (10 seconds)
+
+  // Set initial brush color and size
+  document.getElementById("brushColor").addEventListener("input", function() {
+    brushColor = this.value;
+  });
+  document.getElementById("brushSize").addEventListener("input", function() {
+    brushSize = this.value;
+  });
+
+  // Set background color
+  document.getElementById("bgColor").addEventListener("input", function() {
+    canvas.style.backgroundColor = this.value;
+  });
+
+  // Draw function
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseout", stopDrawing);
+
+  function startDrawing(e) {
+    drawing = true;
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = brushColor;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    
+    lastX = e.offsetX;
+    lastY = e.offsetY;
+  }
+
+  function stopDrawing() {
+    drawing = false;
+    saveStateToUndoStack();
+  }
+
+  function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    saveStateToUndoStack();
+  }
+
+  function undo() {
+    if (undoStack.length > 0) {
+      redoStack.push(undoStack.pop()); // Move last undo state to redo stack
+      const prevState = undoStack[undoStack.length - 1] || ctx.createImageData(canvas.width, canvas.height);
+      ctx.putImageData(prevState, 0, 0);
+    }
+  }
+
+  function redo() {
+    if (redoStack.length > 0) {
+      const redoState = redoStack.pop();
+      undoStack.push(redoState); // Move last redo state to undo stack
+      ctx.putImageData(redoState, 0, 0);
+    }
+  }
+
+  function saveStateToUndoStack() {
+    // Save the current state to the undo stack
+    undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    // Clear the redo stack whenever a new drawing or action happens
+    redoStack = [];
+  }
+
+  function saveArt() {
+    const currentTime = Date.now();
+    if (currentTime - lastUploadTime < cooldownTime) {
+      alert("You must wait 10 seconds before uploading another artwork.");
+      return;
+    }
+
+    lastUploadTime = currentTime;
+
+    const artData = canvas.toDataURL();
+    const galleryData = JSON.parse(localStorage.getItem("gallery")) || [];
+    galleryData.push({
+      imageUrl: artData,
+      tags: document.getElementById("tagsInput").value
+    });
+    localStorage.setItem("gallery", JSON.stringify(galleryData));
+    displayGallery();
+  }
+
+  function submitArt() {
+    // Check cooldown before submitting
+    const currentTime = Date.now();
+    if (currentTime - lastUploadTime < cooldownTime) {
+      alert("You must wait before submitting artwork.");
+      return;
+    }
+    lastUploadTime = currentTime;
+
+    saveArt();
+  }
+
+  function displayGallery() {
+    const galleryData = JSON.parse(localStorage.getItem("gallery")) || [];
+    gallerySection.innerHTML = "";
+
+    galleryData.forEach((art, index) => {
+      const artCard = document.createElement("div");
+      artCard.className = "artCard";
+      artCard.innerHTML = `
+        <img src="${art.imageUrl}" alt="Artwork ${index + 1}" />
+        <p>Tags: ${art.tags}</p>
+        <button onclick="deleteArt(${index})">Delete</button>
+      `;
+      gallerySection.appendChild(artCard);
+    });
+  }
+
+  function deleteArt(index) {
+    const galleryData = JSON.parse(localStorage.getItem("gallery")) || [];
+    galleryData.splice(index, 1);
+    localStorage.setItem("gallery", JSON.stringify(galleryData));
+    displayGallery();
+  }
+
+  // Display the gallery when the page loads
+  displayGallery();
+
+  // Keyboard shortcuts: Ctrl+Z for undo, Ctrl+Y for redo
+  window.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "z") {
+      undo();
+    }
+    if (e.ctrlKey && e.key === "y") {
+      redo();
+    }
+  });
+
+  // Check for clipboard actions (copy-paste)
+  document.addEventListener("paste", function(e) {
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const image = clipboardData.getData('Text');
+    if (image) {
+      const img = new Image();
+      img.src = image;
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0);
+      };
+    }
+  });
+</script>
+
+</body>
+</html>
