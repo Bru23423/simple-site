@@ -164,14 +164,20 @@
 
       statusBtn.style.background = '#f1c40f'; // yellow
 
+      // Check if the code has valid HTML by checking for errors in the iframe
       preview.onload = () => {
         try {
           const doc = preview.contentDocument || preview.contentWindow.document;
           const testScript = doc.querySelector('script');
-          if (testScript) {
+          
+          // Check if the code is valid and working
+          if (testScript && doc.body.innerHTML.trim() !== '') {
             statusBtn.style.background = '#2ecc71'; // green
+            errorBox.textContent = ''; // clear any previous errors
+          } else if (doc.body.innerHTML.trim() === '') {
+            statusBtn.style.background = '#f1c40f'; // yellow (no content)
           } else {
-            statusBtn.style.background = '#f1c40f'; // yellow
+            statusBtn.style.background = '#f1c40f'; // yellow (no script)
           }
         } catch (e) {
           errorBox.textContent = `Code Error:\n${e.message}`;
