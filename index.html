@@ -1,4 +1,5 @@
-<link rel="icon" href="favicon_bricklogo.png" type="image/png
+<link rel="icon" href="favicon_bricklogo.png" type="image/png">
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,7 +79,7 @@
       cursor: default;
     }
     #fishy:hover::after {
-      content: 'This was made by Fishy (:';
+      content: 'This was made by Fishy (:)';
       position: absolute;
       left: 80px;
       background: #222;
@@ -121,9 +122,9 @@
       • Click 🐞 to check and preview your code.<br>
       • Save your code with 💾 (stored in browser only).<br>
       • You’ll be warned before leaving if not saved.<br>
-      • Status light: 🟢 OK | 🟡 Unknown | 🔴 Error
-                     Note:
-       this website it still in BETA and is not done there may be a lot of bugs the check code button is still in BETA.
+      • Status light: 🟢 OK | 🟡 Unknown | 🔴 Error<br>
+      <br> 
+      Note: This website is still in BETA and is not done. There may be bugs. The check code button is still in BETA.
     </div>
   </div>
 
@@ -142,18 +143,25 @@
     });
 
     function saveNote() {
+      if (!isSaved) {
+        const confirmSave = confirm('You have unsaved changes! Saving will overwrite your current note. Do you want to continue?');
+        if (!confirmSave) return;
+      }
+
       localStorage.setItem('myNote', editor.value);
       isSaved = true;
       alert('Note saved locally!');
     }
 
     function loadNote() {
-      const note = localStorage.getItem('myNote');
-      if (note) {
-        editor.value = note;
-        isSaved = true;
-      } else {
-        alert('No saved note.');
+      if (!isSaved && confirm('You have unsaved changes! Are you sure you want to load the saved note and lose your changes?')) {
+        const note = localStorage.getItem('myNote');
+        if (note) {
+          editor.value = note;
+          isSaved = true;
+        } else {
+          alert('No saved note.');
+        }
       }
     }
 
@@ -166,7 +174,6 @@
 
       statusBtn.style.background = '#f1c40f'; // yellow
 
-      // Check if the code has valid HTML by checking for errors in the iframe
       preview.onload = () => {
         try {
           const doc = preview.contentDocument || preview.contentWindow.document;
