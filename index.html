@@ -28,6 +28,7 @@
       padding: 10px;
       border: none;
       resize: none;
+      overflow-y: auto;
     }
     .buttons {
       display: flex;
@@ -70,7 +71,7 @@
     }
     #fishy {
       position: fixed;
-      bottom: 10px;
+      bottom: 50px;
       left: 10px;
       color: #888;
       font-size: 14px;
@@ -97,6 +98,10 @@
       font-size: 14px;
     }
   </style>
+
+  <!-- Add Prism.js library for syntax highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
 </head>
 <body>
 
@@ -125,7 +130,6 @@
 
   <script>
     let isSaved = true;
-
     const editor = document.getElementById('editor');
     const preview = document.getElementById('preview');
     const errorBox = document.getElementById('errorBox');
@@ -174,6 +178,10 @@
           statusBtn.style.background = '#e74c3c'; // red
         }
       };
+
+      // Highlight the code using Prism.js
+      editor.classList.add('language-html');
+      Prism.highlightAll();
     }
 
     function toggleHelp() {
@@ -191,5 +199,3 @@
 
 </body>
 </html>
-
-
