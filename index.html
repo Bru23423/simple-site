@@ -1,38 +1,105 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Hentai Tag Explorer</title>
+  <meta charset="UTF-8">
+  <title>Hentai Tag Battle</title>
   <style>
-    body { background: #111; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
-    .tag { display: inline-block; padding: 10px; margin: 10px; background: #222; border-radius: 10px; cursor: pointer; }
-    .details { margin-top: 20px; }
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    .tag-button {
+      background: #222;
+      border: 2px solid #444;
+      color: #fff;
+      font-size: 24px;
+      margin: 20px;
+      padding: 20px 40px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .tag-button:hover {
+      background: #333;
+      border-color: #888;
+    }
+    h1 {
+      font-size: 36px;
+    }
+    .leaderboard {
+      margin-top: 40px;
+      text-align: left;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
-  <h1>🔞 Hentai Tag Encyclopedia</h1>
-  <div id="tags"></div>
-  <div class="details" id="details"></div>
+
+  <h1>🔞 Hentai Tag Battle</h1>
+  <p>Which tag is hotter? Vote now!</p>
+
+  <div id="battle">
+    <button class="tag-button" onclick="vote(0)" id="tag0">Loading...</button>
+    <button class="tag-button" onclick="vote(1)" id="tag1">Loading...</button>
+  </div>
+
+  <div class="leaderboard" id="leaderboard">
+    <h2>🔥 Leaderboard</h2>
+    <ul id="leaderList"></ul>
+  </div>
 
   <script>
-    const tags = {
-      "futanari": "A genre involving characters with both male and female sexual traits.",
-      "yuri": "Focuses on romantic/sexual relationships between female characters.",
-      "bondage": "Depicts characters restrained, tied up, or otherwise bound.",
-      "tsundere": "A character that switches between cold and loving behavior.",
-    };
+    const tags = [
+      "futanari", "yuri", "tentacles", "futa x male", "monster girl",
+      "bondage", "milf", "futa x futa", "lactation", "glory hole",
+      "elf", "bunny girl", "succubus", "femdom", "incubus",
+      "schoolgirl", "tsundere", "tentacle pit", "maid", "harem"
+    ];
 
-    const tagsContainer = document.getElementById('tags');
-    const details = document.getElementById('details');
+    const votes = {};
 
-    for (let tag in tags) {
-      const el = document.createElement('div');
-      el.className = 'tag';
-      el.textContent = tag;
-      el.onclick = () => details.innerHTML = `<h2>${tag}</h2><p>${tags[tag]}</p>`;
-      tagsContainer.appendChild(el);
+    let current = [];
+
+    function getRandomTags() {
+      let first = tags[Math.floor(Math.random() * tags.length)];
+      let second;
+      do {
+        second = tags[Math.floor(Math.random() * tags.length)];
+      } while (second === first);
+      return [first, second];
     }
+
+    function vote(winnerIndex) {
+      const chosen = current[winnerIndex];
+      votes[chosen] = (votes[chosen] || 0) + 1;
+      updateLeaderboard();
+      showNewBattle();
+    }
+
+    function showNewBattle() {
+      current = getRandomTags();
+      document.getElementById("tag0").textContent = current[0];
+      document.getElementById("tag1").textContent = current[1];
+    }
+
+    function updateLeaderboard() {
+      const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+      const list = document.getElementById("leaderList");
+      list.innerHTML = "";
+      sorted.slice(0, 10).forEach(([tag, count]) => {
+        const li = document.createElement("li");
+        li.textContent = `${tag}: ${count} vote${count > 1 ? "s" : ""}`;
+        list.appendChild(li);
+      });
+    }
+
+    showNewBattle();
   </script>
 </body>
 </html>
+
