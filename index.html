@@ -22,9 +22,9 @@
 <body>
   <div id="ageGate">
     <div>
-      <h2>18+ Only</h2>
-      <p>You must be 18 years or older to enter.</p>
-      <button onclick="acceptAgeGate()">I am 18+</button>
+      <h2>Welcome!</h2>
+      <p>click agree. </p>
+      <button onclick="acceptAgeGate()">agree</button>
     </div>
   </div>
 
@@ -56,7 +56,7 @@
 
   <div id="tos" class="hidden">
     <h2>Terms of Service / Info</h2>
-    <p>(Add your rules here)</p>
+    <p>You must be 18+</p>
   </div>
 
   <script>
@@ -64,6 +64,7 @@
     const MAX_THUMBNAIL_WIDTH = 300;
     const uploadsKey = 'uploads';
     const likeKey = 'likes';
+    const reportKey = 'reports';
 
     function acceptAgeGate() {
       document.getElementById('ageGate').style.display = 'none';
@@ -89,7 +90,7 @@
       const reader = new FileReader();
       reader.onload = function () {
         const uploads = loadData(uploadsKey);
-        uploads.push({ title, tags, image: reader.result, approved: false, uploader: navigator.userAgent, likes: 0, likedBy: [] });
+        uploads.push({ title, tags, image: reader.result, approved: false, uploader: navigator.userAgent, likes: 0, likedBy: [], reports: 0 });
         saveData(uploadsKey, uploads);
         alert("Uploaded for moderation");
         loadModeration();
@@ -136,6 +137,13 @@
       }
     }
 
+    function reportPost(index) {
+      const uploads = loadData(uploadsKey);
+      uploads[index].reports++;
+      saveData(uploadsKey, uploads);
+      alert("This post has been reported!");
+    }
+
     function loadGallery() {
       const uploads = loadData(uploadsKey);
       const gallery = document.getElementById('galleryList');
@@ -164,12 +172,19 @@
           likeBtn.innerText = `Like (${upload.likes})`;
           likeBtn.onclick = () => likePost(index);
           div.appendChild(likeBtn);
+
+          const reportBtn = document.createElement('button');
+          reportBtn.innerText = "Report";
+          reportBtn.onclick = () => reportPost(index);
+          div.appendChild(reportBtn);
+
           if (upload.uploader === navigator.userAgent) {
             const delBtn = document.createElement('button');
             delBtn.innerText = "Delete";
             delBtn.onclick = () => deletePost(index);
             div.appendChild(delBtn);
           }
+
           gallery.appendChild(div);
         }
       });
