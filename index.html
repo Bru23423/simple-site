@@ -91,6 +91,43 @@
         #tos-info {
             margin-top: 20px;
         }
+
+        /* Moderation Section */
+        #moderation-section {
+            margin-top: 20px;
+        }
+
+        .moderation-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .approve, .reject {
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .reject {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .approve:hover, .reject:hover {
+            opacity: 0.8;
+        }
+
+        .moderation-item img, .moderation-item video {
+            max-width: 200px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -113,6 +150,7 @@
         <div class="tabs">
             <button onclick="showTOS()">TOS/INFO</button>
             <button onclick="showUploadForm()">Upload Art</button>
+            <button onclick="showModeration()">Moderate Art</button>
         </div>
 
         <!-- Upload Form -->
@@ -136,6 +174,12 @@
             <p>This is the Terms of Service (TOS) and other important information about the website.</p>
             <p>By uploading content, you agree to the TOS and acknowledge the age restriction for 18+ content.</p>
             <button onclick="hideTOS()">Close</button>
+        </div>
+
+        <!-- Moderation Section -->
+        <div id="moderation-section" style="display:none;">
+            <h2>Moderate Uploaded Art</h2>
+            <div id="moderation-list"></div>
         </div>
     </div>
 
@@ -168,12 +212,22 @@
         function showUploadForm() {
             document.getElementById('upload-section').style.display = 'block';
             document.getElementById('tos-info').style.display = 'none';
+            document.getElementById('moderation-section').style.display = 'none';
         }
 
         // Show TOS/INFO Content
         function showTOS() {
             document.getElementById('tos-info').style.display = 'block';
             document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('moderation-section').style.display = 'none';
+        }
+
+        // Show Moderation Section
+        function showModeration() {
+            document.getElementById('moderation-section').style.display = 'block';
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('tos-info').style.display = 'none';
+            loadModerationQueue();
         }
 
         // Hide TOS/INFO Content
@@ -182,7 +236,7 @@
             document.getElementById('upload-section').style.display = 'block';
         }
 
-        // Handle the Upload of Art (simulated, no actual cloud storage)
+        // Handle the Upload of Art (immediately approved for testing)
         function handleUpload(event) {
             event.preventDefault();
             const fileInput = document.getElementById('art-upload');
@@ -204,24 +258,50 @@
                 return;
             }
 
-            // Simulate saving file and tags (e.g., storing in localStorage or showing preview)
-            statusMessage.textContent = `Your art has been uploaded with tags: ${tags.join(', ')}`;
-            statusMessage.style.color = "green";
-
-            // Simulating file upload with localStorage (for demonstration)
+            // Save the uploaded art immediately as approved (no moderation)
             const uploadedArt = {
                 fileName: file.name,
+                fileUrl: URL.createObjectURL(file),
                 tags: tags,
-                status: 'pending'
+                status: 'approved'  // Directly mark it as approved
             };
 
-            // Save the uploaded art temporarily (you can use localStorage, IndexedDB, or similar)
             let uploadedArts = JSON.parse(localStorage.getItem('uploadedArts') || '[]');
             uploadedArts.push(uploadedArt);
             localStorage.setItem('uploadedArts', JSON.stringify(uploadedArts));
+
+            statusMessage.textContent = `Your art has been uploaded and approved immediately for testing.`;
+            statusMessage.style.color = "green";
+        }
+
+        // Load Moderation Queue
+        function loadModerationQueue() {
+            const uploadedArts = JSON.parse(localStorage.getItem('uploadedArts') || '[]');
+            const moderationList = document.getElementById('moderation-list');
+            moderationList.innerHTML = ''; // Clear the list first
+
+            uploadedArts.forEach((art, index) => {
+                if (art.status === 'approved') {
+                    const artItem = document.createElement('div');
+                    artItem.className = 'moderation-item';
+
+                    // Show the art
+                    const media = art.fileUrl.endsWith('mp4') || art.fileUrl.endsWith('webm') ?
+                        `<video src="${art.fileUrl}" controls></video>` :
+                        `<img src="${art.fileUrl}" alt="Uploaded Art">`;
+
+                    artItem.innerHTML = `
+                        ${media}
+                        <p>Tags: ${art.tags.join(', ')}</p>
+                        <button class="approve" disabled>Approved</button>
+                        <button class="reject" disabled>Rejected</button>
+                    `;
+
+                    moderationList.appendChild(artItem);
+                }
+            });
         }
     </script>
 
 </body>
 </html>
-
