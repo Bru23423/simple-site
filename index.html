@@ -3,214 +3,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Code it for fun.</title>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      height: 100vh;
-      background: #121212;
-      color: #e0e0e0;
-      font-family: monospace;
-    }
-    .left-panel {
-      width: 50%;
-      padding: 10px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-    #editor {
-      flex: 1;
-      background: #1e1e1e;
-      color: #fff;
-      font-size: 16px;
-      padding: 10px;
-      border: none;
-      resize: none;
-      overflow-y: auto;
-    }
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin: 10px 0;
-      align-items: center;
-    }
-    button {
-      background: #333;
-      color: #fff;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #555;
-    }
-    iframe {
-      width: 50%;
-      height: 100%;
-      border: none;
-      background: white;
-    }
-    #errorBox {
-      color: red;
-      font-size: 14px;
-      white-space: pre-wrap;
-      margin-top: 5px;
-      height: 60px;
-      overflow-y: auto;
-    }
-    #statusBtn {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: none;
-      outline: 2px solid #555;
-      cursor: default;
-    }
-    #fishy {
-      position: fixed;
-      bottom: 50px;
-      left: 10px;
-      color: #888;
-      font-size: 14px;
-      cursor: default;
-    }
-    #fishy:hover::after {
-      content: 'This was made by Fishy (:)';
-      position: absolute;
-      left: 80px;
-      background: #222;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-size: 13px;
-      border: 1px solid #444;
-    }
-    #helpBox {
-      background: #1e1e1e;
-      border: 1px solid #444;
-      padding: 10px;
-      margin-top: 5px;
-      display: none;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art Upload Website</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
 
-  <!-- Add Prism.js library for syntax highlighting -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-okaidia.min.css" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+        h1 {
+            color: #333;
+        }
+
+        /* Modal Style for Age Verification */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Tabs for TOS and Upload */
+        .tabs {
+            margin-top: 20px;
+        }
+
+        .tabs button {
+            padding: 10px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .tabs button:hover {
+            background-color: #ddd;
+        }
+
+        /* Upload Form */
+        #upload-section {
+            margin-top: 20px;
+        }
+
+        #upload-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #upload-form input {
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        #status-message {
+            font-weight: bold;
+            color: green;
+        }
+
+        /* TOS/INFO Section */
+        #tos-info {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="left-panel">
-    <div class="buttons">
-      <button onclick="saveNote()">💾 Save</button>
-      <button onclick="loadNote()">📂 Load Saved</button>
-      <button onclick="checkCode()">🐞 Check Code</button>
-      <button onclick="toggleHelp()">❓ Help</button>
-      <button id="statusBtn" title="Code Status"></button>
+    <!-- Age Verification Modal -->
+    <div id="age-verification" class="modal">
+        <div class="modal-content">
+            <h2>Age Verification</h2>
+            <p>You must be 18 or older to access this site.</p>
+            <button onclick="verifyAge(true)">I am 18+</button>
+            <button onclick="verifyAge(false)">I am under 18</button>
+        </div>
     </div>
-    <textarea id="editor" placeholder="Write HTML/JS/CSS code here..."></textarea>
-    <div id="errorBox"></div>
-    <div id="helpBox">
-      <strong> How to Use:</strong><br>
-      • Write code in the box (HTML/CSS/JavaScript).<br>
-      • Click 🐞 to check and preview your code.<br>
-      • Save your code with 💾 (stored in browser only).<br>
-      • You’ll be warned before leaving if not saved.<br>
-      • Status light: 🟢 OK | 🟡 Unknown | 🔴 Error<br>
-      <br> 
-      Note: This website is still in BETA and is not done. There may be bugs. The check code button is still in BETA.
+
+    <!-- Main Content -->
+    <div id="main-content" style="display:none;">
+        <h1>Art Upload Website</h1>
+        
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button onclick="showTOS()">TOS/INFO</button>
+            <button onclick="showUploadForm()">Upload Art</button>
+        </div>
+
+        <!-- Upload Form -->
+        <div id="upload-section" style="display:none;">
+            <h2>Upload Your Art</h2>
+            <form id="upload-form" onsubmit="handleUpload(event)">
+                <label for="art-upload">Choose Art File:</label>
+                <input type="file" id="art-upload" name="art-upload" accept="image/*,video/*" required>
+                <br>
+                <label for="art-tags">Tags (comma separated):</label>
+                <input type="text" id="art-tags" name="art-tags" required>
+                <br>
+                <button type="submit">Upload Art</button>
+            </form>
+            <p id="status-message"></p>
+        </div>
+
+        <!-- TOS/INFO Content -->
+        <div id="tos-info" style="display:none;">
+            <h2>Terms of Service / Info</h2>
+            <p>This is the Terms of Service (TOS) and other important information about the website.</p>
+            <p>By uploading content, you agree to the TOS and acknowledge the age restriction for 18+ content.</p>
+            <button onclick="hideTOS()">Close</button>
+        </div>
     </div>
-  </div>
 
-  <iframe id="preview"></iframe>
-  <div id="fishy" title="This was made by Fishy (:)">@Fishy</div>
+    <script>
+        // Ensure that age verification is done before accessing the site
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                // If the user hasn't verified their age, show the age verification modal
+                document.getElementById('age-verification').style.display = 'block';
+            } else {
+                // If age verified, show the main content (upload form, TOS, etc.)
+                document.getElementById('main-content').style.display = 'block';
+            }
+        });
 
-  <script>
-    let isSaved = true;
-    const editor = document.getElementById('editor');
-    const preview = document.getElementById('preview');
-    const errorBox = document.getElementById('errorBox');
-    const statusBtn = document.getElementById('statusBtn');
-
-    editor.addEventListener('input', () => {
-      isSaved = false;
-    });
-
-    function saveNote() {
-      if (!isSaved) {
-        const confirmSave = confirm('You have unsaved changes! Saving will overwrite your current note. Do you want to continue?');
-        if (!confirmSave) return;
-      }
-
-      localStorage.setItem('myNote', editor.value);
-      isSaved = true;
-      alert('Note saved locally!');
-    }
-
-    function loadNote() {
-      if (!isSaved && confirm('You have unsaved changes! Are you sure you want to load the saved note and lose your changes?')) {
-        const note = localStorage.getItem('myNote');
-        if (note) {
-          editor.value = note;
-          isSaved = true;
-        } else {
-          alert('No saved note.');
+        // Age Verification
+        function verifyAge(is18Plus) {
+            if (is18Plus) {
+                localStorage.setItem('user', 'verified');
+                document.getElementById('age-verification').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert("You must be 18 or older to access this site.");
+                window.location.href = "https://google.com"; // Redirect to another site
+            }
         }
-      }
-    }
 
-    function checkCode() {
-      const code = editor.value;
-      errorBox.textContent = '';
-      const blob = new Blob([code], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      preview.src = url;
-
-      statusBtn.style.background = '#f1c40f'; // yellow
-
-      preview.onload = () => {
-        try {
-          const doc = preview.contentDocument || preview.contentWindow.document;
-          const testScript = doc.querySelector('script');
-          
-          // Check if the code is valid and working
-          if (testScript && doc.body.innerHTML.trim() !== '') {
-            statusBtn.style.background = '#2ecc71'; // green
-            errorBox.textContent = ''; // clear any previous errors
-          } else if (doc.body.innerHTML.trim() === '') {
-            statusBtn.style.background = '#f1c40f'; // yellow (no content)
-          } else {
-            statusBtn.style.background = '#f1c40f'; // yellow (no script)
-          }
-        } catch (e) {
-          errorBox.textContent = `Code Error:\n${e.message}`;
-          statusBtn.style.background = '#e74c3c'; // red
+        // Switch to Upload Form
+        function showUploadForm() {
+            document.getElementById('upload-section').style.display = 'block';
+            document.getElementById('tos-info').style.display = 'none';
         }
-      };
 
-      // Highlight the code using Prism.js
-      editor.classList.add('language-html');
-      Prism.highlightAll();
-    }
+        // Show TOS/INFO Content
+        function showTOS() {
+            document.getElementById('tos-info').style.display = 'block';
+            document.getElementById('upload-section').style.display = 'none';
+        }
 
-    function toggleHelp() {
-      const helpBox = document.getElementById('helpBox');
-      helpBox.style.display = helpBox.style.display === 'block' ? 'none' : 'block';
-    }
+        // Hide TOS/INFO Content
+        function hideTOS() {
+            document.getElementById('tos-info').style.display = 'none';
+            document.getElementById('upload-section').style.display = 'block';
+        }
 
-    window.addEventListener('beforeunload', (e) => {
-      if (!isSaved) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    });
-  </script>
+        // Handle the Upload of Art (simulated, no actual cloud storage)
+        function handleUpload(event) {
+            event.preventDefault();
+            const fileInput = document.getElementById('art-upload');
+            const tagsInput = document.getElementById('art-tags');
+            const statusMessage = document.getElementById('status-message');
+
+            const file = fileInput.files[0];
+            const tags = tagsInput.value.split(',').map(tag => tag.trim());
+
+            if (!file) {
+                statusMessage.textContent = "Please select a file to upload.";
+                statusMessage.style.color = "red";
+                return;
+            }
+
+            if (!tags.length) {
+                statusMessage.textContent = "Please add some tags.";
+                statusMessage.style.color = "red";
+                return;
+            }
+
+            // Simulate saving file and tags (e.g., storing in localStorage or showing preview)
+            statusMessage.textContent = `Your art has been uploaded with tags: ${tags.join(', ')}`;
+            statusMessage.style.color = "green";
+
+            // Simulating file upload with localStorage (for demonstration)
+            const uploadedArt = {
+                fileName: file.name,
+                tags: tags,
+                status: 'pending'
+            };
+
+            // Save the uploaded art temporarily (you can use localStorage, IndexedDB, or similar)
+            let uploadedArts = JSON.parse(localStorage.getItem('uploadedArts') || '[]');
+            uploadedArts.push(uploadedArt);
+            localStorage.setItem('uploadedArts', JSON.stringify(uploadedArts));
+        }
+    </script>
 
 </body>
 </html>
+
