@@ -1,307 +1,130 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Art Upload Website</title>
-    <style>
-        /* Basic Styles */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        /* Modal Style for Age Verification */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            text-align: center;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        /* Tabs for TOS and Upload */
-        .tabs {
-            margin-top: 20px;
-        }
-
-        .tabs button {
-            padding: 10px;
-            margin: 0 10px;
-            cursor: pointer;
-        }
-
-        .tabs button:hover {
-            background-color: #ddd;
-        }
-
-        /* Upload Form */
-        #upload-section {
-            margin-top: 20px;
-        }
-
-        #upload-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        #upload-form input {
-            margin-bottom: 10px;
-            padding: 10px;
-        }
-
-        #status-message {
-            font-weight: bold;
-            color: green;
-        }
-
-        /* TOS/INFO Section */
-        #tos-info {
-            margin-top: 20px;
-        }
-
-        /* Moderation Section */
-        #moderation-section {
-            margin-top: 20px;
-        }
-
-        .moderation-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .approve, .reject {
-            padding: 5px 10px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .approve {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .reject {
-            background-color: #f44336;
-            color: white;
-        }
-
-        .approve:hover, .reject:hover {
-            opacity: 0.8;
-        }
-
-        .moderation-item img, .moderation-item video {
-            max-width: 200px;
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Art Uploader</title>
+  <style>
+    body { font-family: Arial; background: #111; color: #eee; padding: 20px; }
+    h1 { color: #f06; }
+    input, textarea, button { display: block; margin: 10px 0; padding: 5px; width: 100%; max-width: 400px; }
+    .art-card { background: #222; margin: 10px 0; padding: 10px; border: 1px solid #555; }
+    .gallery { margin-top: 20px; }
+    .moderation { background: #333; padding: 10px; border: 1px dashed #666; margin-top: 30px; }
+    nav a { color: #0cf; margin-right: 15px; text-decoration: none; }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
+  <h1>NSFW Art Upload</h1>
 
-    <!-- Age Verification Modal -->
-    <div id="age-verification" class="modal">
-        <div class="modal-content">
-            <h2>Age Verification</h2>
-            <p>You must be 18 or older to access this site.</p>
-            <button onclick="verifyAge(true)">I am 18+</button>
-            <button onclick="verifyAge(false)">I am under 18</button>
-        </div>
-    </div>
+  <nav>
+    <a href="#" onclick="showTab('upload')">Upload</a>
+    <a href="#" onclick="showTab('gallery')">Gallery</a>
+    <a href="#" onclick="showTab('moderation')">Moderate</a>
+    <a href="#" onclick="showTab('tos')">TOS/INFO</a>
+  </nav>
 
-    <!-- Main Content -->
-    <div id="main-content" style="display:none;">
-        <h1>Art Upload Website</h1>
-        
-        <!-- Navigation Tabs -->
-        <div class="tabs">
-            <button onclick="showTOS()">TOS/INFO</button>
-            <button onclick="showUploadForm()">Upload Art</button>
-            <button onclick="showModeration()">Moderate Art</button>
-        </div>
+  <div id="upload">
+    <h2>Upload New Art</h2>
+    <input type="text" id="title" placeholder="Title">
+    <input type="text" id="tags" placeholder="Tags (comma separated)">
+    <textarea id="imageURL" placeholder="Image URL"></textarea>
+    <button onclick="uploadArt()">Submit</button>
+  </div>
 
-        <!-- Upload Form -->
-        <div id="upload-section" style="display:none;">
-            <h2>Upload Your Art</h2>
-            <form id="upload-form" onsubmit="handleUpload(event)">
-                <label for="art-upload">Choose Art File:</label>
-                <input type="file" id="art-upload" name="art-upload" accept="image/*,video/*" required>
-                <br>
-                <label for="art-tags">Tags (comma separated):</label>
-                <input type="text" id="art-tags" name="art-tags" required>
-                <br>
-                <button type="submit">Upload Art</button>
-            </form>
-            <p id="status-message"></p>
-        </div>
+  <div id="gallery" class="gallery hidden">
+    <h2>Approved Art Gallery</h2>
+    <div id="galleryList"></div>
+  </div>
 
-        <!-- TOS/INFO Content -->
-        <div id="tos-info" style="display:none;">
-            <h2>Terms of Service / Info</h2>
-            <p>This is the Terms of Service (TOS) and other important information about the website.</p>
-            <p>By uploading content, you agree to the TOS and acknowledge the age restriction for 18+ content.</p>
-            <button onclick="hideTOS()">Close</button>
-        </div>
+  <div id="moderation" class="moderation hidden">
+    <h2>Moderation Panel</h2>
+    <div id="moderationList"></div>
+  </div>
 
-        <!-- Moderation Section -->
-        <div id="moderation-section" style="display:none;">
-            <h2>Moderate Uploaded Art</h2>
-            <div id="moderation-list"></div>
-        </div>
-    </div>
+  <div id="tos" class="hidden">
+    <h2>Terms of Service / Info</h2>
+    <p>(You can write your TOS/INFO content here later)</p>
+  </div>
 
-    <script>
-        // Ensure that age verification is done before accessing the site
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = localStorage.getItem('user');
-            if (!user) {
-                // If the user hasn't verified their age, show the age verification modal
-                document.getElementById('age-verification').style.display = 'block';
-            } else {
-                // If age verified, show the main content (upload form, TOS, etc.)
-                document.getElementById('main-content').style.display = 'block';
-            }
-        });
+  <script>
+    const MODERATOR_KEY = 'moderator';
 
-        // Age Verification
-        function verifyAge(is18Plus) {
-            if (is18Plus) {
-                localStorage.setItem('user', 'verified');
-                document.getElementById('age-verification').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            } else {
-                alert("You must be 18 or older to access this site.");
-                window.location.href = "https://google.com"; // Redirect to another site
-            }
+    const saveData = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+    const loadData = (key) => JSON.parse(localStorage.getItem(key) || '[]');
+
+    function uploadArt() {
+      const title = document.getElementById('title').value.trim();
+      const tags = document.getElementById('tags').value.trim();
+      const imageURL = document.getElementById('imageURL').value.trim();
+      if (!title || !imageURL) return alert("Fill all fields!");
+
+      const uploads = loadData('uploads');
+      uploads.push({ title, tags, imageURL, approved: false });
+      saveData('uploads', uploads);
+      alert("Uploaded for moderation!");
+      document.getElementById('title').value = "";
+      document.getElementById('tags').value = "";
+      document.getElementById('imageURL').value = "";
+      loadModeration();
+    }
+
+    function approve(index) {
+      const uploads = loadData('uploads');
+      uploads[index].approved = true;
+      saveData('uploads', uploads);
+      loadModeration();
+      loadGallery();
+    }
+
+    function reject(index) {
+      const uploads = loadData('uploads');
+      uploads.splice(index, 1);
+      saveData('uploads', uploads);
+      loadModeration();
+    }
+
+    function loadGallery() {
+      const uploads = loadData('uploads');
+      const gallery = document.getElementById('galleryList');
+      gallery.innerHTML = '';
+      uploads.filter(x => x.approved).forEach(upload => {
+        const div = document.createElement('div');
+        div.className = 'art-card';
+        div.innerHTML = `<h3>${upload.title}</h3><img src="${upload.imageURL}" style="max-width:100%;"><p>Tags: ${upload.tags}</p>`;
+        gallery.appendChild(div);
+      });
+    }
+
+    function loadModeration() {
+      const uploads = loadData('uploads');
+      const modList = document.getElementById('moderationList');
+      modList.innerHTML = '';
+      uploads.forEach((upload, i) => {
+        if (!upload.approved) {
+          const div = document.createElement('div');
+          div.className = 'art-card';
+          div.innerHTML = `<h3>${upload.title}</h3><img src="${upload.imageURL}" style="max-width:100%;"><p>Tags: ${upload.tags}</p><button onclick="approve(${i})">Approve</button><button onclick="reject(${i})">Reject</button>`;
+          modList.appendChild(div);
         }
+      });
+    }
 
-        // Switch to Upload Form
-        function showUploadForm() {
-            document.getElementById('upload-section').style.display = 'block';
-            document.getElementById('tos-info').style.display = 'none';
-            document.getElementById('moderation-section').style.display = 'none';
-        }
+    function showTab(tabId) {
+      ['upload', 'gallery', 'moderation', 'tos'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+      if (tabId === 'gallery') loadGallery();
+      if (tabId === 'moderation') loadModeration();
+    }
 
-        // Show TOS/INFO Content
-        function showTOS() {
-            document.getElementById('tos-info').style.display = 'block';
-            document.getElementById('upload-section').style.display = 'none';
-            document.getElementById('moderation-section').style.display = 'none';
-        }
-
-        // Show Moderation Section
-        function showModeration() {
-            document.getElementById('moderation-section').style.display = 'block';
-            document.getElementById('upload-section').style.display = 'none';
-            document.getElementById('tos-info').style.display = 'none';
-            loadModerationQueue();
-        }
-
-        // Hide TOS/INFO Content
-        function hideTOS() {
-            document.getElementById('tos-info').style.display = 'none';
-            document.getElementById('upload-section').style.display = 'block';
-        }
-
-        // Handle the Upload of Art (immediately approved for testing)
-        function handleUpload(event) {
-            event.preventDefault();
-            const fileInput = document.getElementById('art-upload');
-            const tagsInput = document.getElementById('art-tags');
-            const statusMessage = document.getElementById('status-message');
-
-            const file = fileInput.files[0];
-            const tags = tagsInput.value.split(',').map(tag => tag.trim());
-
-            if (!file) {
-                statusMessage.textContent = "Please select a file to upload.";
-                statusMessage.style.color = "red";
-                return;
-            }
-
-            if (!tags.length) {
-                statusMessage.textContent = "Please add some tags.";
-                statusMessage.style.color = "red";
-                return;
-            }
-
-            // Save the uploaded art immediately as approved (no moderation)
-            const uploadedArt = {
-                fileName: file.name,
-                fileUrl: URL.createObjectURL(file),
-                tags: tags,
-                status: 'approved'  // Directly mark it as approved
-            };
-
-            let uploadedArts = JSON.parse(localStorage.getItem('uploadedArts') || '[]');
-            uploadedArts.push(uploadedArt);
-            localStorage.setItem('uploadedArts', JSON.stringify(uploadedArts));
-
-            statusMessage.textContent = `Your art has been uploaded and approved immediately for testing.`;
-            statusMessage.style.color = "green";
-        }
-
-        // Load Moderation Queue
-        function loadModerationQueue() {
-            const uploadedArts = JSON.parse(localStorage.getItem('uploadedArts') || '[]');
-            const moderationList = document.getElementById('moderation-list');
-            moderationList.innerHTML = ''; // Clear the list first
-
-            uploadedArts.forEach((art, index) => {
-                if (art.status === 'approved') {
-                    const artItem = document.createElement('div');
-                    artItem.className = 'moderation-item';
-
-                    // Show the art
-                    const media = art.fileUrl.endsWith('mp4') || art.fileUrl.endsWith('webm') ?
-                        `<video src="${art.fileUrl}" controls></video>` :
-                        `<img src="${art.fileUrl}" alt="Uploaded Art">`;
-
-                    artItem.innerHTML = `
-                        ${media}
-                        <p>Tags: ${art.tags.join(', ')}</p>
-                        <button class="approve" disabled>Approved</button>
-                        <button class="reject" disabled>Rejected</button>
-                    `;
-
-                    moderationList.appendChild(artItem);
-                }
-            });
-        }
-    </script>
-
+    // Load gallery on start
+    loadGallery();
+  </script>
 </body>
 </html>
