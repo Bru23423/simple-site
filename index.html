@@ -1,220 +1,38 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Art Uploader</title>
+  <title>Hentai Tag Explorer</title>
   <style>
-    body { font-family: Arial; background: #111; color: #eee; padding: 20px; }
-    h1 { color: #f06; }
-    input, textarea, button { display: block; margin: 10px 0; padding: 5px; width: 100%; max-width: 400px; }
-    .art-card { background: #222; margin: 10px 0; padding: 10px; border: 1px solid #555; }
-    .gallery img { max-height: 150px; cursor: pointer; }
-    .gallery { margin-top: 20px; }
-    .moderation { background: #333; padding: 10px; border: 1px dashed #666; margin-top: 30px; }
-    nav a { color: #0cf; margin-right: 15px; text-decoration: none; }
-    .hidden { display: none; }
-    #ageGate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000c; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-    #ageGate div { background: #222; padding: 20px; border: 1px solid #555; text-align: center; }
+    body { background: #111; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+    .tag { display: inline-block; padding: 10px; margin: 10px; background: #222; border-radius: 10px; cursor: pointer; }
+    .details { margin-top: 20px; }
   </style>
 </head>
 <body>
-  <div id="ageGate">
-    <div>
-      <h2>Welcome!</h2>
-      <p>click agree. </p>
-      <button onclick="acceptAgeGate()">agree</button>
-    </div>
-  </div>
-
-  <h1>Art Upload</h1>
-  <nav>
-    <a href="#" onclick="showTab('upload')">Upload</a>
-    <a href="#" onclick="showTab('gallery')">Gallery</a>
-    <a href="#" onclick="showTab('moderation')">Moderate</a>
-    <a href="#" onclick="showTab('tos')">TOS/INFO</a>
-  </nav>
-
-  <div id="upload">
-    <h2>Upload New Art</h2>
-    <input type="text" id="title" placeholder="Title">
-    <input type="text" id="tags" placeholder="Tags (comma separated)">
-    <input type="file" id="fileInput" accept="image/*">
-    <button onclick="uploadArt()">Submit</button>
-  </div>
-
-  <div id="gallery" class="gallery hidden">
-    <h2>Approved Art Gallery</h2>
-    <div id="galleryList"></div>
-  </div>
-
-  <div id="moderation" class="moderation hidden">
-    <h2>Moderation Panel</h2>
-    <div id="moderationList"></div>
-  </div>
-
-  <div id="tos" class="hidden">
-    <h2>Terms of Service / Info</h2>
-    <p>TOS -
-    still being made... </p>
-  </div>
+  <h1>🔞 Hentai Tag Encyclopedia</h1>
+  <div id="tags"></div>
+  <div class="details" id="details"></div>
 
   <script>
-    const MAX_FILE_SIZE_MB = 2;
-    const MAX_THUMBNAIL_WIDTH = 300;
-    const uploadsKey = 'uploads';
-    const likeKey = 'likes';
-    const reportKey = 'reports';
+    const tags = {
+      "futanari": "A genre involving characters with both male and female sexual traits.",
+      "yuri": "Focuses on romantic/sexual relationships between female characters.",
+      "bondage": "Depicts characters restrained, tied up, or otherwise bound.",
+      "tsundere": "A character that switches between cold and loving behavior.",
+    };
 
-    function acceptAgeGate() {
-      document.getElementById('ageGate').style.display = 'none';
+    const tagsContainer = document.getElementById('tags');
+    const details = document.getElementById('details');
+
+    for (let tag in tags) {
+      const el = document.createElement('div');
+      el.className = 'tag';
+      el.textContent = tag;
+      el.onclick = () => details.innerHTML = `<h2>${tag}</h2><p>${tags[tag]}</p>`;
+      tagsContainer.appendChild(el);
     }
-
-    // Block specific IP (client-side only dummy block)
-    fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => {
-      if (data.ip === '2600:4040:70c5:2700:d86:a9de:62f9:a048') {
-        document.body.innerHTML = '<h1>Access Denied</h1><p>You are blocked.</p>';
-      }
-    });
-
-    const saveData = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-    const loadData = (key) => JSON.parse(localStorage.getItem(key) || '[]');
-
-    function uploadArt() {
-      const title = document.getElementById('title').value.trim();
-      const tags = document.getElementById('tags').value.trim();
-      const file = document.getElementById('fileInput').files[0];
-      if (!title || !file) return alert("Fill all fields!");
-      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert("Image too large (max 2MB)");
-
-      const reader = new FileReader();
-      reader.onload = function () {
-        const uploads = loadData(uploadsKey);
-        uploads.push({ title, tags, image: reader.result, approved: false, uploader: navigator.userAgent, likes: 0, likedBy: [], reports: 0 });
-        saveData(uploadsKey, uploads);
-        alert("Uploaded for moderation");
-        loadModeration();
-        document.getElementById('title').value = "";
-        document.getElementById('tags').value = "";
-        document.getElementById('fileInput').value = "";
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function approve(index) {
-      const uploads = loadData(uploadsKey);
-      uploads[index].approved = true;
-      saveData(uploadsKey, uploads);
-      loadModeration();
-      loadGallery();
-    }
-
-    function reject(index) {
-      const uploads = loadData(uploadsKey);
-      uploads.splice(index, 1);
-      saveData(uploadsKey, uploads);
-      loadModeration();
-    }
-
-    function deletePost(index) {
-      const uploads = loadData(uploadsKey);
-      if (uploads[index].uploader === navigator.userAgent) {
-        uploads.splice(index, 1);
-        saveData(uploadsKey, uploads);
-        loadGallery();
-      }
-    }
-
-    function likePost(index) {
-      const uploads = loadData(uploadsKey);
-      const post = uploads[index];
-      const id = navigator.userAgent;
-      if (!post.likedBy.includes(id)) {
-        post.likes++;
-        post.likedBy.push(id);
-        saveData(uploadsKey, uploads);
-        loadGallery();
-      }
-    }
-
-    function reportPost(index) {
-      const uploads = loadData(uploadsKey);
-      uploads[index].reports++;
-      saveData(uploadsKey, uploads);
-      alert("This post has been reported!");
-    }
-
-    function loadGallery() {
-      const uploads = loadData(uploadsKey);
-      const gallery = document.getElementById('galleryList');
-      gallery.innerHTML = '';
-      uploads.forEach((upload, index) => {
-        if (upload.approved) {
-          const div = document.createElement('div');
-          div.className = 'art-card';
-          const thumb = new Image();
-          thumb.src = upload.image;
-          thumb.onload = () => {
-            if (thumb.width > MAX_THUMBNAIL_WIDTH) {
-              thumb.style.width = MAX_THUMBNAIL_WIDTH + 'px';
-            }
-          };
-          thumb.onclick = () => {
-            const img = new Image();
-            img.src = upload.image;
-            const win = window.open();
-            win.document.write(img.outerHTML);
-          };
-          div.appendChild(document.createElement('h3')).innerText = upload.title;
-          div.appendChild(thumb);
-          div.appendChild(document.createElement('p')).innerText = `Tags: ${upload.tags}`;
-          const likeBtn = document.createElement('button');
-          likeBtn.innerText = `Like (${upload.likes})`;
-          likeBtn.onclick = () => likePost(index);
-          div.appendChild(likeBtn);
-
-          const reportBtn = document.createElement('button');
-          reportBtn.innerText = "Report";
-          reportBtn.onclick = () => reportPost(index);
-          div.appendChild(reportBtn);
-
-          if (upload.uploader === navigator.userAgent) {
-            const delBtn = document.createElement('button');
-            delBtn.innerText = "Delete";
-            delBtn.onclick = () => deletePost(index);
-            div.appendChild(delBtn);
-          }
-
-          gallery.appendChild(div);
-        }
-      });
-    }
-
-    function loadModeration() {
-      const uploads = loadData(uploadsKey);
-      const modList = document.getElementById('moderationList');
-      modList.innerHTML = '';
-      uploads.forEach((upload, i) => {
-        if (!upload.approved) {
-          const div = document.createElement('div');
-          div.className = 'art-card';
-          div.innerHTML = `<h3>${upload.title}</h3><img src="${upload.image}" style="max-width:100%;"><p>Tags: ${upload.tags}</p><button onclick="approve(${i})">Approve</button><button onclick="reject(${i})">Reject</button>`;
-          modList.appendChild(div);
-        }
-      });
-    }
-
-    function showTab(tabId) {
-      ['upload', 'gallery', 'moderation', 'tos'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      document.getElementById(tabId).classList.remove('hidden');
-      if (tabId === 'gallery') loadGallery();
-      if (tabId === 'moderation') loadModeration();
-    }
-
-    loadGallery();
   </script>
 </body>
 </html>
