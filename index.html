@@ -3,62 +3,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fishy's Search Portal</title>
+  <title>Universal Search Tool</title>
   <style>
     body {
-      margin: 0;
+      font-family: Arial, sans-serif;
       background: #121212;
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    header {
-      padding: 10px;
-      background: #1e1e1e;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      color: #fff;
+      text-align: center;
+      padding-top: 50px;
     }
     input, select, button {
-      padding: 8px;
+      padding: 10px;
       font-size: 16px;
-      border-radius: 4px;
+      margin: 5px;
+      border-radius: 5px;
       border: none;
-      outline: none;
     }
-    input {
-      flex: 1;
+    button {
+      background: #1e90ff;
+      color: white;
+      cursor: pointer;
     }
-    iframe {
-      flex: 1;
-      border: none;
-      width: 100%;
+    button:hover {
+      background: #3399ff;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <select id="engine">
-      <option value="https://www.google.com/search?q=">Google</option>
-      <option value="https://www.youtube.com/results?search_query=">YouTube</option>
-      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
-    </select>
-    <input type="text" id="query" placeholder="Search anything..." />
-    <button onclick="search()">🔍 Search</button>
-  </header>
-
-  <iframe id="viewer" src=""></iframe>
+  <h1>🔍 Search Anything</h1>
+  <input type="text" id="query" placeholder="Type your search..." />
+  <select id="engine">
+    <option value="google">Google</option>
+    <option value="youtube">YouTube</option>
+    <option value="duckduckgo">DuckDuckGo</option>
+  </select>
+  <button onclick="search()">Search</button>
 
   <script>
     function search() {
+      const query = document.getElementById('query').value.trim();
       const engine = document.getElementById('engine').value;
-      const query = encodeURIComponent(document.getElementById('query').value);
-      document.getElementById('viewer').src = engine + query;
+
+      if (!query) return alert("Please enter a search term.");
+
+      let url = '';
+      if (engine === 'google') {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+      } else if (engine === 'youtube') {
+        url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
+      } else if (engine === 'duckduckgo') {
+        url = 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
+      }
+
+      window.open(url, '_blank');
     }
   </script>
-
 </body>
 </html>
