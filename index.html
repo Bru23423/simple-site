@@ -1,62 +1,13 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Universal Search Tool</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #fff;
-      text-align: center;
-      padding-top: 50px;
-    }
-    input, select, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 5px;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      background: #1e90ff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #3399ff;
-    }
-  </style>
-</head>
-<body>
-  <h1>🔍 Search Anything</h1>
-  <input type="text" id="query" placeholder="Type your search..." />
-  <select id="engine">
-    <option value="google">Google</option>
-    <option value="youtube">YouTube</option>
-    <option value="duckduckgo">DuckDuckGo</option>
-  </select>
-  <button onclick="search()">Search</button>
+<input type="text" id="search" placeholder="Search privately..." />
+<button onclick="search()">Search</button>
 
-  <script>
-    function search() {
-      const query = document.getElementById('query').value.trim();
-      const engine = document.getElementById('engine').value;
-
-      if (!query) return alert("Please enter a search term.");
-
-      let url = '';
-      if (engine === 'google') {
-        url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
-      } else if (engine === 'youtube') {
-        url = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(query);
-      } else if (engine === 'duckduckgo') {
-        url = 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
-      }
-
-      window.open(url, '_blank');
+<script>
+  function search() {
+    const query = document.getElementById("search").value.trim();
+    if (query) {
+      const url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}&kae=d&kp=-2`;
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
-  </script>
-</body>
-</html>
+  }
+</script>
