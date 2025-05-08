@@ -1,3 +1,64 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fishy's Search Portal</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 10px;
+      background: #1e1e1e;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input, select, button {
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: none;
+      outline: none;
+    }
+    input {
+      flex: 1;
+    }
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
 
-test
+  <header>
+    <select id="engine">
+      <option value="https://www.google.com/search?q=">Google</option>
+      <option value="https://www.youtube.com/results?search_query=">YouTube</option>
+      <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+    </select>
+    <input type="text" id="query" placeholder="Search anything..." />
+    <button onclick="search()">🔍 Search</button>
+  </header>
+
+  <iframe id="viewer" src=""></iframe>
+
+  <script>
+    function search() {
+      const engine = document.getElementById('engine').value;
+      const query = encodeURIComponent(document.getElementById('query').value);
+      document.getElementById('viewer').src = engine + query;
+    }
+  </script>
+
+</body>
+</html>
