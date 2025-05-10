@@ -1,13 +1,178 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
-<input type="text" id="search" placeholder="Search privately..." />
-<button onclick="search()">Search</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>xxx - justfun.it.com</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      max-width: 500px;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      margin: 0 auto;
+      display: block;
+      font-size: 16px;
+      background: #1e1e1e;
+      color: white;
+    }
+
+    .site-list {
+      margin-top: 30px;
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .site {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 12px;
+      transition: 0.3s;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .site:hover {
+      border-color: #e91e63;
+      background-color: #2c2c2c;
+    }
+
+    .site .title {
+      color: #e91e63;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .tags {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* AGE GATE OVERLAY */
+    #ageGate {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #ageGate h2 {
+      font-size: 2em;
+      color: #e91e63;
+      margin-bottom: 10px;
+    }
+
+    #ageGate p {
+      margin-bottom: 20px;
+      color: #ccc;
+    }
+
+    #ageGate button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #ageGate .yes {
+      background-color: #e91e63;
+      color: white;
+    }
+
+    #ageGate .no {
+      background-color: #333;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<!-- AGE VERIFICATION -->
+<div id="ageGate">
+  <h2>🔞 Are You 18 or Older?</h2>
+  <p>This site contains adult content. Please confirm your age.</p>
+  <button class="yes" onclick="enterSite()">Yes, I'm 18+</button>
+  <button class="no" onclick="window.location.href='https://google.com'">No, take me back</button>
+</div>
+
+<h1>xxx portal</h1>
+<input type="text" id="searchInput" placeholder="Search by tag (e.g. hentai, furry, etc.)" oninput="searchSites()">
+
+<div class="site-list" id="siteList">
+  <div class="site" data-tags="hentai doujin manga" onclick="openSite('https://nhentai.net')">
+    <div class="title">nhentai.net</div>
+    <div class="tags">Tags: hentai, doujin, manga</div>
+  </div>
+
+  <div class="site" data-tags="rule34 hentai furry" onclick="openSite('https://rule34.xxx')">
+    <div class="title">rule34.xxx</div>
+    <div class="tags">Tags: rule34, hentai, furry</div>
+  </div>
+
+  <div class="site" data-tags="furry art gallery" onclick="openSite('https://e621.net')">
+    <div class="title">e621.net</div>
+    <div class="tags">Tags: furry, art, gallery</div>
+  </div>
+
+  <div class="site" data-tags="animated gifs hentai" onclick="openSite('https://porngif.cc')">
+    <div class="title">porngif.cc</div>
+    <div class="tags">Tags: gifs, animated, hentai</div>
+  </div>
+
+  <div class="site" data-tags="pornhub" onclick="openSite('https://www.pornhub.com')">
+    <div class="title">pornhub.com</div>
+    <div class="tags">Tags: mainstream, video</div>
+  </div>
+</div>
 
 <script>
-  function search() {
-    const query = document.getElementById("search").value.trim();
-    if (query) {
-      const url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}&kae=d&kp=-2`;
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
+  function searchSites() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const sites = document.querySelectorAll('.site');
+
+    sites.forEach(site => {
+      const tags = site.getAttribute('data-tags');
+      site.classList.toggle('hidden', !tags.includes(input));
+    });
+  }
+
+  function openSite(url) {
+    window.location.href = url; // Same tab
+  }
+
+  function enterSite() {
+    document.getElementById("ageGate").style.display = "none";
   }
 </script>
+
+</body>
+</html>
