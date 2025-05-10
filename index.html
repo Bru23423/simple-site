@@ -166,9 +166,10 @@
   }
 
   function openSite(url) {
-    // Clear the search history (reset the input field)
+    // Clear the search history (reset the input field and local/session storage)
     document.getElementById('searchInput').value = '';
     searchSites();  // Reset search results
+    sessionStorage.removeItem('searchHistory'); // Clear session storage
 
     window.location.href = url; // Navigate to the site
   }
