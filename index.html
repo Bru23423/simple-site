@@ -62,13 +62,15 @@
     const errorEl = document.getElementById('error');
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } }
+      })
         .then(stream => {
           videoL.srcObject = stream;
           videoR.srcObject = stream;
         })
         .catch(err => {
-          errorEl.textContent = "Camera permission denied or unavailable.";
+          errorEl.textContent = "Back camera not available or permission denied.";
           console.error("Camera error:", err);
         });
     } else {
