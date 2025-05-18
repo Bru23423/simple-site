@@ -4,372 +4,306 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mini Reddit Clone with Moderator Approval</title>
+<title>Simple Reddit-Like Demo</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 20px; 
-    background: #f5f6fa;
-    color: #333;
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; background: #f7f7f7; }
+  h1 { text-align: center; }
+  #loginSection, #registerSection, #postSection, #moderateSection, #postsSection {
+    background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 0 5px #ccc;
   }
-  h1, h2 {
-    text-align: center;
-  }
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  .hidden {
-    display: none;
-  }
-  input, textarea, button {
-    font-size: 1rem;
-    padding: 8px;
-    margin: 5px 0;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  button {
-    cursor: pointer;
-  }
-  .post {
-    background: white;
-    border-radius: 5px;
-    padding: 15px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-  }
-  .post h3 {
-    margin: 0 0 10px;
-  }
-  .post small {
-    color: #666;
-  }
-  .approved-posts {
-    margin-top: 40px;
-  }
-  .pending-posts {
-    margin-top: 40px;
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
-    padding: 10px;
-    border-radius: 5px;
-  }
-  .error {
-    color: red;
-    font-weight: bold;
-  }
-  .info {
-    background: #d1ecf1;
-    border: 1px solid #bee5eb;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-  }
+  label { display: block; margin-top: 10px; }
+  input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+  button { margin-top: 10px; padding: 10px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; }
+  button:hover { background: #0056b3; }
+  .error { color: red; }
+  .post { border-bottom: 1px solid #ddd; padding: 10px 0; }
+  .post .author { font-weight: bold; }
+  .post .content { margin: 5px 0; }
+  .moderate-buttons button { margin-right: 5px; }
 </style>
 </head>
 <body>
 
-<div class="container">
+<h1>Simple Reddit-Like Demo</h1>
 
-<h1>Mini Reddit Clone</h1>
-
-<div id="warning" class="info">
-  <strong>WARNING:</strong> This demo stores all accounts and posts <em>locally in your browser</em>. It is NOT secure and is only for learning/demo purposes! Do NOT use real passwords here.
+<div id="warning" style="color:red; text-align:center; font-weight:bold;">
+  WARNING: This demo stores all data locally in your browser. Do NOT use real passwords!
 </div>
 
-<!-- LOGIN & REGISTER -->
-<div id="auth-section">
-  <h2>Login or Register</h2>
-  <input type="text" id="username" placeholder="Username" autocomplete="username" />
-  <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
-  <button id="loginBtn">Login</button>
-  <button id="registerBtn">Register</button>
-  <div id="auth-error" class="error"></div>
+<div id="loginSection">
+  <h2>Login</h2>
+  <label>Username:<input type="text" id="loginUsername" /></label>
+  <label>Password:<input type="password" id="loginPassword" /></label>
+  <button onclick="login()">Log In</button>
+  <div id="loginError" class="error"></div>
 </div>
 
-<!-- USER INFO & LOGOUT -->
-<div id="user-section" class="hidden">
-  <h2>Welcome, <span id="display-username"></span>!</h2>
-  <button id="logoutBtn">Logout</button>
+<div id="registerSection">
+  <h2>Register New Account</h2>
+  <label>Username:<input type="text" id="registerUsername" /></label>
+  <label>Password:<input type="password" id="registerPassword" /></label>
+  <button onclick="register()">Register</button>
+  <div id="registerError" class="error"></div>
+</div>
 
-  <div id="submit-post-section" class="hidden">
-    <h3>Submit a Post</h3>
-    <input type="text" id="post-title" placeholder="Post title" />
-    <textarea id="post-content" rows="4" placeholder="Post content"></textarea>
-    <button id="submitPostBtn">Submit for Approval</button>
-    <div id="submit-error" class="error"></div>
+<div id="welcomeSection" style="display:none;">
+  <h2>Welcome, <span id="currentUser"></span>! <button onclick="logout()">Log Out</button></h2>
+
+  <div id="postSection" style="display:none;">
+    <h3>Create a Post</h3>
+    <textarea id="postContent" rows="3" placeholder="Write your post here..."></textarea>
+    <button onclick="createPost()">Submit Post</button>
+    <div id="postError" class="error"></div>
   </div>
 
-  <div id="mod-section" class="hidden">
-    <h3>Moderator: Pending Posts Approval</h3>
-    <div id="pending-posts-list"></div>
+  <div id="moderateSection" style="display:none;">
+    <h3>Moderate Posts</h3>
+    <div id="pendingPosts"></div>
   </div>
-</div>
 
-<!-- APPROVED POSTS -->
-<div class="approved-posts">
-  <h2>Approved Posts</h2>
-  <div id="approved-posts-list"></div>
+  <div id="postsSection">
+    <h3>Approved Posts</h3>
+    <div id="approvedPosts"></div>
+  </div>
 </div>
 
 <script>
-// --- Moderator credentials (hardcoded) ---
-const MOD_USERNAME = 'moderator';
-const MOD_PASSWORD = 'modpass123';
+  // Constants
+  const MODERATOR_USERNAME = "moderator";
+  const MODERATOR_PASSWORD = "modpass123";
 
-// --- Utility Functions ---
-function saveToStorage(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-function loadFromStorage(key) {
-  const val = localStorage.getItem(key);
-  return val ? JSON.parse(val) : null;
-}
-
-// --- User management ---
-let currentUser = null;
-let users = loadFromStorage('users') || [];
-let posts = loadFromStorage('posts') || []; // all posts with approved status
-
-function hashPassword(pwd) {
-  // Simple hash substitute (DO NOT USE IN REAL APPS)
-  let hash = 0, i, chr;
-  if (pwd.length === 0) return hash;
-  for (i = 0; i < pwd.length; i++) {
-    chr = pwd.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
+  // Helpers: Save/load users and posts from localStorage
+  function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
   }
-  return hash.toString();
-}
+  function loadUsers() {
+    let users = localStorage.getItem('users');
+    if (!users) {
+      // Create default moderator account on first load
+      users = [{username: MODERATOR_USERNAME, password: MODERATOR_PASSWORD}];
+      saveUsers(users);
+      return users;
+    }
+    return JSON.parse(users);
+  }
 
-function register(username, password) {
-  username = username.trim().toLowerCase();
-  if (!username || !password) return 'Username and password required';
-  if (users.find(u => u.username === username)) return 'Username taken';
-  if (username === MOD_USERNAME) return 'That username is reserved';
+  function savePosts(posts) {
+    localStorage.setItem('posts', JSON.stringify(posts));
+  }
+  function loadPosts() {
+    let posts = localStorage.getItem('posts');
+    if (!posts) {
+      posts = [];
+      savePosts(posts);
+      return posts;
+    }
+    return JSON.parse(posts);
+  }
 
-  const hashedPwd = hashPassword(password);
-  users.push({ username, passwordHash: hashedPwd });
-  saveToStorage('users', users);
-  return null;
-}
+  // State
+  let currentUser = null;
 
-function login(username, password) {
-  username = username.trim().toLowerCase();
-  if (username === MOD_USERNAME) {
-    if (password === MOD_PASSWORD) {
-      currentUser = { username: MOD_USERNAME, isModerator: true };
-      return null;
-    } else {
-      return 'Incorrect moderator password';
+  // UI Elements
+  const loginUsername = document.getElementById('loginUsername');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginError = document.getElementById('loginError');
+  const registerUsername = document.getElementById('registerUsername');
+  const registerPassword = document.getElementById('registerPassword');
+  const registerError = document.getElementById('registerError');
+  const welcomeSection = document.getElementById('welcomeSection');
+  const currentUserSpan = document.getElementById('currentUser');
+  const postSection = document.getElementById('postSection');
+  const postContent = document.getElementById('postContent');
+  const postError = document.getElementById('postError');
+  const moderateSection = document.getElementById('moderateSection');
+  const pendingPostsDiv = document.getElementById('pendingPosts');
+  const approvedPostsDiv = document.getElementById('approvedPosts');
+
+  // Login function
+  function login() {
+    loginError.textContent = "";
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value.trim();
+
+    if (!username || !password) {
+      loginError.textContent = "Please enter username and password.";
+      return;
+    }
+
+    const users = loadUsers();
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (!user) {
+      loginError.textContent = "Invalid username or password.";
+      return;
+    }
+
+    currentUser = user.username;
+    afterLogin();
+  }
+
+  // Register function
+  function register() {
+    registerError.textContent = "";
+    const username = registerUsername.value.trim();
+    const password = registerPassword.value.trim();
+
+    if (!username || !password) {
+      registerError.textContent = "Please enter username and password.";
+      return;
+    }
+
+    if (username === MODERATOR_USERNAME) {
+      registerError.textContent = "This username is reserved.";
+      return;
+    }
+
+    const users = loadUsers();
+    if (users.find(u => u.username === username)) {
+      registerError.textContent = "Username already taken.";
+      return;
+    }
+
+    users.push({username, password});
+    saveUsers(users);
+
+    alert("Account created! You can now log in.");
+    registerUsername.value = "";
+    registerPassword.value = "";
+  }
+
+  // After successful login
+  function afterLogin() {
+    loginUsername.value = "";
+    loginPassword.value = "";
+    loginError.textContent = "";
+
+    registerUsername.value = "";
+    registerPassword.value = "";
+    registerError.textContent = "";
+
+    document.getElementById('loginSection').style.display = "none";
+    document.getElementById('registerSection').style.display = "none";
+    welcomeSection.style.display = "block";
+    currentUserSpan.textContent = currentUser;
+
+    postSection.style.display = currentUser !== MODERATOR_USERNAME ? "block" : "none";
+    moderateSection.style.display = currentUser === MODERATOR_USERNAME ? "block" : "none";
+
+    renderPosts();
+    renderPendingPosts();
+  }
+
+  // Logout function
+  function logout() {
+    currentUser = null;
+    welcomeSection.style.display = "none";
+    document.getElementById('loginSection').style.display = "block";
+    document.getElementById('registerSection').style.display = "block";
+  }
+
+  // Create new post (pending approval)
+  function createPost() {
+    postError.textContent = "";
+    const content = postContent.value.trim();
+    if (!content) {
+      postError.textContent = "Post content cannot be empty.";
+      return;
+    }
+
+    let posts = loadPosts();
+    posts.push({
+      id: Date.now(),
+      author: currentUser,
+      content,
+      approved: false,
+      createdAt: new Date().toISOString()
+    });
+    savePosts(posts);
+    postContent.value = "";
+    alert("Post submitted for moderation.");
+    renderPendingPosts();
+  }
+
+  // Render approved posts publicly
+  function renderPosts() {
+    let posts = loadPosts();
+    approvedPostsDiv.innerHTML = "";
+    posts.filter(p => p.approved).forEach(post => {
+      const div = document.createElement('div');
+      div.className = 'post';
+      div.innerHTML = `
+        <div class="author">${post.author} says:</div>
+        <div class="content">${escapeHtml(post.content)}</div>
+        <div class="date" style="font-size: 0.8em; color: #555;">${new Date(post.createdAt).toLocaleString()}</div>
+      `;
+      approvedPostsDiv.appendChild(div);
+    });
+  }
+
+  // Render pending posts for moderator
+  function renderPendingPosts() {
+    if (currentUser !== MODERATOR_USERNAME) return;
+    let posts = loadPosts();
+    let pending = posts.filter(p => !p.approved);
+    pendingPostsDiv.innerHTML = "";
+
+    if (pending.length === 0) {
+      pendingPostsDiv.textContent = "No posts to moderate.";
+      return;
+    }
+
+    pending.forEach(post => {
+      const div = document.createElement('div');
+      div.className = 'post';
+      div.innerHTML = `
+        <div class="author">${post.author} (pending)</div>
+        <div class="content">${escapeHtml(post.content)}</div>
+        <div class="date" style="font-size: 0.8em; color: #555;">${new Date(post.createdAt).toLocaleString()}</div>
+        <div class="moderate-buttons">
+          <button onclick="approvePost(${post.id})">Approve</button>
+          <button onclick="rejectPost(${post.id})">Reject</button>
+        </div>
+      `;
+      pendingPostsDiv.appendChild(div);
+    });
+  }
+
+  // Approve a post
+  function approvePost(id) {
+    let posts = loadPosts();
+    let post = posts.find(p => p.id === id);
+    if (post) {
+      post.approved = true;
+      savePosts(posts);
+      renderPendingPosts();
+      renderPosts();
     }
   }
-  const hashedPwd = hashPassword(password);
-  const user = users.find(u => u.username === username && u.passwordHash === hashedPwd);
-  if (!user) return 'Invalid username or password';
-  currentUser = { username: user.username, isModerator: false };
-  return null;
-}
 
-// --- Post management ---
-function submitPost(title, content) {
-  if (!title.trim()) return 'Post title is required';
-  if (!content.trim()) return 'Post content is required';
+  // Reject a post (delete it)
+  function rejectPost(id) {
+    let posts = loadPosts();
+    posts = posts.filter(p => p.id !== id);
+    savePosts(posts);
+    renderPendingPosts();
+  }
 
-  const newPost = {
-    id: Date.now() + Math.random(),
-    title: title.trim(),
-    content: content.trim(),
-    author: currentUser.username,
-    approved: false,
-    timestamp: new Date().toISOString(),
+  // Simple HTML escape
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // On page load, show login/register sections
+  window.onload = () => {
+    logout();
   };
-  posts.push(newPost);
-  saveToStorage('posts', posts);
-  return null;
-}
-
-function approvePost(postId) {
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    post.approved = true;
-    saveToStorage('posts', posts);
-  }
-}
-
-function rejectPost(postId) {
-  posts = posts.filter(p => p.id !== postId);
-  saveToStorage('posts', posts);
-}
-
-// --- UI Elements ---
-const authSection = document.getElementById('auth-section');
-const userSection = document.getElementById('user-section');
-const displayUsername = document.getElementById('display-username');
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const authError = document.getElementById('auth-error');
-const submitPostSection = document.getElementById('submit-post-section');
-const postTitleInput = document.getElementById('post-title');
-const postContentInput = document.getElementById('post-content');
-const submitPostBtn = document.getElementById('submitPostBtn');
-const submitError = document.getElementById('submit-error');
-const modSection = document.getElementById('mod-section');
-const pendingPostsList = document.getElementById('pending-posts-list');
-const approvedPostsList = document.getElementById('approved-posts-list');
-
-// --- UI Functions ---
-function showLoggedInView() {
-  authSection.classList.add('hidden');
-  userSection.classList.remove('hidden');
-  displayUsername.textContent = currentUser.username;
-
-  if (currentUser.isModerator) {
-    modSection.classList.remove('hidden');
-    submitPostSection.classList.add('hidden');
-    loadPendingPosts();
-  } else {
-    modSection.classList.add('hidden');
-    submitPostSection.classList.remove('hidden');
-  }
-  loadApprovedPosts();
-}
-
-function showLoggedOutView() {
-  authSection.classList.remove('hidden');
-  userSection.classList.add('hidden');
-  authError.textContent = '';
-  submitError.textContent = '';
-  postTitleInput.value = '';
-  postContentInput.value = '';
-}
-
-function loadPendingPosts() {
-  pendingPostsList.innerHTML = '';
-  const pendingPosts = posts.filter(p => !p.approved);
-  if (pendingPosts.length === 0) {
-    pendingPostsList.innerHTML = '<p>No posts pending approval.</p>';
-    return;
-  }
-  pendingPosts.forEach(post => {
-    const div = document.createElement('div');
-    div.classList.add('post');
-    div.innerHTML = `
-      <h3>${escapeHtml(post.title)}</h3>
-      <p>${escapeHtml(post.content)}</p>
-      <small>By: ${escapeHtml(post.author)} | ${new Date(post.timestamp).toLocaleString()}</small>
-      <br />
-      <button data-action="approve" data-id="${post.id}">Approve</button>
-      <button data-action="reject" data-id="${post.id}">Reject</button>
-    `;
-    pendingPostsList.appendChild(div);
-  });
-}
-
-function loadApprovedPosts() {
-  approvedPostsList.innerHTML = '';
-  const approvedPosts = posts.filter(p => p.approved);
-  if (approvedPosts.length === 0) {
-    approvedPostsList.innerHTML = '<p>No approved posts yet.</p>';
-    return;
-  }
-  approvedPosts.forEach(post => {
-    const div = document.createElement('div');
-    div.classList.add('post');
-    div.innerHTML = `
-      <h3>${escapeHtml(post.title)}</h3>
-      <p>${escapeHtml(post.content)}</p>
-      <small>By: ${escapeHtml(post.author)} | ${new Date(post.timestamp).toLocaleString()}</small>
-    `;
-    approvedPostsList.appendChild(div);
-  });
-}
-
-function escapeHtml(text) {
-  return text.replace(/[&<>"']/g, function(m) {
-    switch (m) {
-      case '&': return '&amp;';
-      case '<': return '&lt;';
-      case '>': return '&gt;';
-      case '"': return '&quot;';
-      case "'": return '&#39;';
-      default: return m;
-    }
-  });
-}
-
-// --- Event Listeners ---
-loginBtn.addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const error = login(username, password);
-  if (error) {
-    authError.textContent = error;
-  } else {
-    currentUser.isModerator ? console.log('Moderator logged in') : console.log('User logged in');
-    authError.textContent = '';
-    showLoggedInView();
-  }
-});
-
-registerBtn.addEventListener('click', () => {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const error = register(username, password);
-  if (error) {
-    authError.textContent = error;
-  } else {
-    authError.textContent = 'Registered successfully! You can now log in.';
-  }
-});
-
-logoutBtn.addEventListener('click', () => {
-  currentUser = null;
-  showLoggedOutView();
-});
-
-submitPostBtn.addEventListener('click', () => {
-  const title = postTitleInput.value;
-  const content = postContentInput.value;
-  const error = submitPost(title, content);
-  if (error) {
-    submitError.textContent = error;
-  } else {
-    submitError.textContent = '';
-    postTitleInput.value = '';
-    postContentInput.value = '';
-    alert('Post submitted for moderator approval!');
-  }
-  loadPendingPosts();
-  loadApprovedPosts();
-});
-
-pendingPostsList.addEventListener('click', e => {
-  if (!currentUser?.isModerator) return;
-  const btn = e.target;
-  if (btn.tagName === 'BUTTON') {
-    const action = btn.getAttribute('data-action');
-    const id = Number(btn.getAttribute('data-id'));
-    if (action === 'approve') {
-      approvePost(id);
-      loadPendingPosts();
-      loadApprovedPosts();
-    } else if (action === 'reject') {
-      rejectPost(id);
-      loadPendingPosts();
-    }
-  }
-});
-
-// --- On page load ---
-showLoggedOutView();
-
 </script>
-
-</div>
 
 </body>
 </html>
