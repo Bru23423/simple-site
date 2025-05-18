@@ -2,80 +2,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cardboard VR Webcam</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-      font-family: sans-serif;
-    }
-    .vr-container {
-      display: flex;
-      gap: 10px;
-    }
-    .eye {
-      width: 45vw;
-      height: 45vw;
-      max-width: 400px;
-      max-height: 400px;
-      border-radius: 50%;
-      overflow: hidden;
-      position: relative;
-      background: #000;
-    }
-    video {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      min-width: 100%;
-      min-height: 100%;
-    }
-    #error {
-      position: absolute;
-      bottom: 10px;
-      text-align: center;
-      width: 100%;
-      color: red;
-      font-size: 1rem;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini Reddit Clone with Moderator Approval</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px; 
+    background: #f5f6fa;
+    color: #333;
+  }
+  h1, h2 {
+    text-align: center;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hidden {
+    display: none;
+  }
+  input, textarea, button {
+    font-size: 1rem;
+    padding: 8px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  button {
+    cursor: pointer;
+  }
+  .post {
+    background: white;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+  }
+  .post h3 {
+    margin: 0 0 10px;
+  }
+  .post small {
+    color: #666;
+  }
+  .approved-posts {
+    margin-top: 40px;
+  }
+  .pending-posts {
+    margin-top: 40px;
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+  .info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+  }
+</style>
 </head>
 <body>
-  <div class="vr-container">
-    <div class="eye"><video id="videoL" autoplay muted playsinline></video></div>
-    <div class="eye"><video id="videoR" autoplay muted playsinline></video></div>
+
+<div class="container">
+
+<h1>Mini Reddit Clone</h1>
+
+<div id="warning" class="info">
+  <strong>WARNING:</strong> This demo stores all accounts and posts <em>locally in your browser</em>. It is NOT secure and is only for learning/demo purposes! Do NOT use real passwords here.
+</div>
+
+<!-- LOGIN & REGISTER -->
+<div id="auth-section">
+  <h2>Login or Register</h2>
+  <input type="text" id="username" placeholder="Username" autocomplete="username" />
+  <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+  <button id="loginBtn">Login</button>
+  <button id="registerBtn">Register</button>
+  <div id="auth-error" class="error"></div>
+</div>
+
+<!-- USER INFO & LOGOUT -->
+<div id="user-section" class="hidden">
+  <h2>Welcome, <span id="display-username"></span>!</h2>
+  <button id="logoutBtn">Logout</button>
+
+  <div id="submit-post-section" class="hidden">
+    <h3>Submit a Post</h3>
+    <input type="text" id="post-title" placeholder="Post title" />
+    <textarea id="post-content" rows="4" placeholder="Post content"></textarea>
+    <button id="submitPostBtn">Submit for Approval</button>
+    <div id="submit-error" class="error"></div>
   </div>
-  <div id="error"></div>
 
-  <script>
-    const videoL = document.getElementById('videoL');
-    const videoR = document.getElementById('videoR');
-    const errorEl = document.getElementById('error');
+  <div id="mod-section" class="hidden">
+    <h3>Moderator: Pending Posts Approval</h3>
+    <div id="pending-posts-list"></div>
+  </div>
+</div>
 
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: "environment" } }
-      })
-        .then(stream => {
-          videoL.srcObject = stream;
-          videoR.srcObject = stream;
-        })
-        .catch(err => {
-          errorEl.textContent = "Back camera not available or permission denied.";
-          console.error("Camera error:", err);
-        });
+<!-- APPROVED POSTS -->
+<div class="approved-posts">
+  <h2>Approved Posts</h2>
+  <div id="approved-posts-list"></div>
+</div>
+
+<script>
+// --- Moderator credentials (hardcoded) ---
+const MOD_USERNAME = 'moderator';
+const MOD_PASSWORD = 'modpass123';
+
+// --- Utility Functions ---
+function saveToStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function loadFromStorage(key) {
+  const val = localStorage.getItem(key);
+  return val ? JSON.parse(val) : null;
+}
+
+// --- User management ---
+let currentUser = null;
+let users = loadFromStorage('users') || [];
+let posts = loadFromStorage('posts') || []; // all posts with approved status
+
+function hashPassword(pwd) {
+  // Simple hash substitute (DO NOT USE IN REAL APPS)
+  let hash = 0, i, chr;
+  if (pwd.length === 0) return hash;
+  for (i = 0; i < pwd.length; i++) {
+    chr = pwd.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return hash.toString();
+}
+
+function register(username, password) {
+  username = username.trim().toLowerCase();
+  if (!username || !password) return 'Username and password required';
+  if (users.find(u => u.username === username)) return 'Username taken';
+  if (username === MOD_USERNAME) return 'That username is reserved';
+
+  const hashedPwd = hashPassword(password);
+  users.push({ username, passwordHash: hashedPwd });
+  saveToStorage('users', users);
+  return null;
+}
+
+function login(username, password) {
+  username = username.trim().toLowerCase();
+  if (username === MOD_USERNAME) {
+    if (password === MOD_PASSWORD) {
+      currentUser = { username: MOD_USERNAME, isModerator: true };
+      return null;
     } else {
-      errorEl.textContent = "Your browser does not support webcam access.";
+      return 'Incorrect moderator password';
     }
-  </script>
+  }
+  const hashedPwd = hashPassword(password);
+  const user = users.find(u => u.username === username && u.passwordHash === hashedPwd);
+  if (!user) return 'Invalid username or password';
+  currentUser = { username: user.username, isModerator: false };
+  return null;
+}
+
+// --- Post management ---
+function submitPost(title, content) {
+  if (!title.trim()) return 'Post title is required';
+  if (!content.trim()) return 'Post content is required';
+
+  const newPost = {
+    id: Date.now() + Math.random(),
+    title: title.trim(),
+    content: content.trim(),
+    author: currentUser.username,
+    approved: false,
+    timestamp: new Date().toISOString(),
+  };
+  posts.push(newPost);
+  saveToStorage('posts', posts);
+  return null;
+}
+
+function approvePost(postId) {
+  const post = posts.find(p => p.id === postId);
+  if (post) {
+    post.approved = true;
+    saveToStorage('posts', posts);
+  }
+}
+
+function rejectPost(postId) {
+  posts = posts.filter(p => p.id !== postId);
+  saveToStorage('posts', posts);
+}
+
+// --- UI Elements ---
+const authSection = document.getElementById('auth-section');
+const userSection = document.getElementById('user-section');
+const displayUsername = document.getElementById('display-username');
+const loginBtn = document.getElementById('loginBtn');
+const registerBtn = document.getElementById('registerBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const authError = document.getElementById('auth-error');
+const submitPostSection = document.getElementById('submit-post-section');
+const postTitleInput = document.getElementById('post-title');
+const postContentInput = document.getElementById('post-content');
+const submitPostBtn = document.getElementById('submitPostBtn');
+const submitError = document.getElementById('submit-error');
+const modSection = document.getElementById('mod-section');
+const pendingPostsList = document.getElementById('pending-posts-list');
+const approvedPostsList = document.getElementById('approved-posts-list');
+
+// --- UI Functions ---
+function showLoggedInView() {
+  authSection.classList.add('hidden');
+  userSection.classList.remove('hidden');
+  displayUsername.textContent = currentUser.username;
+
+  if (currentUser.isModerator) {
+    modSection.classList.remove('hidden');
+    submitPostSection.classList.add('hidden');
+    loadPendingPosts();
+  } else {
+    modSection.classList.add('hidden');
+    submitPostSection.classList.remove('hidden');
+  }
+  loadApprovedPosts();
+}
+
+function showLoggedOutView() {
+  authSection.classList.remove('hidden');
+  userSection.classList.add('hidden');
+  authError.textContent = '';
+  submitError.textContent = '';
+  postTitleInput.value = '';
+  postContentInput.value = '';
+}
+
+function loadPendingPosts() {
+  pendingPostsList.innerHTML = '';
+  const pendingPosts = posts.filter(p => !p.approved);
+  if (pendingPosts.length === 0) {
+    pendingPostsList.innerHTML = '<p>No posts pending approval.</p>';
+    return;
+  }
+  pendingPosts.forEach(post => {
+    const div = document.createElement('div');
+    div.classList.add('post');
+    div.innerHTML = `
+      <h3>${escapeHtml(post.title)}</h3>
+      <p>${escapeHtml(post.content)}</p>
+      <small>By: ${escapeHtml(post.author)} | ${new Date(post.timestamp).toLocaleString()}</small>
+      <br />
+      <button data-action="approve" data-id="${post.id}">Approve</button>
+      <button data-action="reject" data-id="${post.id}">Reject</button>
+    `;
+    pendingPostsList.appendChild(div);
+  });
+}
+
+function loadApprovedPosts() {
+  approvedPostsList.innerHTML = '';
+  const approvedPosts = posts.filter(p => p.approved);
+  if (approvedPosts.length === 0) {
+    approvedPostsList.innerHTML = '<p>No approved posts yet.</p>';
+    return;
+  }
+  approvedPosts.forEach(post => {
+    const div = document.createElement('div');
+    div.classList.add('post');
+    div.innerHTML = `
+      <h3>${escapeHtml(post.title)}</h3>
+      <p>${escapeHtml(post.content)}</p>
+      <small>By: ${escapeHtml(post.author)} | ${new Date(post.timestamp).toLocaleString()}</small>
+    `;
+    approvedPostsList.appendChild(div);
+  });
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, function(m) {
+    switch (m) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#39;';
+      default: return m;
+    }
+  });
+}
+
+// --- Event Listeners ---
+loginBtn.addEventListener('click', () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const error = login(username, password);
+  if (error) {
+    authError.textContent = error;
+  } else {
+    currentUser.isModerator ? console.log('Moderator logged in') : console.log('User logged in');
+    authError.textContent = '';
+    showLoggedInView();
+  }
+});
+
+registerBtn.addEventListener('click', () => {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const error = register(username, password);
+  if (error) {
+    authError.textContent = error;
+  } else {
+    authError.textContent = 'Registered successfully! You can now log in.';
+  }
+});
+
+logoutBtn.addEventListener('click', () => {
+  currentUser = null;
+  showLoggedOutView();
+});
+
+submitPostBtn.addEventListener('click', () => {
+  const title = postTitleInput.value;
+  const content = postContentInput.value;
+  const error = submitPost(title, content);
+  if (error) {
+    submitError.textContent = error;
+  } else {
+    submitError.textContent = '';
+    postTitleInput.value = '';
+    postContentInput.value = '';
+    alert('Post submitted for moderator approval!');
+  }
+  loadPendingPosts();
+  loadApprovedPosts();
+});
+
+pendingPostsList.addEventListener('click', e => {
+  if (!currentUser?.isModerator) return;
+  const btn = e.target;
+  if (btn.tagName === 'BUTTON') {
+    const action = btn.getAttribute('data-action');
+    const id = Number(btn.getAttribute('data-id'));
+    if (action === 'approve') {
+      approvePost(id);
+      loadPendingPosts();
+      loadApprovedPosts();
+    } else if (action === 'reject') {
+      rejectPost(id);
+      loadPendingPosts();
+    }
+  }
+});
+
+// --- On page load ---
+showLoggedOutView();
+
+</script>
+
+</div>
+
 </body>
 </html>
