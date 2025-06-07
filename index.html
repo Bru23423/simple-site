@@ -4,19 +4,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vision Pro Style Website</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vision Pro Style Apps</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
-      overflow: hidden;
       height: 100vh;
-      font-family: 'Helvetica Neue', sans-serif;
+      overflow: hidden;
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      font-family: 'Helvetica Neue', sans-serif;
       color: white;
     }
 
@@ -27,7 +28,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      z-index: -2;
+      z-index: -3;
       filter: blur(12px) brightness(0.7);
       display: none;
     }
@@ -36,46 +37,108 @@
       position: absolute;
       inset: 0;
       background: linear-gradient(135deg, rgba(255, 0, 150, 0.2), rgba(0, 204, 255, 0.2), rgba(0, 255, 150, 0.2));
-      z-index: -1;
+      z-index: -2;
       pointer-events: none;
     }
 
     .glass-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       backdrop-filter: blur(20px) saturate(150%);
       -webkit-backdrop-filter: blur(20px) saturate(150%);
       background-color: rgba(255, 255, 255, 0.15);
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 2rem;
-      max-width: 400px;
-      text-align: center;
+      padding: 1.5rem;
+      width: 300px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.37);
-      animation: fadeIn 1s ease forwards;
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.5s ease forwards;
+      z-index: 10;
     }
 
-    h1 {
-      font-size: 2rem;
+    .glass-card h1 {
+      font-size: 1.5rem;
       margin-bottom: 1rem;
     }
 
-    button {
-      padding: 0.75rem 1.5rem;
+    .glass-card button.close-btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .glass-card button.close-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .dock {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 5;
+    }
+
+    .dock button {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      color: white;
+    }
+
+    .dock button:hover {
+      transform: scale(1.1);
+    }
+
+    button.toggle-camera {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 0.75rem 1rem;
       font-size: 1rem;
       border: none;
       border-radius: 12px;
       cursor: pointer;
       background: rgba(255, 255, 255, 0.2);
       color: white;
-      transition: background 0.3s ease;
+      z-index: 5;
     }
 
-    button:hover {
+    button.toggle-camera:hover {
       background: rgba(255, 255, 255, 0.35);
     }
 
     @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.95); }
-      100% { opacity: 1; transform: scale(1); }
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+      to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      resize: none;
     }
   </style>
 </head>
@@ -84,13 +147,48 @@
   <video id="cameraFeed" autoplay muted playsinline></video>
   <div class="overlay"></div>
 
-  <div class="glass-card">
-    <h1>Vision Pro UI</h1>
-    <p>Welcome to your futuristic experience.</p>
-    <button onclick="toggleCamera()">Toggle Camera Background</button>
+  <!-- Apps -->
+  <div id="clockApp" class="glass-card">
+    <h1 id="clockDisplay">--:--:--</h1>
+    <button class="close-btn" onclick="closeApp('clockApp')">Close</button>
   </div>
 
+  <div id="notesApp" class="glass-card">
+    <h1>Notes</h1>
+    <textarea placeholder="Type your notes here..."></textarea>
+    <button class="close-btn" onclick="closeApp('notesApp')">Close</button>
+  </div>
+
+  <!-- Dock -->
+  <div class="dock">
+    <button onclick="openApp('clockApp')">🕒</button>
+    <button onclick="openApp('notesApp')">📋</button>
+  </div>
+
+  <!-- Camera toggle -->
+  <button class="toggle-camera" onclick="toggleCamera()">Toggle Camera</button>
+
   <script>
+    // Clock app logic
+    function updateClock() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString();
+      document.getElementById('clockDisplay').textContent = timeString;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Open app
+    function openApp(appId) {
+      document.getElementById(appId).style.display = 'block';
+    }
+
+    // Close app
+    function closeApp(appId) {
+      document.getElementById(appId).style.display = 'none';
+    }
+
+    // Camera toggle
     const video = document.getElementById('cameraFeed');
     let cameraOn = false;
     let stream = null;
