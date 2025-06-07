@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vision Pro UI - Forced Camera + More Apps</title>
+  <title>Vision Pro UI - Working Camera + More Apps</title>
   <style>
     body, html {
       margin: 0;
@@ -27,12 +27,13 @@
       z-index: -3;
       filter: blur(25px) brightness(0.6) saturate(1.1);
       opacity: 1;
+      display: none;
     }
 
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.1); /* Light overlay */
+      background: rgba(0, 0, 0, 0.1);
       z-index: -2;
     }
 
@@ -225,7 +226,7 @@
     // Start camera after user grants permission
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         const video = document.getElementById('cameraFeed');
         video.srcObject = stream;
         video.style.display = 'block';
