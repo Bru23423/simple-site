@@ -1,1 +1,241 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vision Pro Web UI</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        #camera {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .dock {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 10px 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 2;
+        }
+
+        .dock-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            user-select: none;
+        }
+
+        .dock-icon:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .window {
+            position: fixed;
+            top: 100px;
+            left: 100px;
+            width: 400px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            z-index: 3;
+            display: none;
+            flex-direction: column;
+        }
+
+        .title-bar {
+            cursor: move;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            background: rgba(255, 100, 100, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .window-content {
+            flex: 1;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: 0;
+            bottom: 0;
+            cursor: se-resize;
+            background: rgba(255, 255, 255, 0.5);
+            border-bottom-right-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <video id="camera" autoplay playsinline muted></video>
+
+    <!-- Vision Pro Dock -->
+    <div class="dock">
+        <div class="dock-icon" onclick="openApp('Safari')">Safari</div>
+        <div class="dock-icon" onclick="openApp('YouTube')">YouTube</div>
+        <div class="dock-icon" onclick="openApp('Messages')">Messages</div>
+        <div class="dock-icon" onclick="openApp('Photos')">Photos</div>
+    </div>
+
+    <!-- App Window -->
+    <div class="window" id="appWindow">
+        <div class="title-bar" id="titleBar">
+            <span id="appTitle">App</span>
+            <button class="close-btn" onclick="closeApp()"></button>
+        </div>
+        <div class="window-content" id="appContent">
+            <!-- Dynamic Content -->
+        </div>
+        <div class="resize-handle" id="resizeHandle"></div>
+    </div>
+
+    <script>
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { exact: "environment" } },
+                    audio: false
+                });
+                document.getElementById('camera').srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing back camera:", err);
+                try {
+                    const fallbackStream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: false
+                    });
+                    document.getElementById('camera').srcObject = fallbackStream;
+                } catch (err2) {
+                    console.error("No camera available.");
+                }
+            }
+        }
+
+        function openApp(appName) {
+            const appWindow = document.getElementById('appWindow');
+            const appTitle = document.getElementById('appTitle');
+            const appContent = document.getElementById('appContent');
+
+            appTitle.textContent = appName;
+            appWindow.style.display = 'flex';
+
+            // Dynamic app content
+            if (appName === 'YouTube') {
+                appContent.innerHTML = `
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                        frameborder="0" allowfullscreen></iframe>`;
+            } else if (appName === 'Messages') {
+                appContent.innerHTML = `
+                    <p><strong>John:</strong> Hey, how are you?</p>
+                    <p><strong>You:</strong> I'm testing my Vision Pro app!</p>`;
+            } else if (appName === 'Photos') {
+                appContent.innerHTML = `
+                    <img src="https://picsum.photos/400/300" style="width:100%; height:auto; border-radius:12px;">`;
+            } else if (appName === 'Safari') {
+                appContent.innerHTML = `
+                    <iframe src="https://apple.com" width="100%" height="100%" frameborder="0"></iframe>`;
+            }
+        }
+
+        function closeApp() {
+            document.getElementById('appWindow').style.display = 'none';
+        }
+
+        // Drag to move
+        const titleBar = document.getElementById('titleBar');
+        const appWindow = document.getElementById('appWindow');
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        titleBar.addEventListener('mousedown', e => {
+            isDragging = true;
+            const rect = appWindow.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (isDragging) {
+                appWindow.style.left = `${e.clientX - offsetX}px`;
+                appWindow.style.top = `${e.clientY - offsetY}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Resize
+        const resizeHandle = document.getElementById('resizeHandle');
+        let isResizing = false;
+
+        resizeHandle.addEventListener('mousedown', e => {
+            isResizing = true;
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        document.addEventListener('mousemove', e => {
+            if (isResizing) {
+                const rect = appWindow.getBoundingClientRect();
+                appWindow.style.width = `${e.clientX - rect.left}px`;
+                appWindow.style.height = `${e.clientY - rect.top}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isResizing = false;
+        });
+
+        startCamera();
+    </script>
+
+</body>
+</html>
