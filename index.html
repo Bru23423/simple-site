@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vision Pro Web UI + VR Mode</title>
+    <title>2 Circles Camera View</title>
     <style>
         html, body {
             margin: 0;
             padding: 0;
             overflow: hidden;
             height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             background: black;
         }
 
@@ -25,259 +24,68 @@
             z-index: 0;
         }
 
-        .dock {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 10px 20px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            z-index: 2;
-        }
-
-        .dock-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 10px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #000;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            user-select: none;
-        }
-
-        .dock-icon:hover {
-            transform: scale(1.2);
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .window {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 400px;
-            height: 60%;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            backdrop-filter: blur(25px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            z-index: 3;
-            display: none;
-            flex-direction: column;
-        }
-
-        .title-bar {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.3);
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 16px;
-        }
-
-        .close-btn {
-            background: rgba(255, 100, 100, 0.8);
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-size: 16px;
-            line-height: 24px;
-            text-align: center;
-            color: white;
-        }
-
-        .window-content {
-            flex: 1;
-            padding: 10px;
-            overflow: auto;
-            font-size: 14px;
-        }
-
-        /* VR MODE */
-        .vr-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            z-index: 999;
-            pointer-events: none;
-        }
-
-        .vr-left, .vr-right {
+        .circle {
             position: absolute;
             top: 50%;
-            width: 50%;
-            height: 100%;
-            background: black;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .vr-left {
-            left: 0;
-        }
-
-        .vr-right {
-            right: 0;
-        }
-
-        .vr-circle {
-            width: 80vw;
-            height: 80vw;
+            width: 40vw;
+            height: 40vw;
+            max-width: 40vh;
+            max-height: 40vh;
             border-radius: 50%;
-            background: transparent;
-            border: 10px solid black;
             overflow: hidden;
+            border: 5px solid rgba(255,255,255,0.2);
+            transform: translateY(-50%);
+            z-index: 1;
         }
 
-        .vr-circle video {
+        .circle video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scale(1.5); /* Zoom for VR effect */
+            transform: scale(1.5);
         }
 
-        /* VR Button */
-        .vr-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
-            padding: 10px 15px;
-            background: rgba(255,255,255,0.3);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            border: none;
-            color: #000;
-            font-size: 14px;
-            cursor: pointer;
+        .left-circle {
+            left: 10%;
         }
 
-        .vr-button:hover {
-            background: rgba(255,255,255,0.5);
+        .right-circle {
+            right: 10%;
         }
     </style>
 </head>
 <body>
 
+    <!-- Background camera feed -->
     <video id="camera" autoplay playsinline muted></video>
 
-    <!-- VR Button -->
-    <button class="vr-button" onclick="toggleVR()">Toggle VR</button>
-
-    <!-- Vision Pro Dock -->
-    <div class="dock">
-        <div class="dock-icon" onclick="openApp('Safari')">Safari</div>
-        <div class="dock-icon" onclick="openApp('YouTube')">YouTube</div>
-        <div class="dock-icon" onclick="openApp('Messages')">Messages</div>
-        <div class="dock-icon" onclick="openApp('Photos')">Photos</div>
+    <!-- 2 circles of camera -->
+    <div class="circle left-circle">
+        <video id="circleCamL" autoplay playsinline muted></video>
     </div>
 
-    <!-- App Window -->
-    <div class="window" id="appWindow">
-        <div class="title-bar">
-            <span id="appTitle">App</span>
-            <button class="close-btn" onclick="closeApp()">×</button>
-        </div>
-        <div class="window-content" id="appContent">
-            <!-- Dynamic Content -->
-        </div>
-    </div>
-
-    <!-- VR Overlay -->
-    <div class="vr-overlay" id="vrOverlay">
-        <div class="vr-left">
-            <div class="vr-circle">
-                <video id="vrCameraL" autoplay muted playsinline></video>
-            </div>
-        </div>
-        <div class="vr-right">
-            <div class="vr-circle">
-                <video id="vrCameraR" autoplay muted playsinline></video>
-            </div>
-        </div>
+    <div class="circle right-circle">
+        <video id="circleCamR" autoplay playsinline muted></video>
     </div>
 
     <script>
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { ideal: "environment" } }, // Ideal back camera
+                    video: { facingMode: { ideal: "environment" } },
                     audio: false
                 });
+
+                // Main background camera
                 document.getElementById('camera').srcObject = stream;
-                // Also assign to VR left/right cameras
-                document.getElementById('vrCameraL').srcObject = stream;
-                document.getElementById('vrCameraR').srcObject = stream;
+
+                // Circles use same camera stream
+                document.getElementById('circleCamL').srcObject = stream;
+                document.getElementById('circleCamR').srcObject = stream;
+
             } catch (err) {
                 console.error("Error accessing camera:", err);
-                try {
-                    const fallbackStream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: false
-                    });
-                    document.getElementById('camera').srcObject = fallbackStream;
-                    document.getElementById('vrCameraL').srcObject = fallbackStream;
-                    document.getElementById('vrCameraR').srcObject = fallbackStream;
-                } catch (err2) {
-                    console.error("No camera available.");
-                }
             }
-        }
-
-        function openApp(appName) {
-            const appWindow = document.getElementById('appWindow');
-            const appTitle = document.getElementById('appTitle');
-            const appContent = document.getElementById('appContent');
-
-            appTitle.textContent = appName;
-            appWindow.style.display = 'flex';
-
-            // Dynamic app content
-            if (appName === 'YouTube') {
-                appContent.innerHTML = `
-                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                        frameborder="0" allowfullscreen></iframe>`;
-            } else if (appName === 'Messages') {
-                appContent.innerHTML = `
-                    <p><strong>John:</strong> Hey, how are you?</p>
-                    <p><strong>You:</strong> I'm testing my Vision Pro app!</p>`;
-            } else if (appName === 'Photos') {
-                appContent.innerHTML = `
-                    <img src="https://picsum.photos/400/300" style="width:100%; height:auto; border-radius:12px;">`;
-            } else if (appName === 'Safari') {
-                appContent.innerHTML = `
-                    <iframe src="https://apple.com" width="100%" height="100%" frameborder="0"></iframe>`;
-            }
-        }
-
-        function closeApp() {
-            document.getElementById('appWindow').style.display = 'none';
-        }
-
-        let vrEnabled = false;
-        function toggleVR() {
-            vrEnabled = !vrEnabled;
-            document.getElementById('vrOverlay').style.display = vrEnabled ? 'block' : 'none';
         }
 
         startCamera();
