@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vision Pro Web UI</title>
+    <title>Vision Pro Web UI + VR Mode</title>
     <style>
         html, body {
             margin: 0;
@@ -12,6 +12,7 @@
             overflow: hidden;
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: black;
         }
 
         #camera {
@@ -61,10 +62,12 @@
 
         .window {
             position: fixed;
-            top: 100px;
-            left: 100px;
-            width: 400px;
-            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            height: 60%;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             backdrop-filter: blur(25px);
@@ -75,7 +78,6 @@
         }
 
         .title-bar {
-            cursor: move;
             padding: 10px;
             background: rgba(255, 255, 255, 0.3);
             border-top-left-radius: 16px;
@@ -83,38 +85,104 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 16px;
         }
 
         .close-btn {
             background: rgba(255, 100, 100, 0.8);
             border: none;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
+            font-size: 16px;
+            line-height: 24px;
+            text-align: center;
+            color: white;
         }
 
         .window-content {
             flex: 1;
             padding: 10px;
             overflow: auto;
+            font-size: 14px;
         }
 
-        .resize-handle {
+        /* VR MODE */
+        .vr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .vr-left, .vr-right {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            top: 50%;
+            width: 50%;
+            height: 100%;
+            background: black;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vr-left {
+            left: 0;
+        }
+
+        .vr-right {
             right: 0;
-            bottom: 0;
-            cursor: se-resize;
-            background: rgba(255, 255, 255, 0.5);
-            border-bottom-right-radius: 16px;
+        }
+
+        .vr-circle {
+            width: 80vw;
+            height: 80vw;
+            border-radius: 50%;
+            background: transparent;
+            border: 10px solid black;
+            overflow: hidden;
+        }
+
+        .vr-circle video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.5); /* Zoom for VR effect */
+        }
+
+        /* VR Button */
+        .vr-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: none;
+            color: #000;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .vr-button:hover {
+            background: rgba(255,255,255,0.5);
         }
     </style>
 </head>
 <body>
 
     <video id="camera" autoplay playsinline muted></video>
+
+    <!-- VR Button -->
+    <button class="vr-button" onclick="toggleVR()">Toggle VR</button>
 
     <!-- Vision Pro Dock -->
     <div class="dock">
@@ -126,32 +194,50 @@
 
     <!-- App Window -->
     <div class="window" id="appWindow">
-        <div class="title-bar" id="titleBar">
+        <div class="title-bar">
             <span id="appTitle">App</span>
-            <button class="close-btn" onclick="closeApp()"></button>
+            <button class="close-btn" onclick="closeApp()">×</button>
         </div>
         <div class="window-content" id="appContent">
             <!-- Dynamic Content -->
         </div>
-        <div class="resize-handle" id="resizeHandle"></div>
+    </div>
+
+    <!-- VR Overlay -->
+    <div class="vr-overlay" id="vrOverlay">
+        <div class="vr-left">
+            <div class="vr-circle">
+                <video id="vrCameraL" autoplay muted playsinline></video>
+            </div>
+        </div>
+        <div class="vr-right">
+            <div class="vr-circle">
+                <video id="vrCameraR" autoplay muted playsinline></video>
+            </div>
+        </div>
     </div>
 
     <script>
         async function startCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: "environment" } },
+                    video: { facingMode: { ideal: "environment" } }, // Ideal back camera
                     audio: false
                 });
                 document.getElementById('camera').srcObject = stream;
+                // Also assign to VR left/right cameras
+                document.getElementById('vrCameraL').srcObject = stream;
+                document.getElementById('vrCameraR').srcObject = stream;
             } catch (err) {
-                console.error("Error accessing back camera:", err);
+                console.error("Error accessing camera:", err);
                 try {
                     const fallbackStream = await navigator.mediaDevices.getUserMedia({
                         video: true,
                         audio: false
                     });
                     document.getElementById('camera').srcObject = fallbackStream;
+                    document.getElementById('vrCameraL').srcObject = fallbackStream;
+                    document.getElementById('vrCameraR').srcObject = fallbackStream;
                 } catch (err2) {
                     console.error("No camera available.");
                 }
@@ -188,51 +274,11 @@
             document.getElementById('appWindow').style.display = 'none';
         }
 
-        // Drag to move
-        const titleBar = document.getElementById('titleBar');
-        const appWindow = document.getElementById('appWindow');
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        titleBar.addEventListener('mousedown', e => {
-            isDragging = true;
-            const rect = appWindow.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-        });
-
-        document.addEventListener('mousemove', e => {
-            if (isDragging) {
-                appWindow.style.left = `${e.clientX - offsetX}px`;
-                appWindow.style.top = `${e.clientY - offsetY}px`;
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        // Resize
-        const resizeHandle = document.getElementById('resizeHandle');
-        let isResizing = false;
-
-        resizeHandle.addEventListener('mousedown', e => {
-            isResizing = true;
-            e.preventDefault();
-            e.stopPropagation();
-        });
-
-        document.addEventListener('mousemove', e => {
-            if (isResizing) {
-                const rect = appWindow.getBoundingClientRect();
-                appWindow.style.width = `${e.clientX - rect.left}px`;
-                appWindow.style.height = `${e.clientY - rect.top}px`;
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            isResizing = false;
-        });
+        let vrEnabled = false;
+        function toggleVR() {
+            vrEnabled = !vrEnabled;
+            document.getElementById('vrOverlay').style.display = vrEnabled ? 'block' : 'none';
+        }
 
         startCamera();
     </script>
