@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>2 Circles Camera View</title>
+    <title>Camera VR Circles</title>
     <style>
         html, body {
             margin: 0;
@@ -27,13 +27,13 @@
         .circle {
             position: absolute;
             top: 50%;
-            width: 40vw;
-            height: 40vw;
-            max-width: 40vh;
-            max-height: 40vh;
+            width: 45vw;
+            height: 45vw;
+            max-width: 45vh;
+            max-height: 45vh;
             border-radius: 50%;
             overflow: hidden;
-            border: 5px solid rgba(255,255,255,0.2);
+            border: 5px solid rgba(255,255,255,0.15);
             transform: translateY(-50%);
             z-index: 1;
         }
@@ -42,24 +42,41 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scale(1.5);
+            transform: scale(1.4); /* Slight zoom for VR */
         }
 
         .left-circle {
-            left: 10%;
+            left: 5%;
         }
 
         .right-circle {
-            right: 10%;
+            right: 5%;
+        }
+
+        /* Optional: Force landscape on mobile */
+        @media screen and (orientation: portrait) {
+            body::before {
+                content: "Please rotate your device to landscape for VR.";
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-size: 2em;
+                text-align: center;
+                background: rgba(0, 0, 0, 0.7);
+                padding: 20px;
+                z-index: 9999;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Background camera feed -->
+    <!-- Background camera -->
     <video id="camera" autoplay playsinline muted></video>
 
-    <!-- 2 circles of camera -->
+    <!-- 2 VR circles -->
     <div class="circle left-circle">
         <video id="circleCamL" autoplay playsinline muted></video>
     </div>
@@ -76,10 +93,7 @@
                     audio: false
                 });
 
-                // Main background camera
                 document.getElementById('camera').srcObject = stream;
-
-                // Circles use same camera stream
                 document.getElementById('circleCamL').srcObject = stream;
                 document.getElementById('circleCamR').srcObject = stream;
 
