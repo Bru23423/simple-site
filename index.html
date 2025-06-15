@@ -2,109 +2,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Big VR Circles Camera</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100%;
-            background: black;
-        }
+  <meta charset="UTF-8">
+  <title>Virus Simulation</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: black;
+      color: white;
+    }
 
-        #camera {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-        }
+    #warningScreen, #blackout, #jumpscare {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 999;
+    }
 
-        .circle {
-            position: absolute;
-            top: 50%;
-            width: 80vw; /* VERY BIG circles */
-            height: 80vw;
-            max-width: 80vh;
-            max-height: 80vh;
-            border-radius: 50%;
-            overflow: hidden;
-            transform: translateY(-50%);
-            z-index: 1;
-            /* Optional border for testing:
-            border: 3px solid rgba(255,255,255,0.3); */
-        }
+    #warningScreen {
+      background: black;
+      color: red;
+    }
 
-        .circle video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scale(1.2); /* Optional slight zoom */
-        }
+    #enterBtn {
+      padding: 15px 30px;
+      margin-top: 20px;
+      font-size: 1.2em;
+      background: darkred;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
 
-        .left-circle {
-            left: 2%;
-        }
+    .errorPopup {
+      position: fixed;
+      width: 220px;
+      height: 120px;
+      background: #f0f0f0;
+      color: black;
+      border: 2px solid gray;
+      box-shadow: 4px 4px 10px #000;
+      padding: 10px;
+      z-index: 100;
+      font-size: 0.9em;
+    }
 
-        .right-circle {
-            right: 2%;
-        }
+    #blackout {
+      background: black;
+      color: white;
+      display: none;
+      z-index: 1000;
+    }
 
-        /* Force landscape for VR */
-        @media screen and (orientation: portrait) {
-            body::before {
-                content: "Please rotate your device to landscape for VR.";
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: white;
-                font-size: 2em;
-                text-align: center;
-                background: rgba(0, 0, 0, 0.7);
-                padding: 20px;
-                z-index: 9999;
-            }
-        }
-    </style>
+    #jumpscare {
+      display: none;
+      background: black;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+    }
+
+    #jumpscare img {
+      max-width: 100%;
+      height: auto;
+      animation: shake 0.3s infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(2px, 1px) rotate(0deg); }
+      20% { transform: translate(-1px, -2px) rotate(-1deg); }
+      40% { transform: translate(-3px, 0px) rotate(1deg); }
+      60% { transform: translate(3px, 2px) rotate(0deg); }
+      80% { transform: translate(1px, -1px) rotate(1deg); }
+      100% { transform: translate(-1px, 2px) rotate(-1deg); }
+    }
+  </style>
 </head>
 <body>
+  <div id="warningScreen">
+    <h1>⚠️ WARNING ⚠️</h1>
+    <p>This website simulates a fake virus attack with loud sounds and flashing visuals.</p>
+    <p>Do not enter if you are sensitive to jumpscares or flashing imagery.</p>
+    <button id="enterBtn">I Understand. Enter</button>
+  </div>
 
-    <!-- Background camera -->
-    <video id="camera" autoplay playsinline muted></video>
+  <div id="blackout"></div>
+  <div id="jumpscare">
+    <img src="https://c.tenor.com/HZ6foP4tfzYAAAAC/smile-creepy.gif" alt="Screamer">
+    <audio id="screamSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_169a545828.mp3"></audio>
+  </div>
 
-    <!-- 2 Big VR circles -->
-    <div class="circle left-circle">
-        <video id="circleCamL" autoplay playsinline muted></video>
-    </div>
+  <audio id="errorSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_fd5890b345.mp3"></audio>
 
-    <div class="circle right-circle">
-        <video id="circleCamR" autoplay playsinline muted></video>
-    </div>
+  <script>
+    const enterBtn = document.getElementById("enterBtn");
+    const warningScreen = document.getElementById("warningScreen");
+    const errorSound = document.getElementById("errorSound");
+    const blackout = document.getElementById("blackout");
+    const jumpscare = document.getElementById("jumpscare");
+    const screamSound = document.getElementById("screamSound");
 
-    <script>
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { ideal: "environment" } },
-                    audio: false
-                });
+    enterBtn.onclick = () => {
+      warningScreen.style.display = 'none';
+      startVirusSimulation();
+    };
 
-                document.getElementById('camera').srcObject = stream;
-                document.getElementById('circleCamL').srcObject = stream;
-                document.getElementById('circleCamR').srcObject = stream;
+    function startVirusSimulation() {
+      let count = 0;
+      const interval = setInterval(() => {
+        const popup = document.createElement("div");
+        popup.className = "errorPopup";
+        popup.style.left = `${Math.random() * (window.innerWidth - 240)}px`;
+        popup.style.top = `${Math.random() * (window.innerHeight - 140)}px`;
+        popup.innerHTML = `
+          <strong>Error</strong><br>
+          Something went wrong...<br>
+          <button onclick="this.parentElement.remove()">OK</button>
+        `;
+        document.body.appendChild(popup);
+        errorSound.play();
 
-            } catch (err) {
-                console.error("Error accessing camera:", err);
-            }
+        count++;
+        if (count >= 15) {
+          clearInterval(interval);
+          setTimeout(() => {
+            alert("ok I'm done");
+            blackout.style.display = 'flex';
+            setTimeout(() => {
+              jumpscare.style.display = 'flex';
+              screamSound.play();
+            }, 1000);
+          }, 1000);
         }
-
-        startCamera();
-    </script>
-
+      }, 300);
+    }
+  </script>
 </body>
 </html>
