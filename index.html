@@ -1,140 +1,202 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameStop Price Finder</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(180deg, #020617, #0f172a);
-    color: #e2e8f0;
-    margin: 0;
-    min-height: 100vh;
-  }
-  header {
-    text-align: center;
-    padding: 40px 20px 20px;
-  }
-  header h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: #38bdf8;
-  }
-  header p {
-    color: #94a3b8;
-  }
-  .search-box {
-    text-align: center;
-    margin-top: 10px;
-  }
-  input {
-    width: 80%;
-    max-width: 500px;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    font-size: 1rem;
-    outline: none;
-    background: rgba(255,255,255,0.1);
-    color: white;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
-    padding: 30px;
-  }
-  .card {
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 14px;
-    text-align: center;
-    transition: 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-3px);
-    background: rgba(255,255,255,0.1);
-  }
-  .card img {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 10px;
-  }
-  .title {
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .price {
-    font-size: 1.1rem;
-    color: #4ade80;
-  }
-  footer {
-    text-align: center;
-    color: #64748b;
-    font-size: 0.9rem;
-    padding: 20px;
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Error code 404</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#ffd166;--muted:#94a3b8}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:linear-gradient(180deg,#071022 0%, #0a1321 60%); color:#e6eef8}
+    .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px}
+    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);padding:28px;border-radius:12px;backdrop-filter:blur(6px);box-shadow:0 6px 24px rgba(2,6,23,0.6);width:100%;max-width:980px}
+    h1{font-size:clamp(36px,6vw,72px);margin:0 0 8px;letter-spacing:1px}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+
+    /* Game area */
+    .game-row{display:flex;gap:24px;align-items:center}
+    #gameCanvas{background:#f7f7f7;border-radius:6px;display:block}
+    .controls{display:flex;flex-direction:column;gap:8px}
+    button.btn{background:var(--accent);border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.04)}
+
+    /* diagnostics modal */
+    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6)}
+    .modal{background:#071022;padding:20px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);min-width:320px;max-width:640px}
+    .modal h3{margin:0 0 8px}
+    .diag-step{background:rgba(255,255,255,0.02);padding:10px;border-radius:6px;margin:8px 0}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    @media(max-width:720px){.game-row{flex-direction:column-reverse}.controls{flex-direction:row}}
+  </style>
 </head>
 <body>
-  <header>
-    <h1>🎮 GameStop Price Finder</h1>
-    <p>Type what you want — instantly see matching prices and options!</p>
-    <div class="search-box">
-      <input id="search" type="text" placeholder="Search games, consoles, accessories..." autocomplete="off">
+  <div class="wrap">
+    <div class="card">
+      <h1>Error code 404</h1>
+      <p class="lead">The page you're looking for can't be found. But here's a little game to pass the time.</p>
+
+      <div class="game-row">
+        <canvas id="gameCanvas" width="800" height="150" aria-label="Dinosaur runner game"></canvas>
+
+        <div class="controls">
+          <button id="startBtn" class="btn">Start / Restart</button>
+          <button id="diagBtn" class="ghost">Windows Diagnostics</button>
+          <button id="muteBtn" class="ghost">Toggle Sound</button>
+        </div>
+      </div>
+
+      <footer>Controls: Space or Up to jump • Tap on mobile. Score resets on crash.</footer>
     </div>
-  </header>
+  </div>
 
-  <div id="results" class="grid"></div>
-
-  <footer>Demo only — prices and items are samples. No real purchases.</footer>
+  <!-- Modal for diagnostics -->
+  <div id="modal" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" role="document">
+      <h3>Windows Diagnostics</h3>
+      <p class="lead" style="color:var(--muted)">This is a harmless simulated diagnostics panel — it won't change anything on your computer.</p>
+      <div class="diag-step">1. Check disk: Quick scan for errors (simulated)</div>
+      <div class="diag-step">2. Memory check: Running memory verifier (simulated)</div>
+      <div class="diag-step">3. Network test: Ping test to common endpoints (simulated)</div>
+      <div class="diag-step">4. Suggestions: Try restarting your system, update drivers (simulated)</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="closeModal" class="ghost">Close</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const products = [
-      { name: "Nintendo Switch OLED", price: 349.99, img: "https://upload.wikimedia.org/wikipedia/commons/3/38/Nintendo_Switch_OLED_Model_01.jpg" },
-      { name: "PlayStation 5 Console", price: 499.99, img: "https://upload.wikimedia.org/wikipedia/commons/3/3e/PlayStation_5_console.jpg" },
-      { name: "Xbox Series X", price: 499.99, img: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Xbox_Series_X_and_S_controller.jpg" },
-      { name: "Super Mario Wonder", price: 59.99, img: "https://upload.wikimedia.org/wikipedia/en/7/74/Super_Mario_Bros_Wonder_cover_art.jpg" },
-      { name: "Call of Duty: Modern Warfare III", price: 69.99, img: "https://upload.wikimedia.org/wikipedia/en/d/d7/Call_of_Duty_Modern_Warfare_III_cover_art.jpg" },
-      { name: "DualSense Controller", price: 69.99, img: "https://upload.wikimedia.org/wikipedia/commons/2/2f/DualSense_controller.jpg" },
-      { name: "Legend of Zelda: Tears of the Kingdom", price: 69.99, img: "https://upload.wikimedia.org/wikipedia/en/8/8a/The_Legend_of_Zelda_Tears_of_the_Kingdom_cover.jpg" },
-      { name: "Xbox Wireless Controller", price: 59.99, img: "https://upload.wikimedia.org/wikipedia/commons/f/f8/Xbox_Series_X_controller.jpg" },
-      { name: "PlayStation VR2", price: 549.99, img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/PlayStation_VR2.jpg" },
-      { name: "Minecraft (Switch)", price: 29.99, img: "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png" },
-      { name: "Animal Crossing: New Horizons", price: 59.99, img: "https://upload.wikimedia.org/wikipedia/en/2/2a/Animal_Crossing_New_Horizons.jpg" }
-    ];
+    // Simple Chrome-dino-like runner. Designed to be readable and easy to tweak.
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let running = false;
+    let score = 0;
+    let highScore = 0;
+    let speed = 4;
+    let gravity = 0.9;
+    let soundOn = false;
 
-    const searchBox = document.getElementById('search');
-    const results = document.getElementById('results');
+    // Player
+    const player = {x:40,y:0,w:44,h:44,vy:0,ground:110,jumpPower: -13,alive:true};
 
-    function render(items) {
-      results.innerHTML = '';
-      if (items.length === 0) {
-        results.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#94a3b8;">No items found.</p>';
-        return;
+    // Obstacles
+    const obstacles = [];
+    let spawnTimer = 0;
+
+    // Clouds / ground for parallax effect
+    const clouds = [];
+    for(let i=0;i<6;i++){clouds.push({x: i*160 + 200, y: 20 + (i%2)*10, w:40 + (i%3)*20})}
+
+    function reset(){
+      obstacles.length = 0; spawnTimer = 0; score = 0; speed = 4; player.y = player.ground; player.vy = 0; player.alive = true; running = false;
+    }
+
+    function start(){ reset(); running = true; loop(); }
+
+    function loop(){
+      update(); draw();
+      if(running) requestAnimationFrame(loop);
+    }
+
+    function update(){
+      if(!player.alive) return;
+      // Player physics
+      player.vy += gravity * 0.6;
+      player.y += player.vy;
+      if(player.y > player.ground) { player.y = player.ground; player.vy = 0; }
+
+      // Spawn obstacles
+      spawnTimer -= 1;
+      if(spawnTimer <= 0){
+        const gap = 60 + Math.random()*120 - score/100; // closer as score increases
+        spawnTimer = Math.max(40, Math.floor(80 - score/50 + Math.random()*40));
+        const h = 24 + Math.floor(Math.random()*36);
+        obstacles.push({x: canvas.width + 20, w: 18 + Math.random()*24, h: h, y: player.ground + (44 - h)})
       }
-      for (const p of items) {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <img src="${p.img}" alt="${p.name}">
-          <div class="title">${p.name}</div>
-          <div class="price">$${p.price.toFixed(2)}</div>
-        `;
-        results.appendChild(card);
+
+      // Move obstacles
+      for(let i=obstacles.length-1;i>=0;i--){
+        const o = obstacles[i]; o.x -= speed;
+        if(o.x + o.w < -50) obstacles.splice(i,1);
+        // collision
+        if(collide(player, o)) { player.alive = false; running = false; if(soundOn) beep(); highScore = Math.max(highScore, Math.floor(score)); }
+      }
+
+      // Move clouds
+      clouds.forEach(c=>{ c.x -= speed*0.35; if(c.x < -100) c.x = canvas.width + Math.random()*200; });
+
+      // Score
+      score += 0.12 * (speed/4);
+      // speed up slowly
+      if(Math.floor(score) % 100 === 0) speed = 4 + Math.floor(score/100);
+    }
+
+    function collide(a,o){
+      const ax1 = a.x, ay1 = a.y, ax2 = a.x + a.w, ay2 = a.y + a.h;
+      const ox1 = o.x, oy1 = o.y, ox2 = o.x + o.w, oy2 = o.y + o.h;
+      return ax1 < ox2 && ax2 > ox1 && ay1 < oy2 && ay2 > oy1;
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // sky gradient
+      const g = ctx.createLinearGradient(0,0,0,canvas.height);
+      g.addColorStop(0, '#f7f7f7'); g.addColorStop(1,'#e9eef6');
+      ctx.fillStyle = g; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      // clouds
+      ctx.fillStyle = '#e6eef8';
+      clouds.forEach(c=>{ ctx.globalAlpha = 0.7; roundedRect(ctx, c.x, c.y, c.w, 12, 6); ctx.fill(); ctx.globalAlpha = 1; });
+
+      // ground line
+      ctx.fillStyle = '#d6dee8'; ctx.fillRect(0, player.ground + player.h, canvas.width, 6);
+
+      // player (a simple dino)
+      ctx.fillStyle = '#333'; roundedRect(ctx, player.x, player.y, player.w, player.h, 6); ctx.fill();
+      // eye
+      ctx.fillStyle = '#fff'; ctx.fillRect(player.x + 30, player.y + 12, 6, 6);
+
+      // obstacles (cacti/blocks)
+      ctx.fillStyle = '#2b2b2b'; obstacles.forEach(o=>{ roundedRect(ctx, o.x, o.y, o.w, o.h, 4); ctx.fill(); });
+
+      // score
+      ctx.fillStyle = '#222'; ctx.font = '14px system-ui'; ctx.textAlign = 'right'; ctx.fillText('Score: ' + Math.floor(score), canvas.width - 12, 18);
+      ctx.textAlign = 'left'; ctx.fillStyle = '#222'; ctx.fillText('High: ' + Math.floor(highScore), 12, 18);
+
+      if(!player.alive){
+        ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = '#fff'; ctx.font = '22px system-ui'; ctx.textAlign = 'center'; ctx.fillText('Game Over — Press Start to try again', canvas.width/2, canvas.height/2);
       }
     }
 
-    function filter() {
-      const q = searchBox.value.trim().toLowerCase();
-      const filtered = products.filter(p => p.name.toLowerCase().includes(q));
-      render(filtered);
-    }
+    function roundedRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 
-    searchBox.addEventListener('input', filter);
-    render(products); // show all initially
+    // Controls
+    function jump(){ if(player.y === player.ground){ player.vy = player.jumpPower; if(soundOn) beep(); } }
+    document.addEventListener('keydown', e=>{ if(e.code === 'Space' || e.code === 'ArrowUp'){ e.preventDefault(); if(!running){ start(); } jump(); } if(e.key === 'r'){ reset(); draw(); } });
+    canvas.addEventListener('touchstart', e=>{ e.preventDefault(); if(!running){ start(); } jump(); });
+
+    // Buttons
+    document.getElementById('startBtn').addEventListener('click', ()=>{ if(!running) start(); else { reset(); start(); }});
+    document.getElementById('muteBtn').addEventListener('click', ()=>{ soundOn = !soundOn; document.getElementById('muteBtn').textContent = soundOn ? 'Sound: ON' : 'Toggle Sound'; });
+
+    // Simple beep using WebAudio
+    function beep(){ try{ const ctxA = new (window.AudioContext || window.webkitAudioContext)(); const o = ctxA.createOscillator(); const g = ctxA.createGain(); o.type = 'sine'; o.frequency.value = 440; g.gain.value = 0.02; o.connect(g); g.connect(ctxA.destination); o.start(); setTimeout(()=>{ o.stop(); ctxA.close(); }, 80); }catch(e){} }
+
+    // Modal handlers
+    const modal = document.getElementById('modal');
+    document.getElementById('diagBtn').addEventListener('click', ()=>{ modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false'); });
+    document.getElementById('closeModal').addEventListener('click', ()=>{ modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); });
+    modal.addEventListener('click', (e)=>{ if(e.target === modal){ modal.style.display = 'none'; modal.setAttribute('aria-hidden','true'); } });
+
+    // initial draw
+    player.y = player.ground; draw();
+
+    // make canvas responsive
+    function fit(){ const ratio = window.devicePixelRatio || 1; const w = Math.min(window.innerWidth - 80, 900); const h = 150; canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; canvas.width = Math.round(w * ratio); canvas.height = Math.round(h * ratio); ctx.setTransform(ratio,0,0,ratio,0,0); draw(); }
+    window.addEventListener('resize', fit); fit();
   </script>
 </body>
 </html>
