@@ -1,1 +1,225 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Read Like a Master — Demo</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#94a3b8;--accent:#7c3aed;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:linear-gradient(180deg,#051021 0%, #071428 60%);color:#e6eef8;min-height:100vh}
+    .container{max-width:1100px;margin:36px auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#4f46e5);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:0;color:var(--muted)}
+    nav{display:flex;gap:12px;align-items:center}
+    .btn{background:var(--accent);border:none;color:white;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+    .hero{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:center;margin:18px 0}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),var(--glass));padding:18px;border-radius:14px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .stories-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:16px}
+    .story-card{padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:220px}
+    .story-card img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+    .meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+    .locked{opacity:0.6;filter:grayscale(30%)}
+    .tag{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-size:12px}
+
+    .price-box{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+    .price{font-size:28px;font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+    .disabled{opacity:0.6;pointer-events:none}
+
+    footer{margin-top:30px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(rgba(2,6,23,0.6),rgba(2,6,23,0.6));padding:28px}
+    .modal.open{display:flex}
+    .reader{width:100%;max-width:820px;background:#071428;padding:20px;border-radius:12px;box-shadow:0 18px 46px rgba(2,6,23,0.7);color:#e6eef8}
+    .reader .controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .story-title{font-size:20px;margin:0}
+    .story-content{max-height:60vh;overflow:auto;padding-right:10px;line-height:1.7;color:#dcefff}
+
+    .pill{padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:999px;font-size:13px}
+
+    @media (max-width:800px){.hero{grid-template-columns:1fr;}.reader{max-width:100%}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">RL</div>
+        <div>
+          <h1>Read Like a Master</h1>
+          <p class="lead">Short stories, big ideas — demo version</p>
+        </div>
+      </div>
+      <nav>
+        <div class="pill">Demo access</div>
+        <button class="btn ghost" id="signin">Sign in</button>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="card">
+        <h2 style="margin-top:0">Discover stories that sharpen your thinking</h2>
+        <p class="small">This is a demo page. The full app will cost <strong>$3.99 / month</strong> when purchases are enabled. For now you can test a couple of stories below.</p>
+
+        <div class="stories-grid" id="stories">
+          <!-- story cards injected by JS -->
+        </div>
+      </div>
+
+      <aside class="card">
+        <div class="price-box">
+          <div class="price">$3.99<span style="font-size:14px;font-weight:500">/ month</span></div>
+          <div class="small">Subscription not available yet — purchasing is coming soon.</div>
+          <button class="btn disabled" title="Purchasing is disabled in demo">Subscribe (coming soon)</button>
+          <div style="height:12px"></div>
+          <div style="width:100%">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div class="small">Demo stories available</div>
+              <div class="tag">2 available</div>
+            </div>
+            <div class="small">Read two sample stories for free in this demo. The third story will be locked and labeled.</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer>
+      <div>Made with ♥ — Read Like a Master (demo)</div>
+      <div style="margin-top:8px;color:var(--muted)">Want changes? Tell me which fonts, colors, or stories you'd like.</div>
+    </footer>
+  </div>
+
+  <!-- modal reader -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="reader" role="dialog" aria-modal="true">
+      <div class="controls">
+        <div>
+          <h3 id="modalTitle" class="story-title">Story title</h3>
+          <div id="modalMeta" class="meta" style="margin-top:6px"></div>
+        </div>
+        <div>
+          <button class="btn ghost" id="closeModal">Close</button>
+        </div>
+      </div>
+      <div id="modalContent" class="story-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // sample stories data
+    const stories = [
+      {
+        id:1,
+        title: "The Library at Midnight",
+        author: "A. L. Rivers",
+        tags: ["mystery","short"],
+        demo: true,
+        image: htmlSvg(0),
+        excerpt: `When the clock struck midnight the shelves exhaled. Lucia had spent her life cataloguing ghosts between the covers...`,
+        content: `<p>When the clock struck midnight the shelves exhaled. Lucia had spent her life cataloguing ghosts between the covers — the small, stubborn memories that wouldn't be shelved with the rest. Tonight she found a volume without a spine. Inside, instead of paper, there was a thin ribbon of night that answered when she asked the right questions.</p><p>She learned that libraries keep more than books; they keep the last versions of people. Each page she turned revealed a life she might have lived, and with each revelation the library demanded nothing — only to be read.</p>`
+      },
+      {
+        id:2,
+        title: "The Clockmaker's Promise",
+        author: "J. Kestrel",
+        tags: ["speculative","micro"],
+        demo: true,
+        image: htmlSvg(1),
+        excerpt: `Mr. Alder never sold clocks twice. He sold time once — and kept a small fold for himself...`,
+        content: `<p>Mr. Alder never sold clocks twice. He sold time once — and kept a small fold for himself. In his shop the hands moved as if deciding where they wanted to point, and the faces smiled in the way of people who remember their birthdays.</p><p>A child came in once and asked for a watch that could make her brave. Alder wound a gear, whispered a promise into the wound, and the watch ticked louder than the rest. Bravery, Alder discovered, was a sound you could teach to the chest.</p>`
+      },
+      {
+        id:3,
+        title: "Blueprints for Rain",
+        author: "N. H. Vale",
+        tags: ["lyric","locked"],
+        demo: false,
+        image: htmlSvg(2),
+        excerpt: `They drew houses on napkins and mapped where storms would not reach them...`,
+        content: `<p>They drew houses on napkins and mapped where storms would not reach them. The architects began to call it hope; the older women called it practice. Rain, they decided, could be negotiated with if you spoke to it politely and left a window open for apology.</p><p>But the blueprints carried a cost: every line that kept water out would let a little forgetting in. People kept coming back with new drafts, trading memories for dryness.</p>`
+      }
+    ];
+
+    function htmlSvg(idx){
+      const svgs = [
+        `<svg width="100%" height="120" viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg"><rect rx="12" width="100%" height="100%" fill="#0b1220"/><g fill="#8b5cf6"><circle cx="120" cy="120" r="46" opacity="0.16"/><path d="M180 70c30 18 60 18 90 0v100c-30 18-60 18-90 0z" opacity="0.18"/></g><text x="36" y="190" font-size="22" fill="#dbeafe">Library</text></svg>`,
+        `<svg width="100%" height="120" viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg"><rect rx="12" width="100%" height="100%" fill="#071428"/><g fill="#60a5fa"><rect x="60" y="40" width="180" height="120" rx="10" opacity="0.12"/><circle cx="420" cy="120" r="52" opacity="0.12"/></g><text x="36" y="190" font-size="22" fill="#dbeafe">Clockwork</text></svg>`,
+        `<svg width="100%" height="120" viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg"><rect rx="12" width="100%" height="100%" fill="#071428"/><g fill="#34d399"><path d="M60 40h120v120H60z" opacity="0.12"/><path d="M360 40h160v120H360z" opacity="0.12"/></g><text x="36" y="190" font-size="22" fill="#dbeafe">Rain</text></svg>`
+      ];
+      return svgs[idx] || svgs[0];
+    }
+
+    const storiesContainer = document.getElementById('stories');
+
+    function renderCards(){
+      storiesContainer.innerHTML = '';
+      stories.forEach(s => {
+        const card = document.createElement('article');
+        card.className = 'story-card' + (s.demo ? '' : ' locked');
+        card.innerHTML = `
+          <div style="height:120px;border-radius:10px;overflow:hidden">${s.image}</div>
+          <h3 style="margin:8px 0 0">${s.title}</h3>
+          <div class="meta"><div>${s.author}</div><div class="tag">${s.tags.join(', ')}</div></div>
+          <p style="color:var(--muted);margin-top:8px">${s.excerpt}</p>
+          <div style="margin-top:auto;display:flex;gap:8px;align-items:center">
+            <button class="btn" data-id="${s.id}">${s.demo? 'Read demo' : 'Locked'}</button>
+            ${s.demo? '<div class="small" style="color:var(--muted)">Free demo</div>' : '<div class="small" style="color:var(--muted)">Subscription required</div>'}
+          </div>
+        `;
+        storiesContainer.appendChild(card);
+      });
+
+      // attach handlers
+      document.querySelectorAll('.story-card .btn').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          const id = Number(e.currentTarget.dataset.id);
+          const story = stories.find(x=>x.id === id);
+          if(!story.demo){
+            alert('This story is locked. Subscription required (coming soon).');
+            return;
+          }
+          openModal(story);
+        });
+      });
+    }
+
+    function openModal(story){
+      document.getElementById('modalTitle').textContent = story.title;
+      document.getElementById('modalMeta').innerHTML = `<div>${story.author}</div><div>${story.tags.join(' • ')}</div>`;
+      document.getElementById('modalContent').innerHTML = story.content;
+      const modal = document.getElementById('modal');
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+    }
+
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      const modal = document.getElementById('modal');
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    });
+
+    // close when clicking backdrop
+    document.getElementById('modal').addEventListener('click', (e)=>{
+      if(e.target === e.currentTarget){
+        e.currentTarget.classList.remove('open');
+      }
+    });
+
+    // initial render
+    renderCards();
+
+    // Sign in placeholder
+    document.getElementById('signin').addEventListener('click', ()=>{
+      alert('Sign in / account creation will be available in the full release. This demo does not store accounts.');
+    });
+  </script>
+</body>
+</html>
