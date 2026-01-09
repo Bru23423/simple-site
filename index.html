@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Order Manager (DEMO ONLY)</title>
+  <title>Order Manager POS (DEMO ONLY)</title>
   <style>
     :root{
       --bg:#070a10;
@@ -37,7 +37,7 @@
       border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .topbar-inner{
-      max-width: 1200px;
+      max-width: 1280px;
       margin:0 auto;
       padding: 12px 16px;
       display:flex;
@@ -46,23 +46,62 @@
       justify-content:space-between;
       flex-wrap:wrap;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800; letter-spacing:.2px;
-    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:950; letter-spacing:.2px;}
     .dot{
       width:12px; height:12px; border-radius:50%;
       background: var(--accent);
       box-shadow: 0 0 0 6px rgba(96,165,250,.15);
     }
     .sub{
-      color:var(--muted); font-weight:600; font-size:12px;
+      color:var(--muted); font-weight:800; font-size:12px;
       border:1px solid rgba(255,255,255,.10);
       padding:6px 10px; border-radius:999px;
       background: rgba(255,255,255,.02);
+      white-space:nowrap;
     }
+    .tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+    input[type="search"], select, input[type="text"], input[type="number"]{
+      padding: 10px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,23,42,.60);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus, select:focus{
+      border-color: rgba(96,165,250,.9);
+      box-shadow: 0 0 0 4px rgba(96,165,250,.15);
+    }
+    .seg{
+      display:flex;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      border-radius: 12px;
+      overflow:hidden;
+    }
+    .seg button{
+      border:0; background:transparent; color:var(--muted);
+      padding:10px 12px; cursor:pointer; font-weight:950;
+    }
+    .seg button.active{color:#06101f; background: var(--accent);}
+    .btn{
+      border:0; cursor:pointer; font-weight:950;
+      background: var(--accent);
+      color:#06101f;
+      padding:10px 12px;
+      border-radius: 12px;
+    }
+    .btn.secondary{
+      background: transparent;
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .btn.bad{background: rgba(251,113,133,.95); color:#22040a;}
+    .btn.good{background: rgba(52,211,153,.95); color:#02140c;}
+    .btn:disabled{opacity:.55; cursor:not-allowed;}
+
     .banner{
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 12px auto 0;
       padding: 0 16px;
     }
@@ -73,23 +112,20 @@
       padding: 12px 14px;
       box-shadow: 0 10px 30px rgba(0,0,0,.25);
       color: #ffe8a3;
-      font-weight:800;
+      font-weight:950;
       letter-spacing:.2px;
     }
 
     .wrap{
-      max-width:1200px;
+      max-width:1280px;
       margin: 12px auto 30px;
       padding: 0 16px;
       display:grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: 1.25fr .85fr;
       gap:14px;
       align-items:start;
     }
-    @media (max-width: 980px){
-      .wrap{grid-template-columns: 1fr; }
-      .right{position:static}
-    }
+    @media (max-width: 980px){ .wrap{grid-template-columns: 1fr;} .right{position:static} }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
@@ -115,68 +151,10 @@
       text-transform:uppercase;
       color:#cfe1ff;
     }
-    .tools{
-      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-    }
-    input[type="search"], select, input[type="text"]{
-      padding: 10px 10px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(15,23,42,.60);
-      color: var(--text);
-      outline:none;
-    }
-    input[type="search"]:focus, select:focus, input[type="text"]:focus{
-      border-color: rgba(96,165,250,.9);
-      box-shadow: 0 0 0 4px rgba(96,165,250,.15);
-    }
-    .seg{
-      display:flex;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.02);
-      border-radius: 12px;
-      overflow:hidden;
-    }
-    .seg button{
-      border:0; background:transparent; color:var(--muted);
-      padding:10px 12px; cursor:pointer; font-weight:700;
-    }
-    .seg button.active{
-      color:#06101f;
-      background: var(--accent);
-    }
-    .btn{
-      border:0; cursor:pointer; font-weight:800;
-      background: var(--accent);
-      color:#06101f;
-      padding:10px 12px;
-      border-radius: 12px;
-    }
-    .btn.secondary{
-      background: transparent;
-      color: var(--text);
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .btn.bad{
-      background: rgba(251,113,133,.95);
-      color:#22040a;
-    }
-    .btn.good{
-      background: rgba(52,211,153,.95);
-      color:#02140c;
-    }
-    .btn:disabled{
-      opacity:.55; cursor:not-allowed;
-    }
 
-    /* MENU GRID */
-    .menu{
-      padding: 14px;
-    }
-    .cats{
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin-bottom: 12px;
-    }
+    /* MENU */
+    .menu{padding: 14px;}
+    .cats{display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 12px;}
     .chip{
       background: var(--chip);
       border:1px solid rgba(255,255,255,.10);
@@ -186,24 +164,16 @@
       font-size:12px;
       cursor:pointer;
       user-select:none;
-      font-weight:800;
+      font-weight:950;
     }
     .chip.active{
       border-color: rgba(96,165,250,.55);
       color:#cfe1ff;
       box-shadow: 0 0 0 3px rgba(96,165,250,.12);
     }
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns: repeat(2, 1fr);}
-    }
-    @media (max-width: 520px){
-      .grid{grid-template-columns: 1fr;}
-    }
+    .grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;}
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 520px){ .grid{grid-template-columns: 1fr;} }
     .item{
       border:1px solid rgba(255,255,255,.10);
       border-radius: 14px;
@@ -214,19 +184,16 @@
       display:flex;
       flex-direction:column;
       gap:8px;
-      min-height:110px;
+      min-height:120px;
     }
     .item:hover{
       transform: translateY(-1px);
       border-color: rgba(96,165,250,.40);
       box-shadow: 0 12px 30px rgba(0,0,0,.25);
     }
-    .item .t{
-      display:flex; justify-content:space-between; gap:10px;
-      align-items:flex-start;
-    }
-    .name{font-weight:900}
-    .price{color:#cfe1ff; font-weight:900}
+    .t{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+    .name{font-weight:1000}
+    .price{color:#cfe1ff; font-weight:1000}
     .desc{color:var(--muted); font-size:12px; line-height:1.35}
     .tagrow{display:flex; gap:6px; flex-wrap:wrap; margin-top:auto}
     .tag{
@@ -238,54 +205,30 @@
       background: rgba(255,255,255,.02);
     }
 
-    /* RIGHT SIDE */
-    .right{
-      position: sticky;
-      top: 74px;
-      display:grid;
-      gap:14px;
-      align-self:start;
-    }
-    @media (max-width: 980px){
-      .right{position:static; top:auto;}
-    }
+    /* RIGHT */
+    .right{position: sticky; top: 74px; display:grid; gap:14px; align-self:start;}
+    @media (max-width: 980px){ .right{position:static; top:auto;} }
 
     /* CART */
-    .cart{
-      padding: 12px 14px 14px;
-    }
+    .cart{padding: 12px 14px 14px;}
+    .mini{font-size:12px; color: var(--muted);}
     .cart-top{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-bottom:10px;
+      display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;
     }
-    @media (max-width: 520px){
-      .cart-top{grid-template-columns: 1fr;}
-    }
-    .cartlist{
-      display:grid;
-      gap:8px;
-      max-height: 300px;
-      overflow:auto;
-      padding-right: 4px;
-    }
+    @media (max-width: 520px){ .cart-top{grid-template-columns: 1fr;} }
+    .cartlist{display:grid; gap:8px; max-height: 240px; overflow:auto; padding-right: 4px;}
     .line{
       border:1px solid rgba(255,255,255,.10);
       background: rgba(11,18,35,.55);
       border-radius: 14px;
       padding: 10px;
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap:8px;
-      align-items:center;
+      display:grid; grid-template-columns: 1fr auto;
+      gap:8px; align-items:center;
     }
-    .line .meta{display:flex; flex-direction:column; gap:2px;}
-    .line .meta .n{font-weight:900}
-    .line .meta .s{font-size:12px; color:var(--muted)}
-    .qty{
-      display:flex; align-items:center; gap:6px;
-    }
+    .meta{display:flex; flex-direction:column; gap:2px;}
+    .meta .n{font-weight:1000}
+    .meta .s{font-size:12px; color:var(--muted)}
+    .qty{display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
     .qty button{
       width:34px; height:34px;
       border-radius: 10px;
@@ -293,108 +236,126 @@
       background: rgba(255,255,255,.02);
       color: var(--text);
       cursor:pointer;
-      font-weight:900;
+      font-weight:1000;
     }
-    .qty input{
-      width:52px;
-      text-align:center;
-      padding:10px 8px;
-      border-radius: 10px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(15,23,42,.60);
-      color: var(--text);
-    }
+    .qty input{width:56px; text-align:center; padding:10px 8px; border-radius: 10px;}
     .sum{
       margin-top: 10px;
       border-top: 1px solid rgba(255,255,255,.07);
       padding-top: 10px;
-      display:grid;
-      gap:6px;
-      font-size:13px;
-      color: var(--muted);
+      display:grid; gap:6px;
+      font-size:13px; color: var(--muted);
     }
-    .sum .r{display:flex; justify-content:space-between; gap:10px;}
-    .sum .total{
-      color: var(--text);
-      font-weight:900;
-      font-size:14px;
-      margin-top: 2px;
+    .r{display:flex; justify-content:space-between; gap:10px;}
+    .total{color: var(--text); font-weight:1000; font-size:14px; margin-top: 2px;}
+    .cart-actions{margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+
+    /* SETTINGS (tax/fees) */
+    .settings{padding: 12px 14px 14px;}
+    .setgrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width: 520px){ .setgrid{grid-template-columns: 1fr;} }
+    .toggle{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(11,18,35,.55);
+      padding: 10px;
+      border-radius: 14px;
+      margin-top:10px;
     }
-    .cart-actions{
-      margin-top: 12px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .toggle label{display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-weight:900;}
+    .toggle .mini{margin:0}
 
     /* QUEUE */
-    .queue{
-      padding: 14px;
-    }
-    .qtools{
-      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
-      margin-bottom: 10px;
-    }
-    .orders{
-      display:grid;
-      gap:10px;
-      max-height: 520px;
-      overflow:auto;
-      padding-right: 4px;
-    }
+    .queue{padding: 14px;}
+    .qtools{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom: 10px;}
+    .orders{display:grid; gap:10px; max-height: 440px; overflow:auto; padding-right: 4px;}
     .order{
       border:1px solid rgba(255,255,255,.10);
       background: rgba(11,18,35,.55);
       border-radius: 16px;
       padding: 12px;
-      display:grid;
-      gap:10px;
+      display:grid; gap:10px;
     }
-    .order-top{
-      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
-      flex-wrap:wrap;
-    }
-    .oid{
-      font-weight:1000; letter-spacing:.4px;
-    }
-    .mini{
-      font-size:12px; color: var(--muted);
-    }
+    .order-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;}
+    .oid{font-weight:1100; letter-spacing:.4px;}
     .badge{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
+      font-size:12px; padding:6px 10px; border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.02);
       color: var(--muted);
-      font-weight:900;
+      font-weight:1000;
     }
     .b-new{border-color: rgba(96,165,250,.35); color:#cfe1ff;}
     .b-prog{border-color: rgba(251,191,36,.35); color: #ffe8a3;}
     .b-ready{border-color: rgba(52,211,153,.35); color: #b7ffe3;}
     .b-done{border-color: rgba(148,163,184,.30); color: var(--muted);}
-    .olist{
-      display:grid;
-      gap:6px;
-      padding-left: 14px;
-      margin:0;
-      color: var(--text);
-      font-size:13px;
-    }
+    .olist{display:grid; gap:6px; padding-left: 14px; margin:0; color: var(--text); font-size:13px;}
     .order-actions{
       display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
       border-top: 1px solid rgba(255,255,255,.07);
       padding-top: 10px;
     }
 
-    .footer-note{
-      max-width:1200px;
-      margin: 0 auto 30px;
-      padding: 0 16px;
-      color: var(--muted);
+    /* MODAL + RECEIPT */
+    .modal-backdrop{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index:100;
+    }
+    .modal{
+      width: min(820px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.6);
+      overflow:hidden;
+    }
+    .modal-h{
+      padding: 14px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+    }
+    .modal-h .title{font-weight:1100}
+    .modal-b{padding: 14px; display:grid; gap:12px;}
+    .modgrid{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width: 680px){ .modgrid{grid-template-columns:1fr;} }
+    .box{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(11,18,35,.55);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .box h3{margin:0 0 8px; font-size:12px; color:#cfe1ff; letter-spacing:.3px; text-transform:uppercase;}
+    .opt{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:8px 0; border-top:1px solid rgba(255,255,255,.06);
+    }
+    .opt:first-child{border-top:0; padding-top:0}
+    .opt label{display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none}
+    .opt .add{color:#cfe1ff; font-weight:950; font-size:12px;}
+    .modal-actions{
+      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 12px 14px;
+      background: rgba(255,255,255,.02);
+    }
+    .receipt{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+      background: rgba(0,0,0,.25);
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius: 14px;
+      padding: 12px;
+      color: #e9eefc;
+      line-height:1.35;
       font-size:12px;
-      line-height:1.45;
+      max-height: 220px;
+      overflow:auto;
     }
   </style>
 </head>
@@ -403,7 +364,7 @@
     <div class="topbar-inner">
       <div class="brand">
         <span class="dot"></span>
-        <span>Fast-Food Order Manager</span>
+        <span>Order Manager POS + Kitchen</span>
         <span class="sub">DEMO</span>
       </div>
       <div class="tools">
@@ -412,6 +373,8 @@
           <button id="viewPOS" class="active" type="button">POS</button>
           <button id="viewKitchen" type="button">Kitchen</button>
         </div>
+        <button id="exportBtn" class="btn secondary" type="button">Export</button>
+        <button id="importBtn" class="btn secondary" type="button">Import</button>
         <button id="wipeAll" class="btn secondary" type="button">Reset Demo</button>
       </div>
     </div>
@@ -428,6 +391,7 @@
         <h2>Menu</h2>
         <div class="tools">
           <span class="sub" id="menuCount">0 items</span>
+          <span class="sub" id="savePill">Saved</span>
         </div>
       </div>
 
@@ -437,8 +401,9 @@
       </div>
     </section>
 
-    <!-- RIGHT: CART + QUEUE -->
+    <!-- RIGHT -->
     <aside class="right" id="posRight">
+      <!-- CART -->
       <section class="card">
         <div class="card-h">
           <h2>Current Order</h2>
@@ -450,7 +415,7 @@
         <div class="cart">
           <div class="cart-top">
             <div>
-              <label class="mini" for="orderType">Order Type</label>
+              <div class="mini">Order Type</div>
               <select id="orderType">
                 <option>Dine-In</option>
                 <option>Takeout</option>
@@ -458,26 +423,75 @@
               </select>
             </div>
             <div>
-              <label class="mini" for="customerName">Customer Name (optional)</label>
-              <input id="customerName" type="text" placeholder="e.g., Alex" />
+              <div class="mini">Name / Ticket note (optional)</div>
+              <input id="customerName" type="text" placeholder="e.g., Alex / Table 4" />
             </div>
           </div>
 
           <div class="cartlist" id="cartlist"></div>
 
-          <div class="sum" id="summary">
+          <div class="sum">
             <div class="r"><span>Subtotal</span><span id="sub">$0.00</span></div>
-            <div class="r"><span>Tax (8%)</span><span id="tax">$0.00</span></div>
+            <div class="r"><span id="taxLabel">Tax</span><span id="tax">$0.00</span></div>
+            <div class="r"><span id="feeLabel">Service fee</span><span id="fee">$0.00</span></div>
+            <div class="r"><span id="discLabel">Discount</span><span id="disc">-$0.00</span></div>
             <div class="r total"><span>Total</span><span id="total">$0.00</span></div>
           </div>
 
           <div class="cart-actions">
+            <button class="btn secondary" id="printReceipt" type="button">Receipt</button>
             <button class="btn secondary" id="clearCart" type="button">Clear</button>
             <button class="btn" id="placeOrder" type="button" disabled>Place Order</button>
           </div>
         </div>
       </section>
 
+      <!-- SETTINGS -->
+      <section class="card">
+        <div class="card-h">
+          <h2>Tax / Fees (Demo Settings)</h2>
+          <div class="tools">
+            <span class="sub" id="settingsPill">Saved</span>
+          </div>
+        </div>
+        <div class="settings">
+          <div class="setgrid">
+            <div>
+              <div class="mini">Tax %</div>
+              <input id="taxPct" type="number" step="0.01" min="0" max="25" />
+            </div>
+            <div>
+              <div class="mini">Service Fee ($)</div>
+              <input id="feeAmt" type="number" step="0.01" min="0" />
+            </div>
+            <div>
+              <div class="mini">Discount ($)</div>
+              <input id="discAmt" type="number" step="0.01" min="0" />
+            </div>
+            <div>
+              <div class="mini">Discount %</div>
+              <input id="discPct" type="number" step="0.01" min="0" max="100" />
+            </div>
+          </div>
+
+          <div class="toggle">
+            <label><input id="dingOn" type="checkbox" /> Ding on new order</label>
+            <div class="mini">Kitchen sound</div>
+          </div>
+
+          <div class="toggle">
+            <label><input id="pauseOrders" type="checkbox" /> Pause placing new orders</label>
+            <div class="mini">Demo lock</div>
+          </div>
+
+          <div class="cart-actions" style="justify-content:space-between;">
+            <button class="btn secondary" id="resetSettings" type="button">Default</button>
+            <button class="btn secondary" id="saveSettings" type="button">Save</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUEUE -->
       <section class="card">
         <div class="card-h">
           <h2>Order Queue</h2>
@@ -488,6 +502,7 @@
 
         <div class="queue">
           <div class="qtools">
+            <input id="orderSearch" type="search" placeholder="Search #ID / name / item…" />
             <select id="filterStatus">
               <option value="all">All statuses</option>
               <option value="new">New</option>
@@ -503,12 +518,12 @@
       </section>
     </aside>
 
-    <!-- KITCHEN VIEW (same data, different layout) -->
+    <!-- KITCHEN VIEW -->
     <section class="card" id="kitchenPanel" style="display:none;">
       <div class="card-h">
         <h2>Kitchen Display</h2>
         <div class="tools">
-          <span class="sub">Focus: New / In Progress</span>
+          <span class="sub">Saved • Demo</span>
         </div>
       </div>
       <div class="queue">
@@ -524,56 +539,159 @@
     </section>
   </main>
 
-  <div class="footer-note">
-    <strong>Demo note:</strong> Everything is stored in your browser (localStorage). No network calls. “Reset Demo” wipes saved orders.
+  <!-- MODIFIER MODAL -->
+  <div class="modal-backdrop" id="modalBg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Customize item">
+      <div class="modal-h">
+        <div>
+          <div class="title" id="mTitle">Customize</div>
+          <div class="mini" id="mSub">Choose options (demo)</div>
+        </div>
+        <button class="btn secondary" id="mClose" type="button">Close</button>
+      </div>
+
+      <div class="modal-b">
+        <div class="modgrid">
+          <div class="box">
+            <h3>Size</h3>
+            <div id="mSizes"></div>
+          </div>
+          <div class="box">
+            <h3>Extras</h3>
+            <div id="mExtras"></div>
+          </div>
+        </div>
+
+        <div class="box">
+          <h3>Notes</h3>
+          <input id="mNote" type="text" placeholder="e.g., No pickles, extra sauce (demo)" />
+          <div class="mini" style="margin-top:8px;">Modifiers affect the line price (demo).</div>
+        </div>
+
+        <div class="box">
+          <h3>Receipt Preview</h3>
+          <div class="receipt" id="mReceipt"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn secondary" id="mCancel" type="button">Cancel</button>
+        <button class="btn good" id="mAdd" type="button">Add to Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT/IMPORT MODAL -->
+  <div class="modal-backdrop" id="dataBg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Export or import data">
+      <div class="modal-h">
+        <div>
+          <div class="title">Export / Import (JSON)</div>
+          <div class="mini">Demo: backup or move your local data.</div>
+        </div>
+        <button class="btn secondary" id="dataClose" type="button">Close</button>
+      </div>
+
+      <div class="modal-b">
+        <div class="box">
+          <h3>Data</h3>
+          <textarea id="dataBox" style="width:100%;min-height:220px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(15,23,42,.60);color:var(--text);padding:12px;resize:vertical;"></textarea>
+          <div class="mini" style="margin-top:8px;">Export generates JSON. Import replaces your current saved demo data.</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn secondary" id="doExport" type="button">Fill with Export</button>
+        <button class="btn bad" id="doImport" type="button">Import (Replace)</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // ---------- DEMO DATA ----------
+    // ------------------ MENU (DEMO) ------------------
+    // Not real brand items—just a similar fast-food demo layout.
     const MENU = [
-      {id:"b1", cat:"Burgers", name:"Classic Burger", price:4.99, desc:"Beef patty, lettuce, pickles, sauce.", tags:["Popular"]},
-      {id:"b2", cat:"Burgers", name:"Cheeseburger", price:5.49, desc:"Classic burger + cheese.", tags:["Cheesy"]},
-      {id:"b3", cat:"Burgers", name:"Double Burger", price:6.99, desc:"Two patties for extra hunger.", tags:["Big"]},
-      {id:"c1", cat:"Chicken", name:"Crispy Chicken Sandwich", price:5.99, desc:"Crispy chicken, mayo, pickles.", tags:["Crispy"]},
-      {id:"c2", cat:"Chicken", name:"Chicken Nuggets (6pc)", price:4.49, desc:"6 nuggets with a dipping sauce.", tags:["Snack"]},
-      {id:"f1", cat:"Fries", name:"Small Fries", price:2.19, desc:"Golden fries, lightly salted.", tags:["Side"]},
-      {id:"f2", cat:"Fries", name:"Medium Fries", price:2.79, desc:"More fries, more happy.", tags:["Side"]},
-      {id:"f3", cat:"Fries", name:"Large Fries", price:3.39, desc:"For serious fry fans.", tags:["Side"]},
-      {id:"d1", cat:"Drinks", name:"Soft Drink (Small)", price:1.79, desc:"Choose your flavor (demo).", tags:["Cold"]},
-      {id:"d2", cat:"Drinks", name:"Soft Drink (Large)", price:2.39, desc:"Big cup, big sip.", tags:["Cold"]},
-      {id:"d3", cat:"Drinks", name:"Iced Coffee", price:2.99, desc:"Sweet, smooth, chilled.", tags:["Caffeine"]},
-      {id:"s1", cat:"Desserts", name:"Ice Cream Cone", price:1.69, desc:"Classic soft-serve cone.", tags:["Sweet"]},
-      {id:"s2", cat:"Desserts", name:"Cookie", price:1.29, desc:"Baked cookie (demo).", tags:["Sweet"]},
+      {id:"b1", cat:"Burgers", name:"Classic Burger", base:4.99, desc:"Beef patty, lettuce, pickles, sauce.", tags:["Popular"], mods:true},
+      {id:"b2", cat:"Burgers", name:"Cheeseburger", base:5.49, desc:"Classic burger + cheese.", tags:["Cheesy"], mods:true},
+      {id:"b3", cat:"Burgers", name:"Double Burger", base:6.99, desc:"Two patties for extra hunger.", tags:["Big"], mods:true},
+      {id:"c1", cat:"Chicken", name:"Crispy Chicken Sandwich", base:5.99, desc:"Crispy chicken, mayo, pickles.", tags:["Crispy"], mods:true},
+      {id:"c2", cat:"Chicken", name:"Nuggets (6pc)", base:4.49, desc:"6 nuggets with dipping sauce.", tags:["Snack"], mods:true},
+      {id:"f1", cat:"Fries", name:"Fries", base:2.19, desc:"Golden fries, lightly salted.", tags:["Side"], mods:false},
+      {id:"d1", cat:"Drinks", name:"Soft Drink", base:1.79, desc:"Choose your flavor (demo).", tags:["Cold"], mods:true},
+      {id:"d2", cat:"Drinks", name:"Iced Coffee", base:2.99, desc:"Sweet, smooth, chilled.", tags:["Caffeine"], mods:true},
+      {id:"s1", cat:"Desserts", name:"Ice Cream Cone", base:1.69, desc:"Classic soft-serve cone.", tags:["Sweet"], mods:false},
+      {id:"s2", cat:"Desserts", name:"Cookie", base:1.29, desc:"Baked cookie (demo).", tags:["Sweet"], mods:false},
+      // QUICK COMBOS (cool feature)
+      {id:"m1", cat:"Meals", name:"Burger Meal (Combo)", base:8.99, desc:"Includes burger, fries, drink (demo).", tags:["Combo"], mods:true, isMeal:true},
+      {id:"m2", cat:"Meals", name:"Chicken Meal (Combo)", base:9.49, desc:"Includes chicken sandwich, fries, drink.", tags:["Combo"], mods:true, isMeal:true},
     ];
 
-    const TAX_RATE = 0.08;
-    const STORAGE_KEY = "orders_demo_v1";
+    const SIZE_OPTIONS = [
+      {id:"reg", label:"Regular", add:0},
+      {id:"lg",  label:"Large",   add:0.90},
+    ];
+    const EXTRA_OPTIONS = [
+      {id:"cheese", label:"Extra cheese", add:0.70},
+      {id:"bacon",  label:"Add bacon",    add:1.10},
+      {id:"sauce",  label:"Extra sauce",  add:0.30},
+      {id:"nopick", label:"No pickles",   add:0},
+      {id:"nion",   label:"No onions",    add:0},
+      {id:"xice",   label:"Extra ice (drink)", add:0},
+    ];
 
-    // ---------- STATE ----------
+    // ------------------ STORAGE KEYS ------------------
+    const STORE = {
+      orders: "pos_demo_orders_v3",
+      cart: "pos_demo_cart_v3",
+      settings: "pos_demo_settings_v3",
+      counter: "pos_demo_orderCounter_v3"
+    };
+
+    // ------------------ STATE ------------------
     let cat = "All";
     let menuSearch = "";
-    let cart = {}; // {id: qty}
-    let orders = loadOrders(); // array
+    let cart = loadJson(STORE.cart, []); // advanced line items
+    let orders = loadJson(STORE.orders, []);
+    let orderCounter = loadJson(STORE.counter, 1000);
 
-    // ---------- ELEMENTS ----------
+    let settings = loadJson(STORE.settings, {
+      taxPct: 8.00,
+      feeAmt: 0.00,
+      discAmt: 0.00,
+      discPct: 0.00,
+      dingOn: true,
+      pauseOrders: false
+    });
+
+    let lastOrderCount = orders.length;
+
+    // ------------------ ELEMENTS ------------------
     const elCats = document.getElementById("cats");
     const elGrid = document.getElementById("grid");
     const elMenuCount = document.getElementById("menuCount");
     const elMenuSearch = document.getElementById("menuSearch");
+    const savePill = document.getElementById("savePill");
 
     const elCartList = document.getElementById("cartlist");
     const elCartCount = document.getElementById("cartCount");
     const elSub = document.getElementById("sub");
     const elTax = document.getElementById("tax");
+    const elFee = document.getElementById("fee");
+    const elDisc = document.getElementById("disc");
     const elTotal = document.getElementById("total");
+    const elTaxLabel = document.getElementById("taxLabel");
+    const elFeeLabel = document.getElementById("feeLabel");
+    const elDiscLabel = document.getElementById("discLabel");
     const elPlace = document.getElementById("placeOrder");
     const elClearCart = document.getElementById("clearCart");
+    const elPrint = document.getElementById("printReceipt");
     const elOrderType = document.getElementById("orderType");
     const elCustomer = document.getElementById("customerName");
 
     const elOrders = document.getElementById("orders");
     const elQueueCount = document.getElementById("queueCount");
     const elFilterStatus = document.getElementById("filterStatus");
+    const elOrderSearch = document.getElementById("orderSearch");
     const elClearDone = document.getElementById("clearDone");
     const elWipeAll = document.getElementById("wipeAll");
 
@@ -585,54 +703,154 @@
     const elKOrders = document.getElementById("kOrders");
     const elKFilter = document.getElementById("kFilter");
 
-    // ---------- HELPERS ----------
+    // Settings inputs
+    const taxPct = document.getElementById("taxPct");
+    const feeAmt = document.getElementById("feeAmt");
+    const discAmt = document.getElementById("discAmt");
+    const discPct = document.getElementById("discPct");
+    const dingOn = document.getElementById("dingOn");
+    const pauseOrders = document.getElementById("pauseOrders");
+    const resetSettings = document.getElementById("resetSettings");
+    const saveSettings = document.getElementById("saveSettings");
+    const settingsPill = document.getElementById("settingsPill");
+
+    // Mod modal
+    const modalBg = document.getElementById("modalBg");
+    const mTitle = document.getElementById("mTitle");
+    const mSub = document.getElementById("mSub");
+    const mSizes = document.getElementById("mSizes");
+    const mExtras = document.getElementById("mExtras");
+    const mNote = document.getElementById("mNote");
+    const mReceipt = document.getElementById("mReceipt");
+    const mClose = document.getElementById("mClose");
+    const mCancel = document.getElementById("mCancel");
+    const mAdd = document.getElementById("mAdd");
+
+    // Export/import modal
+    const exportBtn = document.getElementById("exportBtn");
+    const importBtn = document.getElementById("importBtn");
+    const dataBg = document.getElementById("dataBg");
+    const dataClose = document.getElementById("dataClose");
+    const dataBox = document.getElementById("dataBox");
+    const doExport = document.getElementById("doExport");
+    const doImport = document.getElementById("doImport");
+
+    // Current modifier selection
+    let modalItem = null;
+    let modalState = { size:"reg", extras:{}, note:"" };
+
+    // ------------------ HELPERS ------------------
     const money = n => "$" + n.toFixed(2);
     const nowTime = () => new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-    const uid = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+    const lineKey = () => Math.random().toString(36).slice(2, 10);
 
-    function loadOrders(){
+    function loadJson(key, fallback){
       try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
-      }catch{ return []; }
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      }catch{
+        return fallback;
+      }
     }
-    function saveOrders(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    function saveJson(key, value){
+      localStorage.setItem(key, JSON.stringify(value));
+      pulseSave();
+    }
+
+    function pulseSave(){
+      savePill.textContent = "Saved";
+      savePill.style.borderColor = "rgba(52,211,153,.35)";
+      savePill.style.color = "#b7ffe3";
+      clearTimeout(pulseSave.t);
+      pulseSave.t = setTimeout(() => {
+        savePill.textContent = "Saved";
+        savePill.style.borderColor = "rgba(255,255,255,.10)";
+        savePill.style.color = "var(--muted)";
+      }, 800);
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    // Ding sound
+    function ding(){
+      if(!settings.dingOn) return;
+      try{
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.setValueAtTime(880, ctx.currentTime);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+        o.connect(g); g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + 0.20);
+      }catch{}
+    }
+
+    // ------------------ PRICING ------------------
+    function computeUnitPrice(item, mods){
+      let unit = item.base;
+      const size = SIZE_OPTIONS.find(s => s.id === mods.size);
+      unit += size ? size.add : 0;
+      for(const opt of EXTRA_OPTIONS){
+        if(mods.extras?.[opt.id]) unit += opt.add;
+      }
+      return unit;
+    }
+    function modsSummary(mods){
+      const parts = [];
+      const size = SIZE_OPTIONS.find(s => s.id === mods.size);
+      if(size && size.id !== "reg") parts.push(size.label);
+      const extras = EXTRA_OPTIONS.filter(o => mods.extras?.[o.id]).map(o => o.label);
+      parts.push(...extras);
+      return parts;
     }
 
     function calcCart(){
       let subtotal = 0;
-      const lines = [];
-      for(const [id, qty] of Object.entries(cart)){
-        const item = MENU.find(x => x.id === id);
-        if(!item || qty <= 0) continue;
-        const line = item.price * qty;
+      let count = 0;
+      const lines = cart.map(li => {
+        const line = li.unit * li.qty;
         subtotal += line;
-        lines.push({item, qty, line});
-      }
-      const tax = subtotal * TAX_RATE;
-      const total = subtotal + tax;
-      return {lines, subtotal, tax, total};
+        count += li.qty;
+        return {...li, line};
+      });
+
+      const taxRate = Math.max(0, Number(settings.taxPct || 0)) / 100;
+      const fee = Math.max(0, Number(settings.feeAmt || 0));
+      const discFixed = Math.max(0, Number(settings.discAmt || 0));
+      const discRate = Math.max(0, Math.min(100, Number(settings.discPct || 0))) / 100;
+
+      const discountFromPct = subtotal * discRate;
+      const discount = Math.min(subtotal, discFixed + discountFromPct);
+
+      const taxable = Math.max(0, subtotal - discount);
+      const tax = taxable * taxRate;
+
+      const total = taxable + tax + fee;
+
+      return {lines, subtotal, discount, taxable, tax, fee, total, count};
     }
 
-    // ---------- RENDER ----------
+    // ------------------ MENU RENDER ------------------
     function renderCats(){
       const cats = ["All", ...Array.from(new Set(MENU.map(m=>m.cat)))];
       elCats.innerHTML = cats.map(c => `
         <div class="chip ${c===cat ? "active":""}" data-cat="${c}">${c}</div>
       `).join("");
       elCats.querySelectorAll(".chip").forEach(ch => {
-        ch.addEventListener("click", () => {
-          cat = ch.dataset.cat;
-          renderMenu();
-        });
+        ch.addEventListener("click", () => { cat = ch.dataset.cat; renderMenu(); });
       });
     }
 
     function getFilteredMenu(){
+      const q = menuSearch.trim().toLowerCase();
       return MENU.filter(m => {
         const inCat = (cat === "All") || (m.cat === cat);
-        const q = menuSearch.trim().toLowerCase();
         const inSearch = !q || (m.name.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q));
         return inCat && inSearch;
       });
@@ -645,66 +863,287 @@
         <div class="item" data-id="${m.id}">
           <div class="t">
             <div class="name">${m.name}</div>
-            <div class="price">${money(m.price)}</div>
+            <div class="price">${money(m.base)}</div>
           </div>
           <div class="desc">${m.desc}</div>
           <div class="tagrow">
             <span class="tag">${m.cat}</span>
+            ${(m.mods ? `<span class="tag">Customizable</span>` : ``)}
+            ${(m.isMeal ? `<span class="tag">Quick Combo</span>` : ``)}
             ${(m.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}
           </div>
         </div>
       `).join("");
 
       elGrid.querySelectorAll(".item").forEach(card => {
-        card.addEventListener("click", () => addToCart(card.dataset.id, 1));
+        card.addEventListener("click", () => openCustomize(card.dataset.id));
       });
     }
 
-    function renderCart(){
-      const {lines, subtotal, tax, total} = calcCart();
-      elCartCount.textContent = `${lines.reduce((a,l)=>a+l.qty,0)} items`;
+    // ------------------ MODAL ------------------
+    function openCustomize(id){
+      const item = MENU.find(x => x.id === id);
+      if(!item) return;
 
-      elCartList.innerHTML = lines.length ? lines.map(l => `
-        <div class="line" data-id="${l.item.id}">
+      // Fast add if not mods
+      if(!item.mods){
+        addLine(item, {size:"reg", extras:{}, note:""});
+        return;
+      }
+
+      modalItem = item;
+      modalState = { size:"reg", extras:{}, note:"" };
+
+      mTitle.textContent = item.name;
+      mSub.textContent = item.desc;
+
+      mSizes.innerHTML = SIZE_OPTIONS.map(s => `
+        <div class="opt">
+          <label>
+            <input type="radio" name="mSize" value="${s.id}" ${s.id==="reg"?"checked":""}/>
+            ${s.label}
+          </label>
+          <div class="add">${s.add ? "+"+money(s.add) : "+$0.00"}</div>
+        </div>
+      `).join("");
+
+      mExtras.innerHTML = EXTRA_OPTIONS.map(o => `
+        <div class="opt">
+          <label>
+            <input type="checkbox" name="mExtra" value="${o.id}" />
+            ${o.label}
+          </label>
+          <div class="add">${o.add ? "+"+money(o.add) : "+$0.00"}</div>
+        </div>
+      `).join("");
+
+      mNote.value = "";
+      updateModalReceipt();
+
+      mSizes.querySelectorAll('input[name="mSize"]').forEach(r => {
+        r.addEventListener("change", () => {
+          modalState.size = r.value;
+          updateModalReceipt();
+        });
+      });
+      mExtras.querySelectorAll('input[name="mExtra"]').forEach(c => {
+        c.addEventListener("change", () => {
+          modalState.extras[c.value] = c.checked;
+          updateModalReceipt();
+        });
+      });
+      mNote.addEventListener("input", () => {
+        modalState.note = mNote.value;
+        updateModalReceipt();
+      });
+
+      modalBg.style.display = "flex";
+      modalBg.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal(){
+      modalBg.style.display = "none";
+      modalBg.setAttribute("aria-hidden", "true");
+      modalItem = null;
+    }
+
+    function buildReceiptPreview(item, mods){
+      const unit = computeUnitPrice(item, mods);
+      const ms = modsSummary(mods);
+      const lines = [];
+      lines.push("DEMO RECEIPT PREVIEW");
+      lines.push("--------------------");
+      lines.push(item.name);
+      if(ms.length) lines.push("  " + ms.join(", "));
+      if(mods.note?.trim()) lines.push("  Note: " + mods.note.trim());
+      lines.push("");
+      lines.push(`Unit: ${money(unit)}`);
+      lines.push(`Qty:  1`);
+      lines.push(`Line: ${money(unit)}`);
+      lines.push("--------------------");
+      lines.push("DEMO ONLY (NOT REAL)");
+      return lines.join("\n");
+    }
+
+    function updateModalReceipt(){
+      if(!modalItem) return;
+      mReceipt.textContent = buildReceiptPreview(modalItem, modalState);
+    }
+
+    function addLine(item, mods){
+      const unit = computeUnitPrice(item, mods);
+      const summary = modsSummary(mods);
+      const note = (mods.note || "").trim();
+
+      // Merge if identical
+      const sig = JSON.stringify({id:item.id, size:mods.size, extras:mods.extras, note});
+      const existing = cart.find(li => li.sig === sig);
+      if(existing){
+        existing.qty += 1;
+      }else{
+        cart.push({
+          key: lineKey(),
+          sig,
+          id: item.id,
+          name: item.name,
+          qty: 1,
+          unit,
+          mods: summary,
+          note
+        });
+      }
+
+      saveJson(STORE.cart, cart);
+      renderCart();
+    }
+
+    // Modal wires
+    document.getElementById("mClose").addEventListener("click", closeModal);
+    document.getElementById("mCancel").addEventListener("click", closeModal);
+    modalBg.addEventListener("click", (e) => { if(e.target === modalBg) closeModal(); });
+    window.addEventListener("keydown", (e) => { if(e.key === "Escape" && modalBg.style.display === "flex") closeModal(); });
+    mAdd.addEventListener("click", () => {
+      if(!modalItem) return;
+      addLine(modalItem, modalState);
+      closeModal();
+    });
+
+    // ------------------ CART RENDER ------------------
+    function renderCart(){
+      const {lines, subtotal, tax, fee, discount, total, count} = calcCart();
+
+      elCartCount.textContent = `${count} items`;
+      elSub.textContent = money(subtotal);
+      elTax.textContent = money(tax);
+      elFee.textContent = money(fee);
+      elDisc.textContent = "-" + money(discount);
+      elTotal.textContent = money(total);
+
+      elTaxLabel.textContent = `Tax (${Number(settings.taxPct||0).toFixed(2)}%)`;
+      elFeeLabel.textContent = `Service fee ($)`;
+      elDiscLabel.textContent = `Discount`;
+
+      elPlace.disabled = lines.length === 0 || !!settings.pauseOrders;
+
+      elCartList.innerHTML = lines.length ? lines.map(li => `
+        <div class="line" data-key="${li.key}">
           <div class="meta">
-            <div class="n">${l.item.name}</div>
-            <div class="s">${money(l.item.price)} • Line: ${money(l.line)}</div>
+            <div class="n">${li.name}</div>
+            <div class="s">${money(li.unit)} • Line: ${money(li.line)}</div>
+            ${li.mods?.length ? `<div class="mini">Mods: ${li.mods.join(", ")}</div>` : ``}
+            ${li.note ? `<div class="mini">Note: ${escapeHtml(li.note)}</div>` : ``}
           </div>
           <div class="qty">
             <button type="button" data-act="dec">−</button>
-            <input type="number" min="1" value="${l.qty}" data-act="qty" />
+            <input type="number" min="1" value="${li.qty}" data-act="qty" />
             <button type="button" data-act="inc">+</button>
             <button type="button" data-act="del" title="Remove" style="border-color:rgba(251,113,133,.35)">✕</button>
           </div>
         </div>
       `).join("") : `<div class="mini">Cart is empty. Click menu items to add.</div>`;
 
-      elSub.textContent = money(subtotal);
-      elTax.textContent = money(tax);
-      elTotal.textContent = money(total);
-
-      elPlace.disabled = lines.length === 0;
-
-      // Wire actions
       elCartList.querySelectorAll(".line").forEach(row => {
-        const id = row.dataset.id;
+        const key = row.dataset.key;
+        const li = cart.find(x => x.key === key);
+
         row.querySelectorAll("button").forEach(btn => {
           btn.addEventListener("click", () => {
             const act = btn.dataset.act;
-            if(act === "inc") addToCart(id, 1);
-            if(act === "dec") addToCart(id, -1);
-            if(act === "del") { delete cart[id]; renderCart(); }
+            if(!li) return;
+            if(act === "inc") li.qty += 1;
+            if(act === "dec") li.qty = Math.max(1, li.qty - 1);
+            if(act === "del") cart = cart.filter(x => x.key !== key);
+
+            saveJson(STORE.cart, cart);
+            renderCart();
           });
         });
+
         const qtyInput = row.querySelector('input[data-act="qty"]');
         if(qtyInput){
           qtyInput.addEventListener("change", () => {
-            const v = Math.max(1, parseInt(qtyInput.value||"1",10));
-            cart[id] = v;
+            if(!li) return;
+            li.qty = Math.max(1, parseInt(qtyInput.value||"1",10));
+            saveJson(STORE.cart, cart);
             renderCart();
           });
         }
       });
+    }
+
+    // ------------------ ORDERS ------------------
+    function nextOrderId(){
+      orderCounter += 1;
+      saveJson(STORE.counter, orderCounter);
+      return String(orderCounter);
+    }
+
+    function placeOrder(){
+      if(settings.pauseOrders){
+        alert("Orders are paused (demo setting). Turn it off in Tax/Fees settings.");
+        return;
+      }
+
+      const {lines, subtotal, tax, fee, discount, total} = calcCart();
+      if(!lines.length) return;
+
+      const oid = nextOrderId();
+      const order = {
+        oid,
+        type: elOrderType.value,
+        customer: elCustomer.value.trim(),
+        status: "new",
+        time: nowTime(),
+        createdAt: Date.now(),
+        pricing: {
+          taxPct: Number(settings.taxPct||0),
+          feeAmt: Number(settings.feeAmt||0),
+          discAmt: Number(settings.discAmt||0),
+          discPct: Number(settings.discPct||0),
+          subtotal, discount, tax, fee, total
+        },
+        items: lines.map(l => ({
+          id:l.id, name:l.name, qty:l.qty, unit:l.unit,
+          mods:l.mods, note:l.note
+        }))
+      };
+
+      orders.push(order);
+      saveJson(STORE.orders, orders);
+
+      // Ding when new order added
+      if(orders.length > lastOrderCount) ding();
+      lastOrderCount = orders.length;
+
+      // Clear cart + persist
+      cart = [];
+      elCustomer.value = "";
+      saveJson(STORE.cart, cart);
+      renderCart();
+      renderQueue();
+    }
+
+    function advanceStatus(oid, dir){
+      const o = orders.find(x => x.oid === oid);
+      if(!o) return;
+      const flow = ["new","progress","ready","done"];
+      let idx = flow.indexOf(o.status);
+      idx = Math.max(0, Math.min(flow.length-1, idx + dir));
+      o.status = flow[idx];
+      saveJson(STORE.orders, orders);
+      renderQueue();
+    }
+
+    function deleteOrder(oid){
+      orders = orders.filter(o => o.oid !== oid);
+      saveJson(STORE.orders, orders);
+      renderQueue();
+    }
+
+    function clearCompleted(){
+      orders = orders.filter(o => o.status !== "done");
+      saveJson(STORE.orders, orders);
+      renderQueue();
     }
 
     function statusBadge(s){
@@ -716,10 +1155,20 @@
 
     function renderQueue(){
       const filter = elFilterStatus.value;
+      const q = elOrderSearch.value.trim().toLowerCase();
+
       const list = orders
         .slice()
         .sort((a,b)=> b.createdAt - a.createdAt)
-        .filter(o => filter==="all" ? true : o.status===filter);
+        .filter(o => filter==="all" ? true : o.status===filter)
+        .filter(o => {
+          if(!q) return true;
+          const blob = [
+            o.oid, o.customer, o.type, o.status,
+            ...(o.items||[]).map(i => `${i.name} ${i.note||""} ${(i.mods||[]).join(" ")}`)
+          ].join(" ").toLowerCase();
+          return blob.includes(q);
+        });
 
       elQueueCount.textContent = String(orders.length);
 
@@ -727,25 +1176,29 @@
         <div class="order" data-oid="${o.oid}">
           <div class="order-top">
             <div>
-              <div class="oid">#${o.oid} • ${o.type}${o.customer ? " • " + o.customer : ""}</div>
-              <div class="mini">Placed: ${o.time}</div>
+              <div class="oid">#${o.oid} • ${o.type}${o.customer ? " • " + escapeHtml(o.customer) : ""}</div>
+              <div class="mini">Placed: ${o.time} • Total: <strong style="color:#cfe1ff">${money(o.pricing.total)}</strong></div>
             </div>
             ${statusBadge(o.status)}
           </div>
 
           <ul class="olist">
-            ${o.items.map(i=>`<li>${i.qty}× ${i.name}</li>`).join("")}
+            ${o.items.map(i=>`
+              <li>
+                <strong>${i.qty}×</strong> ${escapeHtml(i.name)}
+                ${i.mods?.length ? `<span class="mini"> • ${escapeHtml(i.mods.join(", "))}</span>` : ``}
+                ${i.note ? `<div class="mini">Note: ${escapeHtml(i.note)}</div>` : ``}
+              </li>`).join("")}
           </ul>
-
-          <div class="mini">Total: <strong style="color:#cfe1ff">${money(o.total)}</strong></div>
 
           <div class="order-actions">
             <button class="btn secondary" type="button" data-act="prev">Back</button>
-            <button class="btn" type="button" data-act="next">Next</button>
+            <button class="btn good" type="button" data-act="next">Next</button>
+            <button class="btn secondary" type="button" data-act="receipt">Receipt</button>
             <button class="btn bad" type="button" data-act="del">Delete</button>
           </div>
         </div>
-      `).join("") : `<div class="mini">No orders yet. Place an order to see it here.</div>`;
+      `).join("") : `<div class="mini">No orders found.</div>`;
 
       elOrders.querySelectorAll(".order").forEach(card => {
         const oid = card.dataset.oid;
@@ -755,6 +1208,7 @@
             if(act === "next") advanceStatus(oid, +1);
             if(act === "prev") advanceStatus(oid, -1);
             if(act === "del") deleteOrder(oid);
+            if(act === "receipt") showReceiptForOrder(oid);
           });
         });
       });
@@ -768,20 +1222,21 @@
 
       if(mode === "kitchen") list = list.filter(o => o.status === "new" || o.status === "progress");
       if(mode === "ready") list = list.filter(o => o.status === "ready");
-      // all = no filter
 
       elKOrders.innerHTML = list.length ? list.map(o => `
         <div class="order" data-oid="${o.oid}">
           <div class="order-top">
             <div>
-              <div class="oid">#${o.oid} • ${o.type}${o.customer ? " • " + o.customer : ""}</div>
+              <div class="oid">#${o.oid} • ${o.type}${o.customer ? " • " + escapeHtml(o.customer) : ""}</div>
               <div class="mini">Placed: ${o.time}</div>
             </div>
             ${statusBadge(o.status)}
           </div>
 
           <ul class="olist">
-            ${o.items.map(i=>`<li><strong>${i.qty}×</strong> ${i.name}</li>`).join("")}
+            ${o.items.map(i=>`
+              <li><strong>${i.qty}×</strong> ${escapeHtml(i.name)} ${i.note ? `<span class="mini">(${escapeHtml(i.note)})</span>` : ""}</li>
+            `).join("")}
           </ul>
 
           <div class="order-actions">
@@ -803,74 +1258,186 @@
       });
     }
 
-    // ---------- ACTIONS ----------
-    function addToCart(id, delta){
-      cart[id] = (cart[id] || 0) + delta;
-      if(cart[id] <= 0) delete cart[id];
-      renderCart();
+    // ------------------ RECEIPTS (PRINT WINDOW) ------------------
+    function buildOrderReceiptText(o){
+      const p = o.pricing;
+      const lines = [];
+      lines.push("ORDER RECEIPT (DEMO ONLY)");
+      lines.push("--------------------------------");
+      lines.push(`Order #: ${o.oid}`);
+      lines.push(`Type:    ${o.type}`);
+      if(o.customer) lines.push(`Note:    ${o.customer}`);
+      lines.push(`Time:    ${o.time}`);
+      lines.push("--------------------------------");
+      for(const it of o.items){
+        lines.push(`${String(it.qty).padStart(2," ")} x ${it.name}`);
+        if(it.mods && it.mods.length) lines.push("     " + it.mods.join(", "));
+        if(it.note) lines.push("     Note: " + it.note);
+        lines.push(`     @ ${money(it.unit)}`);
+      }
+      lines.push("--------------------------------");
+      lines.push(`Subtotal: ${money(p.subtotal)}`);
+      if(p.discAmt || p.discPct) lines.push(`Discount: -${money(p.discount)}`);
+      lines.push(`Tax (${p.taxPct.toFixed(2)}%): ${money(p.tax)}`);
+      if(p.feeAmt) lines.push(`Fee:      ${money(p.fee)}`);
+      lines.push("--------------------------------");
+      lines.push(`TOTAL:    ${money(p.total)}`);
+      lines.push("--------------------------------");
+      lines.push("DEMO ONLY • NOT A REAL ORDER");
+      return lines.join("\n");
     }
 
-    function clearCart(){
-      cart = {};
-      elCustomer.value = "";
-      renderCart();
-    }
-
-    function placeOrder(){
-      const {lines, subtotal, tax, total} = calcCart();
-      if(!lines.length) return;
-
-      const oid = uid();
-      const order = {
-        oid,
-        type: elOrderType.value,
-        customer: elCustomer.value.trim(),
-        status: "new",
-        time: nowTime(),
-        createdAt: Date.now(),
-        subtotal,
-        tax,
-        total,
-        items: lines.map(l => ({id:l.item.id, name:l.item.name, qty:l.qty, price:l.item.price}))
-      };
-
-      orders.push(order);
-      saveOrders();
-      clearCart();
-      renderQueue();
-    }
-
-    function advanceStatus(oid, dir){
+    function showReceiptForOrder(oid){
       const o = orders.find(x => x.oid === oid);
       if(!o) return;
-      const flow = ["new","progress","ready","done"];
-      let idx = flow.indexOf(o.status);
-      idx = Math.max(0, Math.min(flow.length-1, idx + dir));
-      o.status = flow[idx];
-      saveOrders();
+      const text = buildOrderReceiptText(o);
+      openPrintWindow(text);
+    }
+
+    function openPrintWindow(text){
+      const w = window.open("", "_blank", "width=520,height=700");
+      if(!w){ alert("Popup blocked. Allow popups to print the receipt."); return; }
+      w.document.write(`
+        <html><head><title>Receipt</title>
+        <style>
+          body{font-family: ui-monospace, Menlo, Consolas, monospace; padding:16px; white-space:pre-wrap;}
+          .note{margin-top:12px; color:#444; font-family: system-ui, Arial;}
+          button{padding:10px 12px; margin-top:12px; cursor:pointer;}
+        </style>
+        </head><body>
+        ${escapeHtml(text)}
+        <div class="note">DEMO ONLY — TESTING ONLY</div>
+        <button onclick="window.print()">Print</button>
+        </body></html>
+      `);
+      w.document.close();
+    }
+
+    // Receipt for current cart
+    function receiptForCart(){
+      const {lines, subtotal, tax, fee, discount, total} = calcCart();
+      if(!lines.length){ alert("Cart is empty."); return; }
+      const linesOut = [];
+      linesOut.push("CURRENT CART RECEIPT (DEMO)");
+      linesOut.push("--------------------------------");
+      linesOut.push(`Type: ${elOrderType.value}`);
+      if(elCustomer.value.trim()) linesOut.push(`Note: ${elCustomer.value.trim()}`);
+      linesOut.push("--------------------------------");
+      for(const it of lines){
+        linesOut.push(`${String(it.qty).padStart(2," ")} x ${it.name}`);
+        if(it.mods && it.mods.length) linesOut.push("     " + it.mods.join(", "));
+        if(it.note) linesOut.push("     Note: " + it.note);
+        linesOut.push(`     @ ${money(it.unit)}`);
+      }
+      linesOut.push("--------------------------------");
+      linesOut.push(`Subtotal: ${money(subtotal)}`);
+      linesOut.push(`Discount: -${money(discount)}`);
+      linesOut.push(`Tax (${Number(settings.taxPct||0).toFixed(2)}%): ${money(tax)}`);
+      linesOut.push(`Fee: ${money(fee)}`);
+      linesOut.push("--------------------------------");
+      linesOut.push(`TOTAL: ${money(total)}`);
+      linesOut.push("--------------------------------");
+      linesOut.push("DEMO ONLY • NOT REAL");
+      openPrintWindow(linesOut.join("\n"));
+    }
+
+    // ------------------ SETTINGS ------------------
+    function loadSettingsIntoUI(){
+      taxPct.value = Number(settings.taxPct||0).toFixed(2);
+      feeAmt.value = Number(settings.feeAmt||0).toFixed(2);
+      discAmt.value = Number(settings.discAmt||0).toFixed(2);
+      discPct.value = Number(settings.discPct||0).toFixed(2);
+      dingOn.checked = !!settings.dingOn;
+      pauseOrders.checked = !!settings.pauseOrders;
+      elPlace.disabled = calcCart().lines.length === 0 || !!settings.pauseOrders;
+    }
+
+    function saveSettingsFromUI(){
+      settings.taxPct = clampNum(taxPct.value, 0, 25);
+      settings.feeAmt = clampNum(feeAmt.value, 0, 9999);
+      settings.discAmt = clampNum(discAmt.value, 0, 9999);
+      settings.discPct = clampNum(discPct.value, 0, 100);
+      settings.dingOn = !!dingOn.checked;
+      settings.pauseOrders = !!pauseOrders.checked;
+
+      saveJson(STORE.settings, settings);
+      settingsPill.textContent = "Saved";
+      renderCart();
       renderQueue();
     }
 
-    function deleteOrder(oid){
-      orders = orders.filter(o => o.oid !== oid);
-      saveOrders();
-      renderQueue();
+    function clampNum(v, min, max){
+      const n = Number(v);
+      if(Number.isNaN(n)) return min;
+      return Math.max(min, Math.min(max, n));
     }
 
-    function clearCompleted(){
-      orders = orders.filter(o => o.status !== "done");
-      saveOrders();
-      renderQueue();
+    resetSettings.addEventListener("click", () => {
+      settings = { taxPct: 8.00, feeAmt: 0.00, discAmt: 0.00, discPct: 0.00, dingOn: true, pauseOrders: false };
+      saveJson(STORE.settings, settings);
+      loadSettingsIntoUI();
+      renderCart();
+    });
+
+    saveSettings.addEventListener("click", saveSettingsFromUI);
+
+    // ------------------ EXPORT / IMPORT ------------------
+    function openDataModal(){
+      dataBg.style.display = "flex";
+      dataBg.setAttribute("aria-hidden", "false");
+    }
+    function closeDataModal(){
+      dataBg.style.display = "none";
+      dataBg.setAttribute("aria-hidden", "true");
+    }
+    exportBtn.addEventListener("click", () => { openDataModal(); fillExport(); });
+    importBtn.addEventListener("click", () => { openDataModal(); dataBox.value = ""; });
+
+    dataClose.addEventListener("click", closeDataModal);
+    dataBg.addEventListener("click", (e) => { if(e.target === dataBg) closeDataModal(); });
+
+    function fillExport(){
+      const blob = {
+        demo: true,
+        version: 3,
+        exportedAt: new Date().toISOString(),
+        orders,
+        cart,
+        settings,
+        orderCounter
+      };
+      dataBox.value = JSON.stringify(blob, null, 2);
     }
 
-    function wipeAll(){
-      if(!confirm("Reset demo? This clears ALL saved orders in this browser.")) return;
-      localStorage.removeItem(STORAGE_KEY);
-      orders = [];
-      clearCart();
-      renderQueue();
-    }
+    doExport.addEventListener("click", fillExport);
 
+    doImport.addEventListener("click", () => {
+      const raw = dataBox.value.trim();
+      if(!raw){ alert("Paste JSON to import."); return; }
+      if(!confirm("Import will REPLACE your current saved demo data. Continue?")) return;
+      try{
+        const blob = JSON.parse(raw);
+        if(!blob || typeof blob !== "object") throw new Error("Invalid");
+        orders = Array.isArray(blob.orders) ? blob.orders : [];
+        cart = Array.isArray(blob.cart) ? blob.cart : [];
+        settings = blob.settings && typeof blob.settings === "object" ? blob.settings : settings;
+        orderCounter = Number(blob.orderCounter || orderCounter);
+
+        saveJson(STORE.orders, orders);
+        saveJson(STORE.cart, cart);
+        saveJson(STORE.settings, settings);
+        saveJson(STORE.counter, orderCounter);
+
+        loadSettingsIntoUI();
+        renderCart();
+        renderQueue();
+        closeDataModal();
+      }catch(e){
+        alert("Import failed: invalid JSON.");
+      }
+    });
+
+    // ------------------ VIEW TOGGLE ------------------
     function setView(mode){
       if(mode === "pos"){
         elViewPOS.classList.add("active");
@@ -888,28 +1455,64 @@
       }
     }
 
-    // ---------- WIRES ----------
+    // ------------------ WIRES ------------------
     elMenuSearch.addEventListener("input", () => {
       menuSearch = elMenuSearch.value;
       renderMenu();
     });
 
     elPlace.addEventListener("click", placeOrder);
-    elClearCart.addEventListener("click", clearCart);
+
+    elClearCart.addEventListener("click", () => {
+      cart = [];
+      saveJson(STORE.cart, cart);
+      renderCart();
+    });
+
+    elPrint.addEventListener("click", receiptForCart);
+
     elFilterStatus.addEventListener("change", renderQueue);
+    elOrderSearch.addEventListener("input", renderQueue);
     elClearDone.addEventListener("click", clearCompleted);
-    elWipeAll.addEventListener("click", wipeAll);
+
+    elWipeAll.addEventListener("click", () => {
+      if(!confirm("Reset demo? This clears saved orders, cart, settings, and counters.")) return;
+      Object.values(STORE).forEach(k => localStorage.removeItem(k));
+      cart = [];
+      orders = [];
+      orderCounter = 1000;
+      settings = { taxPct: 8.00, feeAmt: 0.00, discAmt: 0.00, discPct: 0.00, dingOn: true, pauseOrders: false };
+      loadSettingsIntoUI();
+      renderMenu();
+      renderCart();
+      renderQueue();
+      setView("pos");
+    });
 
     elViewPOS.addEventListener("click", () => setView("pos"));
     elViewKitchen.addEventListener("click", () => setView("kitchen"));
     elKFilter.addEventListener("change", renderKitchen);
 
-    // ---------- INIT ----------
+    // ------------------ INIT ------------------
+    loadSettingsIntoUI();
     renderCats();
     renderMenu();
     renderCart();
     renderQueue();
     setView("pos");
+
+    // Persist customer/orderType too (small “cool” save)
+    // (Optional: you can remove this if you don’t want it.)
+    const uiKey = "pos_demo_ui_v1";
+    const ui = loadJson(uiKey, { orderType:"Dine-In", customer:"" });
+    elOrderType.value = ui.orderType || "Dine-In";
+    elCustomer.value = ui.customer || "";
+    function saveUI(){
+      saveJson(uiKey, { orderType: elOrderType.value, customer: elCustomer.value });
+    }
+    elOrderType.addEventListener("change", saveUI);
+    elCustomer.addEventListener("input", saveUI);
+
   </script>
 </body>
 </html>
