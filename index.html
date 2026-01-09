@@ -1,567 +1,915 @@
 <link rel="icon" href="favicon_bricklogo.png" type="image/png">
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Job Application (TESTING ONLY)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Order Manager (DEMO ONLY)</title>
   <style>
     :root{
       --bg:#070a10;
-      --card:#0f172a;
-      --muted:#93a4bf;
+      --panel:#0f172a;
+      --panel2:#0b1223;
       --text:#e5e7eb;
-      --border:#223149;
+      --muted:#93a4bf;
+      --border:#24324a;
       --accent:#60a5fa;
-      --accent2:#34d399;
-      --bad:#fb7185;
+      --good:#34d399;
       --warn:#fbbf24;
+      --bad:#fb7185;
+      --chip: rgba(255,255,255,.03);
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --radius:16px;
     }
     *{box-sizing:border-box}
+    html{overflow-y:scroll}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background: radial-gradient(1000px 700px at 15% 0%, #12224a 0%, var(--bg) 60%);
       color:var(--text);
       min-height:100vh;
+    }
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(7,10,16,.88), rgba(7,10,16,.65));
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .topbar-inner{
+      max-width: 1200px;
+      margin:0 auto;
+      padding: 12px 16px;
       display:flex;
+      gap:12px;
       align-items:center;
-      justify-content:center;
-      padding:24px;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
-    .wrap{width:min(1100px, 100%); display:grid; gap:16px;}
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .dot{
+      width:12px; height:12px; border-radius:50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(96,165,250,.15);
+    }
+    .sub{
+      color:var(--muted); font-weight:600; font-size:12px;
+      border:1px solid rgba(255,255,255,.10);
+      padding:6px 10px; border-radius:999px;
+      background: rgba(255,255,255,.02);
+    }
     .banner{
-      border:1px solid rgba(251,191,36,.35);
-      background: linear-gradient(180deg, rgba(251,191,36,.15), rgba(251,191,36,.06));
-      border-radius:16px;
-      padding:14px 16px;
-      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+      max-width: 1200px;
+      margin: 12px auto 0;
+      padding: 0 16px;
     }
-    .banner strong{color:var(--warn)}
+    .banner > div{
+      border:1px solid rgba(251,191,36,.35);
+      background: linear-gradient(180deg, rgba(251,191,36,.14), rgba(251,191,36,.06));
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      color: #ffe8a3;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin: 12px auto 30px;
+      padding: 0 16px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .wrap{grid-template-columns: 1fr; }
+      .right{position:static}
+    }
+
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
       border:1px solid var(--border);
-      border-radius:16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow:hidden;
-      box-shadow: 0 18px 45px rgba(0,0,0,.4);
     }
-    header{padding:18px 18px 8px;}
-    h1{margin:0 0 6px; font-size:24px; letter-spacing:.2px;}
-    p{margin:0; color:var(--muted); line-height:1.5; font-size:14px;}
-    form{
-      padding:18px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
+    .card-h{
+      padding: 14px 14px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: rgba(255,255,255,.02);
+      flex-wrap:wrap;
     }
-    .full{grid-column:1/-1}
-    .section{
-      grid-column: 1/-1;
-      border-top: 1px solid rgba(255,255,255,.06);
-      padding-top: 12px;
-      margin-top: 4px;
-    }
-    .section h2{
-      margin:0 0 6px;
+    .card-h h2{
+      margin:0;
       font-size:14px;
-      letter-spacing:.3px;
+      letter-spacing:.35px;
       text-transform:uppercase;
       color:#cfe1ff;
     }
-    .section p{font-size:13px}
-    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px;}
-    input, select, textarea{
-      width:100%;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background: rgba(15,23,42,.65);
-      color:var(--text);
-      outline:none;
-      transition: .15s ease;
+    .tools{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
     }
-    input:focus, select:focus, textarea:focus{
+    input[type="search"], select, input[type="text"]{
+      padding: 10px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,23,42,.60);
+      color: var(--text);
+      outline:none;
+    }
+    input[type="search"]:focus, select:focus, input[type="text"]:focus{
       border-color: rgba(96,165,250,.9);
       box-shadow: 0 0 0 4px rgba(96,165,250,.15);
     }
-    textarea{min-height:110px; resize:vertical}
-    .hint{font-size:12px; color:var(--muted); margin-top:8px;}
-    .row{
+    .seg{
       display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      border-radius: 12px;
+      overflow:hidden;
     }
-    .chips{
+    .seg button{
+      border:0; background:transparent; color:var(--muted);
+      padding:10px 12px; cursor:pointer; font-weight:700;
+    }
+    .seg button.active{
+      color:#06101f;
+      background: var(--accent);
+    }
+    .btn{
+      border:0; cursor:pointer; font-weight:800;
+      background: var(--accent);
+      color:#06101f;
+      padding:10px 12px;
+      border-radius: 12px;
+    }
+    .btn.secondary{
+      background: transparent;
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .btn.bad{
+      background: rgba(251,113,133,.95);
+      color:#22040a;
+    }
+    .btn.good{
+      background: rgba(52,211,153,.95);
+      color:#02140c;
+    }
+    .btn:disabled{
+      opacity:.55; cursor:not-allowed;
+    }
+
+    /* MENU GRID */
+    .menu{
+      padding: 14px;
+    }
+    .cats{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .chip{
+      background: var(--chip);
+      border:1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      font-weight:800;
+    }
+    .chip.active{
+      border-color: rgba(96,165,250,.55);
+      color:#cfe1ff;
+      box-shadow: 0 0 0 3px rgba(96,165,250,.12);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: repeat(2, 1fr);}
+    }
+    @media (max-width: 520px){
+      .grid{grid-template-columns: 1fr;}
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      background: rgba(11,18,35,.55);
+      padding: 12px;
+      cursor:pointer;
+      transition: .12s ease;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-height:110px;
+    }
+    .item:hover{
+      transform: translateY(-1px);
+      border-color: rgba(96,165,250,.40);
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+    .item .t{
+      display:flex; justify-content:space-between; gap:10px;
+      align-items:flex-start;
+    }
+    .name{font-weight:900}
+    .price{color:#cfe1ff; font-weight:900}
+    .desc{color:var(--muted); font-size:12px; line-height:1.35}
+    .tagrow{display:flex; gap:6px; flex-wrap:wrap; margin-top:auto}
+    .tag{
+      font-size:11px;
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      background: rgba(255,255,255,.02);
+    }
+
+    /* RIGHT SIDE */
+    .right{
+      position: sticky;
+      top: 74px;
+      display:grid;
+      gap:14px;
+      align-self:start;
+    }
+    @media (max-width: 980px){
+      .right{position:static; top:auto;}
+    }
+
+    /* CART */
+    .cart{
+      padding: 12px 14px 14px;
+    }
+    .cart-top{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    @media (max-width: 520px){
+      .cart-top{grid-template-columns: 1fr;}
+    }
+    .cartlist{
+      display:grid;
+      gap:8px;
+      max-height: 300px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .line{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(11,18,35,.55);
+      border-radius: 14px;
+      padding: 10px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:8px;
+      align-items:center;
+    }
+    .line .meta{display:flex; flex-direction:column; gap:2px;}
+    .line .meta .n{font-weight:900}
+    .line .meta .s{font-size:12px; color:var(--muted)}
+    .qty{
+      display:flex; align-items:center; gap:6px;
+    }
+    .qty button{
+      width:34px; height:34px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.02);
+      color: var(--text);
+      cursor:pointer;
+      font-weight:900;
+    }
+    .qty input{
+      width:52px;
+      text-align:center;
+      padding:10px 8px;
+      border-radius: 10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,23,42,.60);
+      color: var(--text);
+    }
+    .sum{
+      margin-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding-top: 10px;
+      display:grid;
+      gap:6px;
+      font-size:13px;
+      color: var(--muted);
+    }
+    .sum .r{display:flex; justify-content:space-between; gap:10px;}
+    .sum .total{
+      color: var(--text);
+      font-weight:900;
+      font-size:14px;
+      margin-top: 2px;
+    }
+    .cart-actions{
+      margin-top: 12px;
       display:flex;
       gap:8px;
       flex-wrap:wrap;
-      margin-top:8px;
+      justify-content:flex-end;
     }
-    .chip{
-      font-size:12px;
-      border:1px solid rgba(255,255,255,.08);
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.02);
-      user-select:none;
+
+    /* QUEUE */
+    .queue{
+      padding: 14px;
     }
-    .status{
+    .qtools{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+      margin-bottom: 10px;
+    }
+    .orders{
+      display:grid;
+      gap:10px;
+      max-height: 520px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .order{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(11,18,35,.55);
+      border-radius: 16px;
+      padding: 12px;
+      display:grid;
+      gap:10px;
+    }
+    .order-top{
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .oid{
+      font-weight:1000; letter-spacing:.4px;
+    }
+    .mini{
+      font-size:12px; color: var(--muted);
+    }
+    .badge{
       font-size:12px;
       padding:6px 10px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.02);
-      color:var(--muted);
+      color: var(--muted);
+      font-weight:900;
     }
-    .status.good{border-color: rgba(52,211,153,.35); color: var(--accent2)}
-    .status.bad{border-color: rgba(251,113,133,.35); color: var(--bad)}
-    .status.warn{border-color: rgba(251,191,36,.35); color: var(--warn)}
-    .actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
-    button{
-      border:0;
-      padding:12px 14px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:700;
-      color:#06101f;
-      background: var(--accent);
-      transition:.15s ease;
-    }
-    button:hover{filter:brightness(1.05)}
-    button.secondary{
-      background: transparent;
-      color: var(--text);
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .error{display:none; margin-top:8px; font-size:12px; color: var(--bad);}
-    .show{display:block}
-    .req::after{content:" *"; color: var(--bad)}
-    .tiny{font-size:12px; color:var(--muted); padding:0 18px 18px;}
-    .inline2{
+    .b-new{border-color: rgba(96,165,250,.35); color:#cfe1ff;}
+    .b-prog{border-color: rgba(251,191,36,.35); color: #ffe8a3;}
+    .b-ready{border-color: rgba(52,211,153,.35); color: #b7ffe3;}
+    .b-done{border-color: rgba(148,163,184,.30); color: var(--muted);}
+    .olist{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
+      gap:6px;
+      padding-left: 14px;
+      margin:0;
+      color: var(--text);
+      font-size:13px;
     }
-    @media (max-width: 860px){
-      form{grid-template-columns:1fr}
-      .inline2{grid-template-columns:1fr}
+    .order-actions{
+      display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding-top: 10px;
+    }
+
+    .footer-note{
+      max-width:1200px;
+      margin: 0 auto 30px;
+      padding: 0 16px;
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.45;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="banner" role="alert" aria-live="polite">
-      <strong>DO NOT APPLY — TESTING ONLY.</strong>
-      <div style="margin-top:6px;color:var(--muted);font-size:13px;line-height:1.4;">
-        This form is a demo UI and does not submit to any employer. It auto-saves text locally on this device.
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>Fast-Food Order Manager</span>
+        <span class="sub">DEMO</span>
       </div>
-    </div>
-
-    <div class="card">
-      <header>
-        <h1>Job Application (Testing Form)</h1>
-        <p>Complete the fields below. Required fields are marked with <span style="color:#fb7185">*</span>.</p>
-      </header>
-
-      <form id="appForm" novalidate>
-        <!-- PERSONAL INFO -->
-        <div class="section">
-          <h2>Applicant Information</h2>
-          <p>Please provide accurate contact information.</p>
+      <div class="tools">
+        <input id="menuSearch" type="search" placeholder="Search menu…" />
+        <div class="seg" title="View mode">
+          <button id="viewPOS" class="active" type="button">POS</button>
+          <button id="viewKitchen" type="button">Kitchen</button>
         </div>
-
-        <div>
-          <label class="req" for="firstName">First Name</label>
-          <input id="firstName" name="firstName" autocomplete="given-name" required />
-          <div class="error" data-err="firstName">Please enter your first name.</div>
-        </div>
-
-        <div>
-          <label class="req" for="lastName">Last Name</label>
-          <input id="lastName" name="lastName" autocomplete="family-name" required />
-          <div class="error" data-err="lastName">Please enter your last name.</div>
-        </div>
-
-        <div>
-          <label class="req" for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" required />
-          <div class="error" data-err="email">Enter a valid email (example@domain.com).</div>
-        </div>
-
-        <div>
-          <label class="req" for="phone">Phone</label>
-          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(555) 123-4567" required />
-          <div class="error" data-err="phone">Please enter your phone number.</div>
-        </div>
-
-        <div class="inline2 full">
-          <div>
-            <label for="address1">Street Address</label>
-            <input id="address1" name="address1" autocomplete="address-line1" />
-          </div>
-          <div>
-            <label for="address2">Apt/Suite (optional)</label>
-            <input id="address2" name="address2" autocomplete="address-line2" />
-          </div>
-        </div>
-
-        <div>
-          <label for="city">City</label>
-          <input id="city" name="city" autocomplete="address-level2" />
-        </div>
-
-        <div class="inline2">
-          <div>
-            <label for="state">State</label>
-            <input id="state" name="state" autocomplete="address-level1" placeholder="NY" />
-          </div>
-          <div>
-            <label for="zip">ZIP</label>
-            <input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" />
-          </div>
-        </div>
-
-        <!-- ROLE -->
-        <div class="section">
-          <h2>Position & Availability</h2>
-          <p>Tell us what you’re applying for and when you can work.</p>
-        </div>
-
-        <div>
-          <label class="req" for="position">Position Applying For</label>
-          <select id="position" name="position" required>
-            <option value="">Select a position…</option>
-            <option>Customer Service Representative</option>
-            <option>Retail Sales Associate</option>
-            <option>Cashier</option>
-            <option>Team Member</option>
-            <option>Shift Lead</option>
-            <option>Intern</option>
-            <option>Other</option>
-          </select>
-          <div class="error" data-err="position">Please pick a position.</div>
-        </div>
-
-        <div>
-          <label for="employmentType">Employment Type</label>
-          <select id="employmentType" name="employmentType">
-            <option value="">Select…</option>
-            <option>Full-time</option>
-            <option>Part-time</option>
-            <option>Seasonal/Temporary</option>
-            <option>Internship</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="startDate">Earliest Start Date</label>
-          <input id="startDate" name="startDate" type="date" />
-        </div>
-
-        <div>
-          <label for="availability">General Availability</label>
-          <select id="availability" name="availability">
-            <option value="">Select…</option>
-            <option>Weekdays</option>
-            <option>Weekends</option>
-            <option>Evenings</option>
-            <option>Overnights</option>
-            <option>Flexible</option>
-          </select>
-        </div>
-
-        <div class="full">
-          <label for="schedule">Schedule Notes (optional)</label>
-          <textarea id="schedule" name="schedule" placeholder="Ex: Available after 3pm on weekdays, any time on weekends."></textarea>
-        </div>
-
-        <div>
-          <label for="desiredPay">Desired Pay (optional)</label>
-          <input id="desiredPay" name="desiredPay" placeholder="$15/hr or $40,000/yr" />
-        </div>
-
-        <div>
-          <label for="workAuth">Work Authorization (optional)</label>
-          <select id="workAuth" name="workAuth">
-            <option value="">Select…</option>
-            <option>Authorized to work</option>
-            <option>Will need sponsorship</option>
-            <option>Prefer not to say</option>
-          </select>
-        </div>
-
-        <!-- EXPERIENCE -->
-        <div class="section">
-          <h2>Experience</h2>
-          <p>Share your most relevant experience and strengths.</p>
-        </div>
-
-        <div>
-          <label class="req" for="yearsExp">Years of Relevant Experience</label>
-          <select id="yearsExp" name="yearsExp" required>
-            <option value="">Select…</option>
-            <option>0 (Entry level)</option>
-            <option>1–2 years</option>
-            <option>3–5 years</option>
-            <option>6–10 years</option>
-            <option>10+ years</option>
-          </select>
-          <div class="error" data-err="yearsExp">Please select years of experience.</div>
-        </div>
-
-        <div>
-          <label for="prevEmployer">Most Recent Employer (optional)</label>
-          <input id="prevEmployer" name="prevEmployer" placeholder="Company name" />
-        </div>
-
-        <div class="full">
-          <label class="req" for="experience">Work Experience / Skills Summary</label>
-          <textarea id="experience" name="experience" required placeholder="Describe your experience, key skills, and tools you’ve used."></textarea>
-          <div class="error" data-err="experience">Please write a short summary of your experience/skills.</div>
-
-          <div class="chips" aria-hidden="true">
-            <span class="chip">Communication</span>
-            <span class="chip">Teamwork</span>
-            <span class="chip">Problem-solving</span>
-            <span class="chip">Customer service</span>
-            <span class="chip">Reliability</span>
-          </div>
-        </div>
-
-        <div class="full">
-          <label for="achievement">Top Achievement (optional)</label>
-          <textarea id="achievement" name="achievement" placeholder="Example: Improved customer satisfaction, led a project, hit sales goals, etc."></textarea>
-        </div>
-
-        <!-- PROFESSIONAL QUESTIONS -->
-        <div class="section">
-          <h2>Professional Questions</h2>
-          <p>These are typical screening questions used by employers.</p>
-        </div>
-
-        <div class="full">
-          <label class="req" for="whyRole">Why are you interested in this position?</label>
-          <textarea id="whyRole" name="whyRole" required placeholder="Explain why you want this role and what stands out to you."></textarea>
-          <div class="error" data-err="whyRole">Please answer why you’re interested in the position.</div>
-        </div>
-
-        <div class="full">
-          <label class="req" for="strengths">What are your top strengths for this role?</label>
-          <textarea id="strengths" name="strengths" required placeholder="List 2–4 strengths and how they help you do great work."></textarea>
-          <div class="error" data-err="strengths">Please list your strengths.</div>
-        </div>
-
-        <div class="full">
-          <label for="improvement">What is one area you’re working to improve? (optional)</label>
-          <textarea id="improvement" name="improvement" placeholder="Keep it honest + professional. Example: public speaking, time management, etc."></textarea>
-        </div>
-
-        <div class="full">
-          <label class="req" for="scenario1">Scenario: A customer is upset and raising their voice. What do you do?</label>
-          <textarea id="scenario1" name="scenario1" required placeholder="Explain your step-by-step approach."></textarea>
-          <div class="error" data-err="scenario1">Please answer the scenario question.</div>
-        </div>
-
-        <div class="full">
-          <label class="req" for="scenario2">Scenario: You notice a teammate breaking a rule or causing a problem. What do you do?</label>
-          <textarea id="scenario2" name="scenario2" required placeholder="Explain how you handle it respectfully and correctly."></textarea>
-          <div class="error" data-err="scenario2">Please answer the scenario question.</div>
-        </div>
-
-        <div class="full">
-          <label for="reference">Professional Reference (optional)</label>
-          <textarea id="reference" name="reference" placeholder="Name, relationship, phone/email (if allowed)."></textarea>
-        </div>
-
-        <!-- EDUCATION -->
-        <div class="section">
-          <h2>Education</h2>
-          <p>Provide education and certifications if applicable.</p>
-        </div>
-
-        <div class="full">
-          <label for="education">Education (optional)</label>
-          <textarea id="education" name="education" placeholder="School, degree, certifications, courses, etc."></textarea>
-        </div>
-
-        <!-- DOCUMENTS -->
-        <div class="section">
-          <h2>Documents</h2>
-          <p>Optional: attach documents (demo only).</p>
-        </div>
-
-        <div class="full">
-          <label for="resume">Resume (PDF/DOC) (optional)</label>
-          <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx" />
-          <div class="hint">Demo only: this file will not upload anywhere unless you connect a backend.</div>
-        </div>
-
-        <!-- CONSENT -->
-        <div class="section">
-          <h2>Confirmation</h2>
-          <p>Please acknowledge before submitting.</p>
-        </div>
-
-        <div class="full">
-          <label class="req">
-            <input type="checkbox" id="confirm" name="confirm" style="width:auto; margin-right:10px;" required />
-            I understand this is <strong style="color:#fbbf24;">DO NOT APPLY — TESTING ONLY</strong> and not a real application submission.
-          </label>
-          <div class="error" data-err="confirm">You must confirm this is testing only.</div>
-        </div>
-
-        <div class="full row">
-          <div class="row" style="gap:8px;">
-            <span id="saveStatus" class="status warn">Testing mode</span>
-            <span class="hint">Auto-save is on (local device).</span>
-          </div>
-          <div class="actions">
-            <button type="button" class="secondary" id="clearBtn">Clear</button>
-            <button type="submit" id="submitBtn">Submit (Demo)</button>
-          </div>
-        </div>
-      </form>
-
-      <div class="tiny">
-        Note: This page stores text fields in your browser’s localStorage for convenience. It does not send information anywhere by itself.
+        <button id="wipeAll" class="btn secondary" type="button">Reset Demo</button>
       </div>
     </div>
   </div>
 
+  <div class="banner">
+    <div>DO NOT APPLY — TESTING ONLY / DEMO ONLY. This does not place real orders.</div>
+  </div>
+
+  <main class="wrap">
+    <!-- LEFT: MENU -->
+    <section class="card" id="posPanel">
+      <div class="card-h">
+        <h2>Menu</h2>
+        <div class="tools">
+          <span class="sub" id="menuCount">0 items</span>
+        </div>
+      </div>
+
+      <div class="menu">
+        <div class="cats" id="cats"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: CART + QUEUE -->
+    <aside class="right" id="posRight">
+      <section class="card">
+        <div class="card-h">
+          <h2>Current Order</h2>
+          <div class="tools">
+            <span class="sub" id="cartCount">0 items</span>
+          </div>
+        </div>
+
+        <div class="cart">
+          <div class="cart-top">
+            <div>
+              <label class="mini" for="orderType">Order Type</label>
+              <select id="orderType">
+                <option>Dine-In</option>
+                <option>Takeout</option>
+                <option>Drive-Thru</option>
+              </select>
+            </div>
+            <div>
+              <label class="mini" for="customerName">Customer Name (optional)</label>
+              <input id="customerName" type="text" placeholder="e.g., Alex" />
+            </div>
+          </div>
+
+          <div class="cartlist" id="cartlist"></div>
+
+          <div class="sum" id="summary">
+            <div class="r"><span>Subtotal</span><span id="sub">$0.00</span></div>
+            <div class="r"><span>Tax (8%)</span><span id="tax">$0.00</span></div>
+            <div class="r total"><span>Total</span><span id="total">$0.00</span></div>
+          </div>
+
+          <div class="cart-actions">
+            <button class="btn secondary" id="clearCart" type="button">Clear</button>
+            <button class="btn" id="placeOrder" type="button" disabled>Place Order</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h">
+          <h2>Order Queue</h2>
+          <div class="tools">
+            <span class="sub" id="queueCount">0</span>
+          </div>
+        </div>
+
+        <div class="queue">
+          <div class="qtools">
+            <select id="filterStatus">
+              <option value="all">All statuses</option>
+              <option value="new">New</option>
+              <option value="progress">In Progress</option>
+              <option value="ready">Ready</option>
+              <option value="done">Completed</option>
+            </select>
+            <button class="btn secondary" id="clearDone" type="button">Clear Completed</button>
+          </div>
+
+          <div class="orders" id="orders"></div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- KITCHEN VIEW (same data, different layout) -->
+    <section class="card" id="kitchenPanel" style="display:none;">
+      <div class="card-h">
+        <h2>Kitchen Display</h2>
+        <div class="tools">
+          <span class="sub">Focus: New / In Progress</span>
+        </div>
+      </div>
+      <div class="queue">
+        <div class="qtools">
+          <select id="kFilter">
+            <option value="kitchen">Kitchen (New + In Progress)</option>
+            <option value="ready">Ready only</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div class="orders" id="kOrders" style="max-height: calc(100vh - 220px);"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer-note">
+    <strong>Demo note:</strong> Everything is stored in your browser (localStorage). No network calls. “Reset Demo” wipes saved orders.
+  </div>
+
   <script>
-    const form = document.getElementById("appForm");
-    const saveStatus = document.getElementById("saveStatus");
-    const clearBtn = document.getElementById("clearBtn");
-    const STORAGE_KEY = "jobApplicationDraft_ADV_v1";
+    // ---------- DEMO DATA ----------
+    const MENU = [
+      {id:"b1", cat:"Burgers", name:"Classic Burger", price:4.99, desc:"Beef patty, lettuce, pickles, sauce.", tags:["Popular"]},
+      {id:"b2", cat:"Burgers", name:"Cheeseburger", price:5.49, desc:"Classic burger + cheese.", tags:["Cheesy"]},
+      {id:"b3", cat:"Burgers", name:"Double Burger", price:6.99, desc:"Two patties for extra hunger.", tags:["Big"]},
+      {id:"c1", cat:"Chicken", name:"Crispy Chicken Sandwich", price:5.99, desc:"Crispy chicken, mayo, pickles.", tags:["Crispy"]},
+      {id:"c2", cat:"Chicken", name:"Chicken Nuggets (6pc)", price:4.49, desc:"6 nuggets with a dipping sauce.", tags:["Snack"]},
+      {id:"f1", cat:"Fries", name:"Small Fries", price:2.19, desc:"Golden fries, lightly salted.", tags:["Side"]},
+      {id:"f2", cat:"Fries", name:"Medium Fries", price:2.79, desc:"More fries, more happy.", tags:["Side"]},
+      {id:"f3", cat:"Fries", name:"Large Fries", price:3.39, desc:"For serious fry fans.", tags:["Side"]},
+      {id:"d1", cat:"Drinks", name:"Soft Drink (Small)", price:1.79, desc:"Choose your flavor (demo).", tags:["Cold"]},
+      {id:"d2", cat:"Drinks", name:"Soft Drink (Large)", price:2.39, desc:"Big cup, big sip.", tags:["Cold"]},
+      {id:"d3", cat:"Drinks", name:"Iced Coffee", price:2.99, desc:"Sweet, smooth, chilled.", tags:["Caffeine"]},
+      {id:"s1", cat:"Desserts", name:"Ice Cream Cone", price:1.69, desc:"Classic soft-serve cone.", tags:["Sweet"]},
+      {id:"s2", cat:"Desserts", name:"Cookie", price:1.29, desc:"Baked cookie (demo).", tags:["Sweet"]},
+    ];
 
-    function showStatus(text, type){
-      saveStatus.textContent = text;
-      saveStatus.classList.remove("good","bad","warn");
-      if(type) saveStatus.classList.add(type);
-    }
+    const TAX_RATE = 0.08;
+    const STORAGE_KEY = "orders_demo_v1";
 
-    function getFormDataObject(){
-      const fd = new FormData(form);
-      const obj = {};
-      for (const [k, v] of fd.entries()){
-        if (k === "resume") continue;       // don't store file
-        if (k === "confirm") {              // checkbox
-          obj[k] = document.getElementById("confirm").checked ? "yes" : "";
-          continue;
-        }
-        obj[k] = v;
-      }
-      return obj;
-    }
+    // ---------- STATE ----------
+    let cat = "All";
+    let menuSearch = "";
+    let cart = {}; // {id: qty}
+    let orders = loadOrders(); // array
 
-    function saveDraft(){
-      const obj = getFormDataObject();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-      showStatus("Saved (testing)", "good");
-    }
+    // ---------- ELEMENTS ----------
+    const elCats = document.getElementById("cats");
+    const elGrid = document.getElementById("grid");
+    const elMenuCount = document.getElementById("menuCount");
+    const elMenuSearch = document.getElementById("menuSearch");
 
-    function loadDraft(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw){ showStatus("Testing mode", "warn"); return; }
+    const elCartList = document.getElementById("cartlist");
+    const elCartCount = document.getElementById("cartCount");
+    const elSub = document.getElementById("sub");
+    const elTax = document.getElementById("tax");
+    const elTotal = document.getElementById("total");
+    const elPlace = document.getElementById("placeOrder");
+    const elClearCart = document.getElementById("clearCart");
+    const elOrderType = document.getElementById("orderType");
+    const elCustomer = document.getElementById("customerName");
+
+    const elOrders = document.getElementById("orders");
+    const elQueueCount = document.getElementById("queueCount");
+    const elFilterStatus = document.getElementById("filterStatus");
+    const elClearDone = document.getElementById("clearDone");
+    const elWipeAll = document.getElementById("wipeAll");
+
+    const elViewPOS = document.getElementById("viewPOS");
+    const elViewKitchen = document.getElementById("viewKitchen");
+    const posPanel = document.getElementById("posPanel");
+    const posRight = document.getElementById("posRight");
+    const kitchenPanel = document.getElementById("kitchenPanel");
+    const elKOrders = document.getElementById("kOrders");
+    const elKFilter = document.getElementById("kFilter");
+
+    // ---------- HELPERS ----------
+    const money = n => "$" + n.toFixed(2);
+    const nowTime = () => new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    const uid = () => Math.random().toString(36).slice(2, 8).toUpperCase();
+
+    function loadOrders(){
       try{
-        const obj = JSON.parse(raw);
-        Object.keys(obj).forEach(key => {
-          const el = form.elements[key];
-          if(!el) return;
-          if(key === "confirm"){
-            document.getElementById("confirm").checked = (obj[key] === "yes");
-          } else {
-            el.value = obj[key];
-          }
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      }catch{ return []; }
+    }
+    function saveOrders(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    }
+
+    function calcCart(){
+      let subtotal = 0;
+      const lines = [];
+      for(const [id, qty] of Object.entries(cart)){
+        const item = MENU.find(x => x.id === id);
+        if(!item || qty <= 0) continue;
+        const line = item.price * qty;
+        subtotal += line;
+        lines.push({item, qty, line});
+      }
+      const tax = subtotal * TAX_RATE;
+      const total = subtotal + tax;
+      return {lines, subtotal, tax, total};
+    }
+
+    // ---------- RENDER ----------
+    function renderCats(){
+      const cats = ["All", ...Array.from(new Set(MENU.map(m=>m.cat)))];
+      elCats.innerHTML = cats.map(c => `
+        <div class="chip ${c===cat ? "active":""}" data-cat="${c}">${c}</div>
+      `).join("");
+      elCats.querySelectorAll(".chip").forEach(ch => {
+        ch.addEventListener("click", () => {
+          cat = ch.dataset.cat;
+          renderMenu();
         });
-        showStatus("Loaded saved draft (testing)", "good");
-      }catch(e){
-        showStatus("Could not load draft", "bad");
-      }
+      });
     }
 
-    function clearDraft(){
+    function getFilteredMenu(){
+      return MENU.filter(m => {
+        const inCat = (cat === "All") || (m.cat === cat);
+        const q = menuSearch.trim().toLowerCase();
+        const inSearch = !q || (m.name.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q));
+        return inCat && inSearch;
+      });
+    }
+
+    function renderMenu(){
+      const items = getFilteredMenu();
+      elMenuCount.textContent = `${items.length} items`;
+      elGrid.innerHTML = items.map(m => `
+        <div class="item" data-id="${m.id}">
+          <div class="t">
+            <div class="name">${m.name}</div>
+            <div class="price">${money(m.price)}</div>
+          </div>
+          <div class="desc">${m.desc}</div>
+          <div class="tagrow">
+            <span class="tag">${m.cat}</span>
+            ${(m.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}
+          </div>
+        </div>
+      `).join("");
+
+      elGrid.querySelectorAll(".item").forEach(card => {
+        card.addEventListener("click", () => addToCart(card.dataset.id, 1));
+      });
+    }
+
+    function renderCart(){
+      const {lines, subtotal, tax, total} = calcCart();
+      elCartCount.textContent = `${lines.reduce((a,l)=>a+l.qty,0)} items`;
+
+      elCartList.innerHTML = lines.length ? lines.map(l => `
+        <div class="line" data-id="${l.item.id}">
+          <div class="meta">
+            <div class="n">${l.item.name}</div>
+            <div class="s">${money(l.item.price)} • Line: ${money(l.line)}</div>
+          </div>
+          <div class="qty">
+            <button type="button" data-act="dec">−</button>
+            <input type="number" min="1" value="${l.qty}" data-act="qty" />
+            <button type="button" data-act="inc">+</button>
+            <button type="button" data-act="del" title="Remove" style="border-color:rgba(251,113,133,.35)">✕</button>
+          </div>
+        </div>
+      `).join("") : `<div class="mini">Cart is empty. Click menu items to add.</div>`;
+
+      elSub.textContent = money(subtotal);
+      elTax.textContent = money(tax);
+      elTotal.textContent = money(total);
+
+      elPlace.disabled = lines.length === 0;
+
+      // Wire actions
+      elCartList.querySelectorAll(".line").forEach(row => {
+        const id = row.dataset.id;
+        row.querySelectorAll("button").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const act = btn.dataset.act;
+            if(act === "inc") addToCart(id, 1);
+            if(act === "dec") addToCart(id, -1);
+            if(act === "del") { delete cart[id]; renderCart(); }
+          });
+        });
+        const qtyInput = row.querySelector('input[data-act="qty"]');
+        if(qtyInput){
+          qtyInput.addEventListener("change", () => {
+            const v = Math.max(1, parseInt(qtyInput.value||"1",10));
+            cart[id] = v;
+            renderCart();
+          });
+        }
+      });
+    }
+
+    function statusBadge(s){
+      if(s==="new") return `<span class="badge b-new">NEW</span>`;
+      if(s==="progress") return `<span class="badge b-prog">IN PROGRESS</span>`;
+      if(s==="ready") return `<span class="badge b-ready">READY</span>`;
+      return `<span class="badge b-done">COMPLETED</span>`;
+    }
+
+    function renderQueue(){
+      const filter = elFilterStatus.value;
+      const list = orders
+        .slice()
+        .sort((a,b)=> b.createdAt - a.createdAt)
+        .filter(o => filter==="all" ? true : o.status===filter);
+
+      elQueueCount.textContent = String(orders.length);
+
+      elOrders.innerHTML = list.length ? list.map(o => `
+        <div class="order" data-oid="${o.oid}">
+          <div class="order-top">
+            <div>
+              <div class="oid">#${o.oid} • ${o.type}${o.customer ? " • " + o.customer : ""}</div>
+              <div class="mini">Placed: ${o.time}</div>
+            </div>
+            ${statusBadge(o.status)}
+          </div>
+
+          <ul class="olist">
+            ${o.items.map(i=>`<li>${i.qty}× ${i.name}</li>`).join("")}
+          </ul>
+
+          <div class="mini">Total: <strong style="color:#cfe1ff">${money(o.total)}</strong></div>
+
+          <div class="order-actions">
+            <button class="btn secondary" type="button" data-act="prev">Back</button>
+            <button class="btn" type="button" data-act="next">Next</button>
+            <button class="btn bad" type="button" data-act="del">Delete</button>
+          </div>
+        </div>
+      `).join("") : `<div class="mini">No orders yet. Place an order to see it here.</div>`;
+
+      elOrders.querySelectorAll(".order").forEach(card => {
+        const oid = card.dataset.oid;
+        card.querySelectorAll("button").forEach(b => {
+          b.addEventListener("click", () => {
+            const act = b.dataset.act;
+            if(act === "next") advanceStatus(oid, +1);
+            if(act === "prev") advanceStatus(oid, -1);
+            if(act === "del") deleteOrder(oid);
+          });
+        });
+      });
+
+      renderKitchen();
+    }
+
+    function renderKitchen(){
+      const mode = elKFilter.value;
+      let list = orders.slice().sort((a,b)=> a.createdAt - b.createdAt);
+
+      if(mode === "kitchen") list = list.filter(o => o.status === "new" || o.status === "progress");
+      if(mode === "ready") list = list.filter(o => o.status === "ready");
+      // all = no filter
+
+      elKOrders.innerHTML = list.length ? list.map(o => `
+        <div class="order" data-oid="${o.oid}">
+          <div class="order-top">
+            <div>
+              <div class="oid">#${o.oid} • ${o.type}${o.customer ? " • " + o.customer : ""}</div>
+              <div class="mini">Placed: ${o.time}</div>
+            </div>
+            ${statusBadge(o.status)}
+          </div>
+
+          <ul class="olist">
+            ${o.items.map(i=>`<li><strong>${i.qty}×</strong> ${i.name}</li>`).join("")}
+          </ul>
+
+          <div class="order-actions">
+            <button class="btn secondary" type="button" data-act="prev">Back</button>
+            <button class="btn good" type="button" data-act="next">Next</button>
+          </div>
+        </div>
+      `).join("") : `<div class="mini">Nothing for the kitchen right now.</div>`;
+
+      elKOrders.querySelectorAll(".order").forEach(card => {
+        const oid = card.dataset.oid;
+        card.querySelectorAll("button").forEach(b => {
+          b.addEventListener("click", () => {
+            const act = b.dataset.act;
+            if(act === "next") advanceStatus(oid, +1);
+            if(act === "prev") advanceStatus(oid, -1);
+          });
+        });
+      });
+    }
+
+    // ---------- ACTIONS ----------
+    function addToCart(id, delta){
+      cart[id] = (cart[id] || 0) + delta;
+      if(cart[id] <= 0) delete cart[id];
+      renderCart();
+    }
+
+    function clearCart(){
+      cart = {};
+      elCustomer.value = "";
+      renderCart();
+    }
+
+    function placeOrder(){
+      const {lines, subtotal, tax, total} = calcCart();
+      if(!lines.length) return;
+
+      const oid = uid();
+      const order = {
+        oid,
+        type: elOrderType.value,
+        customer: elCustomer.value.trim(),
+        status: "new",
+        time: nowTime(),
+        createdAt: Date.now(),
+        subtotal,
+        tax,
+        total,
+        items: lines.map(l => ({id:l.item.id, name:l.item.name, qty:l.qty, price:l.item.price}))
+      };
+
+      orders.push(order);
+      saveOrders();
+      clearCart();
+      renderQueue();
+    }
+
+    function advanceStatus(oid, dir){
+      const o = orders.find(x => x.oid === oid);
+      if(!o) return;
+      const flow = ["new","progress","ready","done"];
+      let idx = flow.indexOf(o.status);
+      idx = Math.max(0, Math.min(flow.length-1, idx + dir));
+      o.status = flow[idx];
+      saveOrders();
+      renderQueue();
+    }
+
+    function deleteOrder(oid){
+      orders = orders.filter(o => o.oid !== oid);
+      saveOrders();
+      renderQueue();
+    }
+
+    function clearCompleted(){
+      orders = orders.filter(o => o.status !== "done");
+      saveOrders();
+      renderQueue();
+    }
+
+    function wipeAll(){
+      if(!confirm("Reset demo? This clears ALL saved orders in this browser.")) return;
       localStorage.removeItem(STORAGE_KEY);
-      form.reset();
-      document.querySelectorAll(".error").forEach(e => e.classList.remove("show"));
-      showStatus("Cleared (testing)", "warn");
+      orders = [];
+      clearCart();
+      renderQueue();
     }
 
-    function setError(name, on){
-      const el = document.querySelector(`[data-err="${name}"]`);
-      if(el) el.classList.toggle("show", !!on);
-    }
-
-    function validate(){
-      let ok = true;
-
-      const firstName = form.firstName.value.trim();
-      const lastName = form.lastName.value.trim();
-      const email = form.email.value.trim();
-      const phone = form.phone.value.trim();
-      const position = form.position.value.trim();
-      const yearsExp = form.yearsExp.value.trim();
-      const experience = form.experience.value.trim();
-      const whyRole = form.whyRole.value.trim();
-      const strengths = form.strengths.value.trim();
-      const scenario1 = form.scenario1.value.trim();
-      const scenario2 = form.scenario2.value.trim();
-      const confirm = document.getElementById("confirm").checked;
-
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-      setError("firstName", !firstName);
-      setError("lastName", !lastName);
-      setError("email", !emailOk);
-      setError("phone", !phone);
-      setError("position", !position);
-      setError("yearsExp", !yearsExp);
-      setError("experience", !experience);
-      setError("whyRole", !whyRole);
-      setError("strengths", !strengths);
-      setError("scenario1", !scenario1);
-      setError("scenario2", !scenario2);
-      setError("confirm", !confirm);
-
-      if(!firstName || !lastName || !emailOk || !phone || !position || !yearsExp ||
-         !experience || !whyRole || !strengths || !scenario1 || !scenario2 || !confirm){
-        ok = false;
+    function setView(mode){
+      if(mode === "pos"){
+        elViewPOS.classList.add("active");
+        elViewKitchen.classList.remove("active");
+        posPanel.style.display = "";
+        posRight.style.display = "";
+        kitchenPanel.style.display = "none";
+      } else {
+        elViewKitchen.classList.add("active");
+        elViewPOS.classList.remove("active");
+        posPanel.style.display = "none";
+        posRight.style.display = "none";
+        kitchenPanel.style.display = "";
+        renderKitchen();
       }
-      return ok;
     }
 
-    // Auto-save on input (debounced)
-    let t;
-    form.addEventListener("input", () => {
-      showStatus("Saving...", "warn");
-      clearTimeout(t);
-      t = setTimeout(saveDraft, 250);
+    // ---------- WIRES ----------
+    elMenuSearch.addEventListener("input", () => {
+      menuSearch = elMenuSearch.value;
+      renderMenu();
     });
 
-    clearBtn.addEventListener("click", clearDraft);
+    elPlace.addEventListener("click", placeOrder);
+    elClearCart.addEventListener("click", clearCart);
+    elFilterStatus.addEventListener("change", renderQueue);
+    elClearDone.addEventListener("click", clearCompleted);
+    elWipeAll.addEventListener("click", wipeAll);
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const ok = validate();
-      if(!ok){
-        showStatus("Fix errors before submitting", "bad");
-        return;
-      }
+    elViewPOS.addEventListener("click", () => setView("pos"));
+    elViewKitchen.addEventListener("click", () => setView("kitchen"));
+    elKFilter.addEventListener("change", renderKitchen);
 
-      const data = getFormDataObject();
-
-      showStatus("Submitted (demo/testing)", "good");
-      alert(
-        "Submitted (DEMO / TESTING ONLY)\n\n" +
-        "Nothing was sent anywhere.\n\n" +
-        "Data preview:\n" +
-        JSON.stringify(data, null, 2)
-      );
-    });
-
-    loadDraft();
+    // ---------- INIT ----------
+    renderCats();
+    renderMenu();
+    renderCart();
+    renderQueue();
+    setView("pos");
   </script>
 </body>
 </html>
