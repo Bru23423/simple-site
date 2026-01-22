@@ -3,235 +3,163 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>POS Order Manager (DEMO ONLY)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auto Spell Fix (No API)</title>
   <style>
-    :root{
-      --bg:#070a10;
-      --text:#e5e7eb;
-      --muted:#93a4bf;
-      --border:#24324a;
-      --accent:#60a5fa;
-      --good:#34d399;
-      --warn:#fbbf24;
-      --bad:#fb7185;
-      --shadow: 0 18px 50px rgba(0,0,0,.45);
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    html{overflow-y:scroll}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1000px 700px at 15% 0%, #12224a 0%, var(--bg) 60%);
-      color:var(--text);
-      min-height:100vh;
-    }
-    .topbar{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(180deg, rgba(7,10,16,.88), rgba(7,10,16,.65));
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .topbar-inner{
-      max-width: 1320px;
-      margin:0 auto;
-      padding: 12px 16px;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:950; letter-spacing:.2px;}
-    .dot{
-      width:12px; height:12px; border-radius:50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 6px rgba(96,165,250,.15);
-    }
-    .sub{
-      color:var(--muted); font-weight:800; font-size:12px;
-      border:1px solid rgba(255,255,255,.10);
-      padding:6px 10px; border-radius:999px;
-      background: rgba(255,255,255,.02);
-      white-space:nowrap;
-    }
-    .tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
-    input[type="search"], select, input[type="text"], input[type="number"]{
-      padding: 10px 10px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(15,23,42,.60);
-      color: var(--text);
-      outline:none;
-    }
-    textarea{
-      width:100%;
-      padding: 10px 10px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(15,23,42,.60);
-      color: var(--text);
-      outline:none;
-      resize:vertical;
-      min-height: 90px;
-    }
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(96,165,250,.9);
-      box-shadow: 0 0 0 4px rgba(96,165,250,.15);
-    }
-    .seg{
-      display:flex;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.02);
-      border-radius: 12px;
-      overflow:hidden;
-    }
-    .seg button{
-      border:0; background:transparent; color:var(--muted);
-      padding:10px 12px; cursor:pointer; font-weight:950;
-    }
-    .seg button.active{color:#06101f; background: var(--accent);}
-    .btn{
-      border:0; cursor:pointer; font-weight:950;
-      background: var(--accent);
-      color:#06101f;
-      padding:10px 12px;
-      border-radius: 12px;
-    }
-    .btn.secondary{
-      background: transparent;
-      color: var(--text);
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .btn.bad{background: rgba(251,113,133,.95); color:#22040a;}
-    .btn.good{background: rgba(52,211,153,.95); color:#02140c;}
-    .btn:disabled{opacity:.55; cursor:not-allowed;}
+    body{font-family:system-ui,Segoe UI,Arial;max-width:900px;margin:30px auto;padding:0 16px}
+    textarea{width:100%;height:240px;font-size:16px;line-height:1.4;padding:12px;border:1px solid #ccc;border-radius:10px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+    button{padding:10px 14px;border:0;border-radius:10px;cursor:pointer}
+    .primary{background:#111;color:#fff}
+    .ghost{background:#eee}
+    .note{color:#555;font-size:13px}
+    .pill{display:inline-block;background:#f3f3f3;padding:4px 10px;border-radius:999px;font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>Auto Spell Fix ✅ (No API)</h1>
+  <div class="pill">Uses browser spellcheck + common-typo autocorrect</div>
 
-    .banner{
-      max-width: 1320px;
-      margin: 12px auto 0;
-      padding: 0 16px;
-    }
-    .banner > div{
-      border:1px solid rgba(251,191,36,.35);
-      background: linear-gradient(180deg, rgba(251,191,36,.14), rgba(251,191,36,.06));
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-      color: #ffe8a3;
-      font-weight:950;
-      letter-spacing:.2px;
+  <p class="note">
+    Tip: Right-click red-underlined words for built-in browser suggestions too.
+  </p>
+
+  <textarea id="box" spellcheck="true" placeholder="Type here... it will auto-fix common typos as you type."></textarea>
+
+  <div class="row">
+    <button class="primary" id="fixNow">Fix Now</button>
+    <button class="ghost" id="toggleLive">Live Fix: ON</button>
+    <button class="ghost" id="clear">Clear</button>
+    <button class="ghost" id="copy">Copy</button>
+  </div>
+
+  <p class="note" id="status"></p>
+
+  <script>
+    // Simple offline autocorrect map (add your own!)
+    const fixes = new Map(Object.entries({
+      "teh":"the",
+      "adn":"and",
+      "wierd":"weird",
+      "definately":"definitely",
+      "occured":"occurred",
+      "seperat":"separate",
+      "becuase":"because",
+      "thier":"their",
+      "recieve":"receive",
+      "tommorow":"tomorrow",
+      "yestarday":"yesterday",
+      "paniking":"panicking",
+      "stresed":"stressed",
+      "promiss":"promise",
+      "happend":"happened",
+      "strait":"straight",
+      "jsut":"just",
+      "dont":"don't",
+      "cant":"can't",
+      "wont":"won't",
+      "im":"I'm",
+      "ive":"I've",
+      "id":"I'd",
+      "ill":"I'll",
+      "u":"you",
+      "ur":"your",
+      "r":"are"
+    }));
+
+    const box = document.getElementById("box");
+    const status = document.getElementById("status");
+    const fixNowBtn = document.getElementById("fixNow");
+    const toggleLiveBtn = document.getElementById("toggleLive");
+    const clearBtn = document.getElementById("clear");
+    const copyBtn = document.getElementById("copy");
+
+    let liveFix = true;
+    let lastValue = "";
+
+    function smartCapitalizeI(text) {
+      // Make standalone i -> I
+      return text.replace(/(^|[^\w])i([^\w]|$)/g, (m, a, b) => `${a}I${b}`);
     }
 
-    .wrap{
-      max-width:1320px;
-      margin: 12px auto 30px;
-      padding: 0 16px;
-      display:grid;
-      grid-template-columns: 1.25fr .9fr;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){ .wrap{grid-template-columns: 1fr;} .right{position:static} }
+    function applyFixes(text) {
+      // Fixes whole words only, keeps punctuation
+      let replaced = 0;
 
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .card-h{
-      padding: 14px 14px 10px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      background: rgba(255,255,255,.02);
-      flex-wrap:wrap;
-    }
-    .card-h h2{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.35px;
-      text-transform:uppercase;
-      color:#cfe1ff;
+      const out = text.replace(/\b[\w']+\b/g, (word) => {
+        const lower = word.toLowerCase();
+        if (fixes.has(lower)) {
+          replaced++;
+          const fixed = fixes.get(lower);
+
+          // Preserve capitalization style a bit
+          if (word === word.toUpperCase()) return fixed.toUpperCase();
+          if (word[0] === word[0].toUpperCase()) return fixed[0].toUpperCase() + fixed.slice(1);
+          return fixed;
+        }
+        return word;
+      });
+
+      return { text: smartCapitalizeI(out), replaced };
     }
 
-    /* MENU */
-    .menu{padding: 14px;}
-    .cats{display:flex; gap:8px; flex-wrap:wrap; margin-bottom: 12px;}
-    .chip{
-      border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
-      font-weight:950;
-      background: rgba(255,255,255,.03);
-    }
-    .chip.active{
-      border-color: rgba(96,165,250,.55);
-      color:#cfe1ff;
-      box-shadow: 0 0 0 3px rgba(96,165,250,.12);
-    }
-    .grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;}
-    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
-    @media (max-width: 520px){ .grid{grid-template-columns: 1fr;} }
-    .item{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
-      background: rgba(11,18,35,.55);
-      padding: 12px;
-      cursor:pointer;
-      transition: .12s ease;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      min-height:120px;
-    }
-    .item:hover{
-      transform: translateY(-1px);
-      border-color: rgba(96,165,250,.40);
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
-    }
-    .t{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
-    .name{font-weight:1000}
-    .price{color:#cfe1ff; font-weight:1000}
-    .desc{color:var(--muted); font-size:12px; line-height:1.35}
-    .tagrow{display:flex; gap:6px; flex-wrap:wrap; margin-top:auto}
-    .tag{
-      font-size:11px;
-      padding:5px 8px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      background: rgba(255,255,255,.02);
+    function setTextKeepCursor(newText) {
+      // Keep cursor position nicely when live-fixing
+      const start = box.selectionStart;
+      const end = box.selectionEnd;
+      const old = box.value;
+
+      box.value = newText;
+
+      // Try to keep cursor in same logical spot
+      const delta = newText.length - old.length;
+      const ns = Math.max(0, start + delta);
+      const ne = Math.max(0, end + delta);
+      box.setSelectionRange(ns, ne);
     }
 
-    /* RIGHT */
-    .right{position: sticky; top: 74px; display:grid; gap:14px; align-self:start;}
-    @media (max-width: 980px){ .right{position:static; top:auto;} }
-
-    .mini{font-size:12px; color: var(--muted);}
-
-    /* CART */
-    .cart{padding: 12px 14px 14px;}
-    .cart-top{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;}
-    @media (max-width: 520px){ .cart-top{grid-template-columns: 1fr;} }
-    .cartlist{display:grid; gap:8px; max-height: 240px; overflow:auto; padding-right: 4px;}
-    .line{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(11,18,35,.55);
-      border-radius: 14px;
-      padding: 10px;
-      display:grid; grid-template-columns: 1fr auto;
-      gap:8px; align-items:center;
+    function fixAll() {
+      const { text, replaced } = applyFixes(box.value);
+      if (text !== box.value) setTextKeepCursor(text);
+      status.textContent = replaced
+        ? `Fixed ${replaced} thing(s).`
+        : `Nothing obvious to fix (try right-click spellcheck for suggestions).`;
     }
-    .meta{display:flex; flex-direction:column; gap:2px;}
-    .meta .n{font-weight:1000}
-    .meta .s{font-size:12px; color:var(--
+
+    // Live fixing while typing (lightweight)
+    box.addEventListener("input", () => {
+      if (!liveFix) return;
+
+      // Only run if change is meaningful and not too frequent
+      if (box.value === lastValue) return;
+      lastValue = box.value;
+
+      const { text, replaced } = applyFixes(box.value);
+      if (replaced > 0 && text !== box.value) setTextKeepCursor(text);
+    });
+
+    fixNowBtn.addEventListener("click", fixAll);
+
+    toggleLiveBtn.addEventListener("click", () => {
+      liveFix = !liveFix;
+      toggleLiveBtn.textContent = `Live Fix: ${liveFix ? "ON" : "OFF"}`;
+      status.textContent = liveFix ? "Live fix enabled." : "Live fix disabled.";
+    });
+
+    clearBtn.addEventListener("click", () => {
+      box.value = "";
+      status.textContent = "Cleared.";
+      box.focus();
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(box.value);
+        status.textContent = "Copied!";
+      } catch {
+        status.textContent = "Copy failed (browser blocked clipboard).";
+      }
+    });
+  </script>
+</body>
+</html>
