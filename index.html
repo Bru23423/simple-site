@@ -8,56 +8,70 @@
 body{
     margin:0;
     height:100vh;
+    background:#0f0f12;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:#0f0f12;
     font-family:Arial, Helvetica, sans-serif;
     color:white;
+    user-select:none;
+    overflow:hidden;
 }
 
 .container{
     text-align:center;
     background:#18181d;
-    padding:40px;
-    border-radius:18px;
-    box-shadow:0 0 30px rgba(0,0,0,0.5);
-    width:320px;
-}
-
-h1{
-    font-size:40px;
-    margin-bottom:10px;
+    padding:50px 70px;
+    border-radius:20px;
+    box-shadow:0 0 30px rgba(0,0,0,0.6);
+    position:relative;
+    z-index:2;
 }
 
 #counter{
-    font-size:50px;
-    margin:20px 0;
+    font-size:60px;
+    margin-bottom:20px;
 }
 
 button{
-    width:100%;
-    padding:12px;
-    margin-top:10px;
+    padding:12px 20px;
     border:none;
     border-radius:10px;
+    background:#3b3b45;
+    color:white;
     font-size:16px;
     cursor:pointer;
-    background:#2c2c34;
-    color:white;
-    transition:0.2s;
 }
 
 button:hover{
-    background:#3b3b45;
+    background:#505060;
 }
 
-.clickBtn{
-    background:#4f46e5;
+/* click animation */
+
+.click-effect{
+    position:absolute;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:white;
+    pointer-events:none;
+    animation:pop 0.6s ease-out forwards;
 }
 
-.clickBtn:hover{
-    background:#6366f1;
+@keyframes pop{
+    0%{
+        transform:scale(0);
+        opacity:1;
+    }
+    70%{
+        transform:scale(6);
+        opacity:0.5;
+    }
+    100%{
+        transform:scale(8);
+        opacity:0;
+    }
 }
 </style>
 </head>
@@ -65,60 +79,51 @@ button:hover{
 <body>
 
 <div class="container">
-
-<h1>Click Counter</h1>
-
 <div id="counter">0</div>
-
-<button class="clickBtn" onclick="clickButton()">CLICK</button>
-
-<button onclick="buyAuto()">Auto Click (+1/sec) Cost: 50</button>
-
-<button onclick="changeClicks()">Change Click Power</button>
-
+<button onclick="setNumber(event)">Change Number</button>
 </div>
 
 <script>
 
 let clicks = 0
-let clickPower = 1
-let autoClickers = 0
 
 function update(){
     document.getElementById("counter").innerText = clicks
 }
 
-function clickButton(){
-    clicks += clickPower
+document.body.addEventListener("click", function(e){
+
+    if(e.target.tagName === "BUTTON") return
+
+    clicks++
     update()
-}
 
-function buyAuto(){
+    // animation
+    let effect = document.createElement("div")
+    effect.className = "click-effect"
+    effect.style.left = (e.clientX - 10) + "px"
+    effect.style.top = (e.clientY - 10) + "px"
 
-    if(clicks >= 50){
-        clicks -= 50
-        autoClickers++
+    document.body.appendChild(effect)
+
+    setTimeout(()=>{
+        effect.remove()
+    },600)
+
+})
+
+function setNumber(event){
+
+    event.stopPropagation()
+
+    let num = prompt("Enter new number:")
+
+    if(num !== null && !isNaN(num)){
+        clicks = parseInt(num)
+        update()
     }
 
-    update()
 }
-
-function changeClicks(){
-
-    let newPower = prompt("Enter clicks per click:")
-
-    if(newPower && newPower > 0){
-        clickPower = parseInt(newPower)
-    }
-
-}
-
-setInterval(function(){
-
-    clicks += autoClickers
-    update()
-
-},1000)
 
 </script>
 
