@@ -88,7 +88,8 @@ button:hover{
 let clicks = 0
 
 function update(){
-    document.getElementById("counter").innerText = clicks
+    // Display with commas
+    document.getElementById("counter").innerText = clicks.toLocaleString()
 }
 
 document.body.addEventListener("click", function(e){
