@@ -2,291 +2,123 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eaz Calculator</title>
+<title>Click Counter</title>
 
 <style>
-
 body{
-font-family: Arial, Helvetica, sans-serif;
-background:#0f172a;
-color:white;
-margin:0;
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-
-header{
-width:100%;
-background:#020617;
-padding:15px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-letter-spacing:1px;
-box-shadow:0 2px 10px rgba(0,0,0,.5);
-}
-
-nav{
-margin-top:10px;
-}
-
-nav button{
-margin:5px;
-padding:8px 14px;
-border:none;
-background:#1e293b;
-color:white;
-border-radius:6px;
-cursor:pointer;
-}
-
-nav button:hover{
-background:#334155;
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0f0f12;
+    font-family:Arial, Helvetica, sans-serif;
+    color:white;
 }
 
 .container{
-margin-top:30px;
-display:flex;
-flex-direction:column;
-align-items:center;
+    text-align:center;
+    background:#18181d;
+    padding:40px;
+    border-radius:18px;
+    box-shadow:0 0 30px rgba(0,0,0,0.5);
+    width:320px;
 }
 
-.calculator{
-background:#020617;
-padding:20px;
-border-radius:12px;
-box-shadow:0 0 25px rgba(0,0,0,.6);
+h1{
+    font-size:40px;
+    margin-bottom:10px;
 }
 
-#display{
-width:260px;
-height:50px;
-margin-bottom:15px;
-font-size:22px;
-text-align:right;
-padding:10px;
-border:none;
-border-radius:6px;
-background:#0f172a;
-color:white;
+#counter{
+    font-size:50px;
+    margin:20px 0;
 }
 
-.buttons{
-display:grid;
-grid-template-columns:repeat(4,65px);
-gap:10px;
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+    background:#2c2c34;
+    color:white;
+    transition:0.2s;
 }
 
-button.calc{
-height:55px;
-font-size:18px;
-border:none;
-border-radius:8px;
-background:#1e293b;
-color:white;
-cursor:pointer;
-transition:.2s;
+button:hover{
+    background:#3b3b45;
 }
 
-button.calc:hover{
-background:#3b82f6;
-transform:scale(1.05);
+.clickBtn{
+    background:#4f46e5;
 }
 
-button.equal{
-background:#22c55e;
+.clickBtn:hover{
+    background:#6366f1;
 }
-
-button.equal:hover{
-background:#16a34a;
-}
-
-.page{
-display:none;
-max-width:900px;
-padding:30px;
-}
-
-.active{
-display:block;
-}
-
-footer{
-margin-top:40px;
-font-size:14px;
-color:#94a3b8;
-}
-
 </style>
 </head>
 
 <body>
 
-<header>
-Eaz Calculator
-<nav>
-<button onclick="showPage('calc')">Calculator</button>
-<button onclick="showPage('help')">Help</button>
-<button onclick="showPage('tos')">Terms</button>
-</nav>
-</header>
-
 <div class="container">
 
-<div id="calc" class="page active">
+<h1>Click Counter</h1>
 
-<div class="calculator">
+<div id="counter">0</div>
 
-<input id="display" disabled>
+<button class="clickBtn" onclick="clickButton()">CLICK</button>
 
-<div class="buttons">
-<button class="calc" onclick="press('7')">7</button>
-<button class="calc" onclick="press('8')">8</button>
-<button class="calc" onclick="press('9')">9</button>
-<button class="calc" onclick="press('/')">÷</button>
+<button onclick="buyAuto()">Auto Click (+1/sec) Cost: 50</button>
 
-<button class="calc" onclick="press('4')">4</button>
-<button class="calc" onclick="press('5')">5</button>
-<button class="calc" onclick="press('6')">6</button>
-<button class="calc" onclick="press('*')">×</button>
-
-<button class="calc" onclick="press('1')">1</button>
-<button class="calc" onclick="press('2')">2</button>
-<button class="calc" onclick="press('3')">3</button>
-<button class="calc" onclick="press('-')">−</button>
-
-<button class="calc" onclick="press('0')">0</button>
-<button class="calc" onclick="press('.')">.</button>
-<button class="calc equal" onclick="calculate()">=</button>
-<button class="calc" onclick="press('+')">+</button>
-
-<button class="calc" onclick="sqrt()">√</button>
-<button class="calc" onclick="square()">x²</button>
-<button class="calc" onclick="clearDisplay()">C</button>
-<button class="calc" onclick="del()">⌫</button>
-</div>
+<button onclick="changeClicks()">Change Click Power</button>
 
 </div>
-
-</div>
-
-<div id="help" class="page">
-<h2>Help & Support</h2>
-
-<p>
-Welcome to the Eaz Calculator. This calculator supports:
-</p>
-
-<ul>
-<li>Basic arithmetic</li>
-<li>Square root</li>
-<li>Power functions</li>
-<li>Keyboard input</li>
-<li>Mobile support</li>
-</ul>
-
-<p>
-If you need assistance or want to report issues please contact:
-</p>
-
-<p><b>Email:</b> justfun.it.com@gmail.com</p>
-
-<p>
-Our team aims to respond quickly and maintain a professional and secure service.
-</p>
-
-</div>
-
-<div id="tos" class="page">
-
-<h2>Terms of Service</h2>
-
-<p><b>Comprehensive User Agreement Covering Safety, Privacy, and User Protections</b></p>
-
-<h3>1. Introduction</h3>
-<p>This Terms of Service Agreement governs your use of our services. By accessing the service you agree to these terms.</p>
-
-<h3>2. Acceptance of Terms</h3>
-<p>Your use of the Services constitutes acceptance of this Agreement. We may revise these terms periodically.</p>
-
-<h3>3. User Responsibilities</h3>
-<p>Users must use the service lawfully and respectfully and may not attempt unauthorized access, distribute malware, or interfere with service operation.</p>
-
-<h3>4. Safety Measures</h3>
-<p>We work to maintain a safe environment and encourage users to report suspicious behavior.</p>
-
-<h3>5. Privacy Policy</h3>
-<p>We respect your privacy and only collect necessary information to operate the service.</p>
-
-<h3>6. Data Protection</h3>
-<p>Industry standard security measures are implemented to protect user information.</p>
-
-<h3>7. Intellectual Property</h3>
-<p>All site content and design elements are protected intellectual property.</p>
-
-<h3>8. Limitation of Liability</h3>
-<p>The service is provided "as is" without warranties.</p>
-
-<h3>9. Modification of Terms</h3>
-<p>We may update these terms periodically.</p>
-
-<h3>10. Termination</h3>
-<p>We may suspend access for violations of these terms.</p>
-
-<h3>11. Dispute Resolution</h3>
-<p>Disputes may be resolved through binding arbitration where permitted by law.</p>
-
-<h3>12. Contact</h3>
-<p>Email: justfun.it.com@gmail.com</p>
-
-</div>
-
-</div>
-
-<footer>
-© 2026 JustFun Calculator • Professional Tools
-</footer>
 
 <script>
 
-function press(val){
-document.getElementById("display").value += val;
+let clicks = 0
+let clickPower = 1
+let autoClickers = 0
+
+function update(){
+    document.getElementById("counter").innerText = clicks
 }
 
-function calculate(){
-try{
-document.getElementById("display").value =
-eval(document.getElementById("display").value);
-}catch{
-alert("Invalid Expression");
-}
+function clickButton(){
+    clicks += clickPower
+    update()
 }
 
-function clearDisplay(){
-document.getElementById("display").value="";
+function buyAuto(){
+
+    if(clicks >= 50){
+        clicks -= 50
+        autoClickers++
+    }
+
+    update()
 }
 
-function del(){
-let d=document.getElementById("display");
-d.value=d.value.slice(0,-1);
+function changeClicks(){
+
+    let newPower = prompt("Enter clicks per click:")
+
+    if(newPower && newPower > 0){
+        clickPower = parseInt(newPower)
+    }
+
 }
 
-function sqrt(){
-let d=document.getElementById("display");
-d.value=Math.sqrt(d.value);
-}
+setInterval(function(){
 
-function square(){
-let d=document.getElementById("display");
-d.value=d.value*d.value;
-}
+    clicks += autoClickers
+    update()
 
-function showPage(id){
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
+},1000)
 
 </script>
 
